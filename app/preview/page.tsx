@@ -3,6 +3,8 @@ import { buildOnPageResult } from "@/lib/recommendation";
 import { signReportToken } from "@/lib/token";
 import type { ComplianceAnswers } from "@/lib/engine/types";
 
+export const dynamic = "force-dynamic";
+
 const SCENARIOS: {
   label: string;
   description: string;
