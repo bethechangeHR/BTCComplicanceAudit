@@ -8,7 +8,10 @@
   --btc-gray: #676766;
   --btc-white: #ffffff;
   --btc-gold: #c2a268;
-  --paper: #faf7f1;
+  --btc-surface: #f5f8f7;
+  --btc-ink: #14211e;
+  --btc-instrument: #0b211d;
+  --btc-instrument-line: rgba(255, 255, 255, 0.12);
 }
 
 * {
@@ -29,16 +32,16 @@ body::before {
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E");
 }
 
 ::selection {
-  background: rgba(23, 170, 150, 0.22);
-  color: #0f6f62;
+  background: rgba(20, 33, 30, 0.18);
+  color: var(--btc-ink);
 }
 
 .font-display {
-  font-family: var(--font-fraunces), ui-serif, Georgia, serif;
+  font-family: var(--font-spectral), ui-serif, Georgia, serif;
   font-feature-settings: "ss01" 1;
 }
 
@@ -60,21 +63,27 @@ body::before {
   animation: rise-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-@keyframes seal-in {
+@keyframes reveal-in {
   from {
     opacity: 0;
-    transform: scale(0.85) rotate(-6deg);
-  }
-  60% {
-    opacity: 1;
-    transform: scale(1.04) rotate(1deg);
+    transform: scale(0.97);
+    filter: blur(6px);
   }
   to {
     opacity: 1;
-    transform: scale(1) rotate(0deg);
+    transform: scale(1);
+    filter: blur(0);
   }
 }
 
-.animate-seal-in {
-  animation: seal-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+.animate-reveal-in {
+  animation: reveal-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-reveal-in,
+  .animate-rise-in {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }

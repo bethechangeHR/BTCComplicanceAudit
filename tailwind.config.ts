@@ -15,8 +15,9 @@ const config: Config = {
           white: "#ffffff",
           gold: "#c2a268",
         },
-        paper: "#faf7f1",
-        ink: "#22201c",
+        surface: "#f5f8f7",
+        ink: "#14211e",
+        instrument: "#0b211d",
       },
       fontFamily: {
         sans: [
@@ -26,7 +27,7 @@ const config: Config = {
           "-apple-system",
           "sans-serif",
         ],
-        display: ["var(--font-fraunces)", "ui-serif", "Georgia", "serif"],
+        display: ["var(--font-spectral)", "ui-serif", "Georgia", "serif"],
       },
       boxShadow: {
         document:

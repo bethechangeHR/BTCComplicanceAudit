@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { Fraunces, Inter } from "next/font/google";
+import { Spectral, Inter } from "next/font/google";
 import "./globals.css";
 
-const fraunces = Fraunces({
+const spectral = Spectral({
   subsets: ["latin"],
-  variable: "--font-fraunces",
+  variable: "--font-spectral",
   weight: ["400", "500", "600"],
   style: ["normal", "italic"],
   display: "swap",
@@ -28,8 +28,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${fraunces.variable} ${inter.variable}`}>
-      <body className="min-h-screen bg-paper font-sans text-btc-gray antialiased">
+    <html lang="en" className={`${spectral.variable} ${inter.variable}`}>
+      <body className="min-h-screen bg-surface font-sans text-btc-gray antialiased">
         {children}
       </body>
     </html>
