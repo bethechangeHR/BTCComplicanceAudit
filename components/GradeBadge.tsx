@@ -1,32 +1,70 @@
 import type { RiskGrade } from "@/lib/engine/types";
 
-const GRADE_RING: Record<RiskGrade, string> = {
-  A: "from-btc-teal to-btc-teal-dark",
-  B: "from-btc-teal to-btc-teal-dark",
-  C: "from-btc-gold to-[#8f7442]",
-  D: "from-[#c17a3d] to-[#8a4f22]",
-  F: "from-[#b3452f] to-[#7a2318]",
+const GRADE_ACCENT: Record<RiskGrade, string> = {
+  A: "text-white",
+  B: "text-white",
+  C: "text-btc-gold",
+  D: "text-btc-gold",
+  F: "text-btc-gold",
 };
 
+function flaggedCountLine(flaggedCount: number): string {
+  if (flaggedCount === 0) {
+    return "No flagged areas from your answers";
+  }
+  return flaggedCount === 1
+    ? "1 risk area flagged"
+    : `${flaggedCount} risk areas flagged`;
+}
+
+/**
+ * The assessment scorecard: the single most important visual moment in the
+ * funnel per client feedback (2026-07-09), replacing the prior circular
+ * "seal" badge. Lives on the deep-teal instrument surface built for exactly
+ * this moment. See plan Part B3.
+ */
 export function GradeBadge({
   grade,
+  riskTierLabel,
+  flaggedCount,
   animated = true,
 }: {
   grade: RiskGrade;
+  riskTierLabel?: string;
+  flaggedCount?: number;
   animated?: boolean;
 }) {
   return (
     <div
-      className={`relative mx-auto flex h-40 w-40 items-center justify-center rounded-full bg-gradient-to-br shadow-seal sm:h-48 sm:w-48 ${GRADE_RING[grade]} ${animated ? "animate-seal-in" : ""}`}
+      className={`rounded-3xl border bg-instrument px-8 py-10 sm:px-12 sm:py-14 ${animated ? "animate-reveal-in" : ""}`}
+      style={{ borderColor: "var(--btc-instrument-line)" }}
     >
-      <div className="flex h-[85%] w-[85%] items-center justify-center rounded-full border-2 border-white/40 bg-white/10">
-        <span className="font-display text-7xl font-medium text-white sm:text-8xl">
+      <div className="flex flex-col items-center gap-5 text-center">
+        <span
+          className={`font-display text-8xl font-medium leading-none sm:text-9xl ${GRADE_ACCENT[grade]}`}
+        >
           {grade}
         </span>
+
+        {riskTierLabel && (
+          <span className="text-lg font-semibold text-white sm:text-xl">
+            {riskTierLabel}
+          </span>
+        )}
+
+        {typeof flaggedCount === "number" && (
+          <span
+            className="text-sm font-medium text-white/70"
+            style={{
+              borderTop: "1px solid var(--btc-instrument-line)",
+              paddingTop: "1rem",
+              marginTop: "0.25rem",
+            }}
+          >
+            {flaggedCountLine(flaggedCount)}
+          </span>
+        )}
       </div>
-      <span className="absolute -bottom-2 rounded-full bg-btc-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-btc-gray shadow-document">
-        Risk Grade
-      </span>
     </div>
   );
 }

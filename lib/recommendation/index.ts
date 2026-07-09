@@ -14,6 +14,7 @@ import {
   GRADE_VERDICT_COPY,
   QUALIFICATION_TAGS,
   RESULT_DISCLAIMER,
+  RISK_TIER_LABELS,
 } from "./copy";
 import type {
   EmailPayload,
@@ -55,6 +56,7 @@ export function buildOnPageResult(result: EngineResult): OnPageResult {
     score: result.score,
     maxPossibleScore: result.maxPossibleScore,
     verdictLine: GRADE_VERDICT_COPY[result.grade],
+    riskTierLabel: RISK_TIER_LABELS[result.grade],
     categoryRisks: result.categoryRisks,
     disclaimer: RESULT_DISCLAIMER,
     bookingUrl: bookingUrlWithAttribution("landing-page-cta", "web"),
@@ -128,4 +130,5 @@ export {
   GRADE_VERDICT_COPY,
   RESULT_DISCLAIMER,
   QUALIFICATION_TAGS,
+  RISK_TIER_LABELS,
 } from "./copy";

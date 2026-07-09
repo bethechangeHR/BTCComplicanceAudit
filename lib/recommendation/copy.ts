@@ -19,6 +19,19 @@ export const GRADE_VERDICT_COPY: Record<RiskGrade, string> = {
   F: "Your business is significantly exposed across multiple compliance areas. This needs attention now.",
 };
 
+/**
+ * Named risk tier shown on the scorecard next to the letter grade, per the
+ * plan's Part B3. Short, real exposure-level language, not a euphemism, and
+ * not a caps-tracked eyebrow label in the component that renders it.
+ */
+export const RISK_TIER_LABELS: Record<RiskGrade, string> = {
+  A: "Low exposure",
+  B: "Some exposure",
+  C: "Moderate exposure",
+  D: "High exposure",
+  F: "Severe exposure",
+};
+
 export const RESULT_DISCLAIMER =
   "This is an educational estimate and a directional risk indicator, not legal advice. It does not tell you which laws apply to your specific business as settled fact. For a full review of your actual exposure, book a free 30-minute HR risk assessment with a Be the Change HR Pro.";
 

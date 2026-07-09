@@ -10,13 +10,9 @@ export function BookingEmbed({ bookingUrl }: { bookingUrl: string }) {
       className="animate-rise-in overflow-hidden rounded-2xl border border-ink/10 bg-white shadow-document"
       style={{ animationDelay: "180ms" }}
     >
-      <div className="border-b border-ink/8 bg-btc-teal/6 px-6 py-4">
+      <div className="border-b border-ink/8 px-6 py-4">
         <p className="font-display text-lg text-ink">
-          Book your free 30-minute HR risk assessment
-        </p>
-        <p className="mt-0.5 text-sm text-btc-gray">
-          Talk through your results with a Be the Change HR Pro. No cost, no
-          obligation.
+          Free 30-minute HR risk assessment
         </p>
       </div>
       <div className="relative min-h-[600px] w-full">
@@ -32,12 +28,12 @@ export function BookingEmbed({ bookingUrl }: { bookingUrl: string }) {
           className="h-[600px] w-full"
         />
       </div>
-      <div className="border-t border-ink/8 px-6 py-3 text-center">
+      <div className="border-t border-ink/8 px-6 py-2 text-center">
         <a
           href={bookingUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-sm font-medium text-btc-teal-dark underline underline-offset-2"
+          className="text-xs text-btc-gray/70 underline underline-offset-2"
         >
           Having trouble with the calendar? Open booking in a new tab.
         </a>
