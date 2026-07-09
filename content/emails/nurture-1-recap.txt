@@ -1,0 +1,26 @@
+NURTURE EMAIL 1 OF 4: RECAP AND BOOK
+Send window: day 1 to 2 after the transactional report email, only if the
+booking event has not fired for this contact.
+
+---
+
+Subject: Still thinking about your {{grade}} risk grade?
+
+Body:
+
+Hi {{firstName}},
+
+Your California HR Risk Audit came back a {{grade}} a couple of days ago.
+The area flagged as your biggest exposure was {{topCategory}}.
+
+Your full report is still available if you have not had a chance to read it:
+
+{{reportUrl}}
+
+A 30-minute call with a Be the Change HR Pro is the fastest way to find out
+exactly what closing that gap actually takes for a business your size. No
+cost, no obligation.
+
+{{bookingUrl}}
+
+Be the Change HR

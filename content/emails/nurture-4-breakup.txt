@@ -1,0 +1,29 @@
+NURTURE EMAIL 4 OF 4: TWO-OPTION BREAKUP
+Send window: day 9 to 10 after the transactional report email, only if the
+booking event has not fired for this contact. Final email in the sequence,
+stop automation after this one regardless of response.
+
+---
+
+Subject: Should we close the file on your HR risk audit?
+
+Body:
+
+Hi {{firstName}},
+
+Your California HR Risk Audit came back a {{grade}} a little over a week ago,
+with {{topCategory}} flagged as the biggest gap. You have not booked a call
+yet, so I wanted to check in one more time before we stop reaching out.
+
+Two options:
+
+1. Book the 30-minute HR risk assessment now, no cost, no obligation:
+{{bookingUrl}}
+
+2. Reply and let us know it is not the right time. We will stop following up
+and your full report stays available here if anything changes:
+{{reportUrl}}
+
+Either way, we appreciate you taking the time to run the audit.
+
+Be the Change HR

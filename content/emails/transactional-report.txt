@@ -1,0 +1,35 @@
+TRANSACTIONAL REPORT EMAIL
+Trigger: fires immediately (within 5 minutes) after the tool's email gate is
+submitted, via the n8n workflow's HubSpot-send step (or the n8n-fallback
+sender if HubSpot's transactional-send capability is not confirmed, see
+ops/n8n-workflow.md). Sent from bethechangehr.com.
+
+Merge fields used: {{firstName}}, {{grade}}, {{gapCount}}, {{topCategory}},
+{{reportUrl}}, {{bookingUrl}}. Source: lib/recommendation buildEmailPayload().
+
+---
+
+Subject: Your California HR Risk Audit result: grade {{grade}}
+
+Preview text: Your full breakdown, including {{gapCount}} flagged areas, is ready.
+
+Body:
+
+Hi {{firstName}},
+
+Your California HR Risk Audit is complete. Your business scored a {{grade}}.
+
+Your full report is ready now. It names every general risk area your answers
+point to, the reasoning behind each one, and the complete scope of work it
+would take to close it:
+
+{{reportUrl}}
+
+The area flagged as your biggest exposure right now: {{topCategory}}.
+
+If you'd rather talk it through directly, book a free 30-minute HR risk
+assessment with a Be the Change HR Pro. No cost, no obligation.
+
+{{bookingUrl}}
+
+Be the Change HR

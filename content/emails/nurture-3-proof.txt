@@ -1,0 +1,36 @@
+NURTURE EMAIL 3 OF 4: PROOF
+Send window: day 6 to 7 after the transactional report email, only if the
+booking event has not fired for this contact.
+
+PENDING: no specific approved testimonial quote was found in the reviewed
+source files (btc-kb-lead-magnets.md, btc-kb-client-facing.md,
+btc-source-of-truth.md). The [TESTIMONIAL PLACEHOLDER] line below should be
+replaced with a real, approved client testimonial once LeiLani or marketing
+selects one. Do not invent one to fill this gap, see CLAUDE.md rule 3.
+
+---
+
+Subject: Why business owners bring in outside HR before it becomes a legal problem
+
+Body:
+
+Hi {{firstName}},
+
+Most businesses do not call an HR firm after everything is running smoothly.
+They call after a close call: a contractor who should have been an employee,
+a termination that went wrong, a complaint nobody knew how to handle.
+
+Be the Change HR is a team of HR Pros with 15-plus years of experience each,
+serving employers nationwide. It is real people who have handled this exact
+situation before, not a generic template or a one-person consultant.
+
+[TESTIMONIAL PLACEHOLDER: insert one approved client testimonial here once
+selected. Do not publish this email with an unapproved or invented quote.]
+
+If {{topCategory}} is still sitting on your list, a 30-minute call is enough
+to find out exactly where you stand and what it would take to fix it. No
+cost, no obligation.
+
+{{bookingUrl}}
+
+Be the Change HR

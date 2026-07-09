@@ -1,0 +1,32 @@
+NURTURE EMAIL 2 OF 4: TOP RISK INSIGHT
+Send window: day 3 to 4 after the transactional report email, only if the
+booking event has not fired for this contact.
+
+---
+
+Subject: What a {{topCategory}} gap actually costs a business like yours
+
+Body:
+
+Hi {{firstName}},
+
+Of everything your California HR Risk Audit flagged, {{topCategory}} is the
+one worth understanding first. It is not just a paperwork issue. It is the
+kind of gap that turns into a real claim the moment one employee situation
+goes sideways: a contractor dispute, a termination, a complaint.
+
+The average employment lawsuit costs an estimated $200,000. That is an
+industry-wide figure, not a prediction about your business specifically, but
+it is the reason gaps like this one do not stay theoretical for long.
+
+Your full report walks through exactly why {{topCategory}} is flagged and the
+complete scope of what it takes to close it:
+
+{{reportUrl}}
+
+The fastest way to actually close it, instead of just knowing about it, is a
+30-minute call with a Be the Change HR Pro. No cost, no obligation.
+
+{{bookingUrl}}
+
+Be the Change HR
