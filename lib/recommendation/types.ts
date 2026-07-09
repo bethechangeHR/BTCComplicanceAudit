@@ -56,6 +56,9 @@ export interface ReportView {
   score: number;
   maxPossibleScore: number;
   verdictLine: string;
+  /** Named exposure-level label for the grade, e.g. "Low exposure" for A,
+   * "Severe exposure" for F. See lib/recommendation/copy.ts RISK_TIER_LABELS. */
+  riskTierLabel: string;
   gapSections: ReportGapSection[];
   industryContext: {
     amountUsd: number;

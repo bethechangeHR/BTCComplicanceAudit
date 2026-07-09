@@ -86,6 +86,7 @@ export function buildReport(
     score: result.score,
     maxPossibleScore: result.maxPossibleScore,
     verdictLine: GRADE_VERDICT_COPY[result.grade],
+    riskTierLabel: RISK_TIER_LABELS[result.grade],
     gapSections: groupGapSections(result),
     industryContext: {
       amountUsd: INDUSTRY_LAWSUIT_ANCHOR.amountUsd,
