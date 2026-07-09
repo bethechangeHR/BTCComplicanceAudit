@@ -27,6 +27,22 @@ const BOOKING_URL =
   process.env.NEXT_PUBLIC_BOOKING_URL ??
   "https://meetings.hubspot.com/bethechangehr/discoverycall";
 
+/**
+ * HubSpot's meetings tool auto-populates engagements_last_meeting_booked_
+ * campaign/source/medium from UTM params on the link the visitor books
+ * through, no extra wiring needed. utm_campaign stays constant so every
+ * booked call from this funnel rolls up to one campaign; utm_source/medium
+ * identify which touchpoint (landing page, hosted report, or which email)
+ * actually drove the booking.
+ */
+function bookingUrlWithAttribution(source: string, medium: string): string {
+  const url = new URL(BOOKING_URL);
+  url.searchParams.set("utm_campaign", "ca-hr-risk-audit");
+  url.searchParams.set("utm_source", source);
+  url.searchParams.set("utm_medium", medium);
+  return url.toString();
+}
+
 export function buildQualificationTag(
   hrSupport: HrSupportAnswer,
 ): QualificationTag {
@@ -41,7 +57,7 @@ export function buildOnPageResult(result: EngineResult): OnPageResult {
     verdictLine: GRADE_VERDICT_COPY[result.grade],
     categoryRisks: result.categoryRisks,
     disclaimer: RESULT_DISCLAIMER,
-    bookingUrl: BOOKING_URL,
+    bookingUrl: bookingUrlWithAttribution("landing-page-cta", "web"),
   };
 }
 
@@ -75,7 +91,7 @@ export function buildReport(
       source: INDUSTRY_LAWSUIT_ANCHOR.source,
     },
     disclaimer: RESULT_DISCLAIMER,
-    bookingUrl: BOOKING_URL,
+    bookingUrl: bookingUrlWithAttribution("hosted-report", "web"),
     generatedAt: context.generatedAt,
     contactName: context.contactName,
     company: context.company,
@@ -97,7 +113,7 @@ export function buildEmailPayload(
         ? `Your full breakdown, including ${result.categoryRisks.length} flagged area${result.categoryRisks.length === 1 ? "" : "s"}, is ready.`
         : "Your full compliance breakdown is ready.",
     reportUrl: context.reportUrl,
-    bookingUrl: BOOKING_URL,
+    bookingUrl: bookingUrlWithAttribution("transactional-email", "email"),
     mergeFields: {
       firstName,
       grade: result.grade,
