@@ -37,8 +37,8 @@ export function EmailGateStep({
           Your grade is ready.
         </h2>
         <p className="text-sm text-btc-gray/80">
-          Enter your email to reveal your risk grade and get your full audit
-          report.
+          Enter your email to see your grade now and get the full audit
+          report sent to your inbox.
         </p>
       </div>
       <form onSubmit={handleSubmit} className="space-y-4 text-left">

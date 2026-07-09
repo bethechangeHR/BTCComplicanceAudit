@@ -25,7 +25,7 @@ export function QuestionStep({
             key={option.value}
             type="button"
             onClick={() => onAnswer(option.value)}
-            className="animate-rise-in group flex items-center justify-between rounded-xl border border-ink/10 bg-white px-5 py-4 text-left shadow-document transition-all duration-150 hover:-translate-y-0.5 hover:border-btc-teal/50 hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-btc-teal focus-visible:ring-offset-2"
+            className="animate-rise-in group flex items-center justify-between rounded-xl border border-ink/10 bg-white px-5 py-4 text-left shadow-document transition-all duration-200 hover:-translate-y-0.5 hover:border-btc-teal/60 hover:shadow-[0_20px_40px_-18px_rgba(15,111,98,0.35)] focus:outline-none focus-visible:ring-2 focus-visible:ring-btc-teal focus-visible:ring-offset-2"
             style={{ animationDelay: `${index * 60}ms` }}
           >
             <span className="text-base text-ink sm:text-lg">

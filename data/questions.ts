@@ -57,6 +57,8 @@ export const QUESTIONS: Question[] = [
   {
     key: "salariedClassification",
     prompt: "How are your employees classified?",
+    helper:
+      "Salary alone doesn't make a role exempt. The role itself has to meet specific exemption requirements.",
     options: [
       { value: "hourly", label: "All hourly" },
       { value: "mix", label: "A mix of salaried and hourly" },

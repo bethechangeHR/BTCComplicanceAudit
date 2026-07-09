@@ -7,11 +7,13 @@ export function ProgressTrail({
 }) {
   return (
     <div className="mx-auto w-full max-w-md">
-      <div className="mb-2 flex items-center justify-between text-xs font-semibold uppercase tracking-[0.14em] text-btc-gray/70">
-        <span>
+      <div className="mb-2 flex items-center justify-between text-sm">
+        <span className="font-medium text-ink">
           Question {step} of {total}
         </span>
-        <span>{Math.round((step / total) * 100)}%</span>
+        <span className="text-btc-gray/70">
+          {Math.round((step / total) * 100)}%
+        </span>
       </div>
       <div className="flex gap-1.5">
         {Array.from({ length: total }, (_, i) => (

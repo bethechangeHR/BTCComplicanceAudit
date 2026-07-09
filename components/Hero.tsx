@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export function Hero({ onStart }: { onStart: () => void }) {
   return (
-    <div className="animate-rise-in mx-auto max-w-xl space-y-8 text-center">
+    <div className="animate-reveal-in mx-auto max-w-xl space-y-8 text-center">
       <Image
         src="/btc-logo-color.png"
         alt="Be the Change HR"
@@ -12,15 +12,14 @@ export function Hero({ onStart }: { onStart: () => void }) {
         priority
       />
       <div className="space-y-4">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-btc-teal-dark">
-          California HR Risk Audit
-        </p>
-        <h1 className="font-display text-3xl font-medium leading-tight text-ink sm:text-4xl">
-          Find out what your HR practices are actually exposing you to.
+        <h1 className="text-balance font-display text-4xl font-medium leading-tight text-ink sm:text-5xl">
+          See exactly where your HR practices are exposing your business,
+          before it becomes a claim.
         </h1>
         <p className="text-base text-btc-gray sm:text-lg">
-          Eight quick questions. An instant A to F risk grade. A named list of
-          exactly where your business is exposed, before it becomes a claim.
+          California employment law leaves little room for guesswork. Answer
+          a few short questions and get a real HR risk grade for your
+          business, plus the specific areas creating exposure right now.
         </p>
       </div>
       <button
@@ -31,7 +30,8 @@ export function Hero({ onStart }: { onStart: () => void }) {
         Start my free risk audit
       </button>
       <p className="text-xs text-btc-gray/60">
-        Takes about 90 seconds. No cost, no obligation.
+        Built by California HR professionals. About 90 seconds, no cost, no
+        obligation.
       </p>
     </div>
   );
