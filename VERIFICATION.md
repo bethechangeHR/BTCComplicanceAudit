@@ -60,6 +60,78 @@ outstanding before this session's design and pixel work started and
 remains outstanding now; nothing in this session's changes affects it
 either way.
 
+**2026-07-09, pipeline audit and fix (Slack, HubSpot, email, name/company):**
+Noah reported no Slack alerts were appearing and asked whether the pipeline
+was even populating HubSpot or n8n at all. A full read-only audit of the live
+n8n workflow, its execution history, the live HubSpot portal, and the Slack
+channel was done before any change:
+
+- `search_executions` on workflow `WZgb6WemXlxuamzz` returned 10 real
+  executions beyond the original test-fire baseline (IDs 157-166, all
+  `status: success`), most of them `tool_viewed` page-load events with all
+  fields empty (correct, no PII on that branch), and one real
+  `tool_complete` submission: execution `166`, 2026-07-09T19:42:20Z, from
+  `ntpyt2001@gmail.com` (Noah's own email), grade D, 31/54.
+- `get_execution` with `includeData` confirmed execution 166 ran the full
+  graph correctly: `Upsert HubSpot Contact` updated Noah's real, pre-existing
+  HubSpot contact (ID `10054`) with every `compliance_check_*`/`cc_*`
+  property populated. Verified independently with
+  `mcp__claude_ai_HubSpot__search_crm_objects` querying that email directly:
+  all fields present and correct (`compliance_check_grade: "D"`,
+  `compliance_check_score: "31"`, `compliance_check_max_score: "54"`,
+  `compliance_check_gap_ids`, all `cc_*` answer fields, etc). This is the
+  first real, non-manual-test-fire proof this pipeline has had.
+- Execution 166's `Send Report Email (HubSpot)` node hit the exact same
+  `Forbidden - perhaps check your credentials?` / missing-scope error
+  confirmed in the original 2026-07-09 test-fire (section 7.6 below),
+  confirming Hard Gate 1 is still unresolved, not a new bug.
+- `list_credentials` on the n8n instance confirmed no SMTP-type or
+  `twilioApi` credential exists, only HubSpot and Slack credentials. The SMTP
+  fallback node has never had anything to fall back to.
+- `slack_read_channel` on `#btc-risk-audit-alerts` (`C0BG9RE3QDQ`) returned
+  exactly one message ever: the automated channel-join notice from
+  2026-07-09T08:37:46 PDT. Zero submission alerts, confirming Noah's report.
+  Root cause: `get_workflow_details` showed the `Notify Slack: New
+  Submission` node genuinely present in the *active/published* version of
+  the workflow (not just a draft, contrary to what a prior session worried
+  might happen), but individually `disabled: true`. Not a bug, the
+  documented pending state.
+- Code read of `components/EmailGateStep.tsx` confirmed a real, separate gap
+  Noah caught independently: the form never collected name or company, only
+  email/phone. Every downstream piece (`app/api/submit/route.ts`,
+  `lib/token.ts`, `ReportView.tsx`, this workflow's `Normalize Payload` and
+  `Upsert HubSpot Contact` nodes) already expected and used these fields, so
+  Noah's own contact showing "Noah" as firstname was from his pre-existing
+  CRM record, not from the funnel.
+
+**Fixes applied, same session:**
+
+1. `components/EmailGateStep.tsx` and `components/ComplianceCheckApp.tsx`:
+   added `name` (required) and `company` (optional) fields to the email
+   gate, threaded into the `/api/submit` POST body. `npx tsc --noEmit`,
+   `npm run lint`, `npx vitest run` all re-run clean after (32/32 tests,
+   no changes needed to any test since no test asserted on
+   `GateSubmission`'s exact shape).
+2. n8n workflow `WZgb6WemXlxuamzz` updated via `update_workflow` (two
+   `setNodeDisabled` operations) and republished via `publish_workflow`:
+   `Notify Slack: New Submission` enabled, `Send Report Email (HubSpot)`
+   disabled (was live but always erroring on the confirmed scope block).
+   Confirmed via a fresh `get_workflow_details` call that the *active*
+   version (`activeVersionId 8981beb3-445f-4a4a-b30e-0c1c95ee0801`)
+   reflects both changes, not a draft.
+3. Email strategy changed on Noah's direction: his HubSpot AI Assistant
+   recommends marketing email (included in his plan) over chasing the
+   transactional-send scope grant. This extends the pattern already chosen
+   for the nurture sequence to the report email too, one native HubSpot
+   workflow instead of an n8n-triggered send. See `ops/n8n-workflow.md`,
+   "HubSpot marketing-email workflow, manual build task" for the exact
+   checklist, a manual HubSpot-UI task for Noah or LeiLani, not buildable
+   through the connected MCP tools.
+
+**Still open after this fix:** the HubSpot marketing-email workflow itself
+(email delivery stays unverified until it's built), HR-Pro sign-off, and
+Twilio SMS (explicitly out of scope for this fix per Noah).
+
 ## 1. Test output
 
 `npx vitest run`, 2026-07-08, original run. Re-run 2026-07-09 after the Part

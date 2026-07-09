@@ -3,7 +3,9 @@
 import { useState, type FormEvent } from "react";
 
 export interface GateSubmission {
+  name: string;
   email: string;
+  company?: string;
   phone?: string;
   smsOptIn: boolean;
 }
@@ -17,14 +19,18 @@ export function EmailGateStep({
   submitting: boolean;
   error?: string;
 }) {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [company, setCompany] = useState("");
   const [phone, setPhone] = useState("");
   const [smsOptIn, setSmsOptIn] = useState(false);
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
     onSubmit({
+      name: name.trim(),
       email: email.trim(),
+      company: company.trim() || undefined,
       phone: phone.trim() || undefined,
       smsOptIn: smsOptIn && phone.trim().length > 0,
     });
@@ -44,6 +50,23 @@ export function EmailGateStep({
       <form onSubmit={handleSubmit} className="space-y-4 text-left">
         <div>
           <label
+            htmlFor="name"
+            className="mb-1 block text-xs font-semibold uppercase tracking-wide text-btc-gray/70"
+          >
+            Your name
+          </label>
+          <input
+            id="name"
+            type="text"
+            required
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Jordan Smith"
+            className="w-full rounded-lg border border-ink/15 bg-white px-4 py-3 text-base text-ink shadow-sm focus:border-btc-teal focus:outline-none focus:ring-2 focus:ring-btc-teal/30"
+          />
+        </div>
+        <div>
+          <label
             htmlFor="email"
             className="mb-1 block text-xs font-semibold uppercase tracking-wide text-btc-gray/70"
           >
@@ -56,6 +79,22 @@ export function EmailGateStep({
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@company.com"
+            className="w-full rounded-lg border border-ink/15 bg-white px-4 py-3 text-base text-ink shadow-sm focus:border-btc-teal focus:outline-none focus:ring-2 focus:ring-btc-teal/30"
+          />
+        </div>
+        <div>
+          <label
+            htmlFor="company"
+            className="mb-1 block text-xs font-semibold uppercase tracking-wide text-btc-gray/70"
+          >
+            Company (optional)
+          </label>
+          <input
+            id="company"
+            type="text"
+            value={company}
+            onChange={(e) => setCompany(e.target.value)}
+            placeholder="Acme Co"
             className="w-full rounded-lg border border-ink/15 bg-white px-4 py-3 text-base text-ink shadow-sm focus:border-btc-teal focus:outline-none focus:ring-2 focus:ring-btc-teal/30"
           />
         </div>
