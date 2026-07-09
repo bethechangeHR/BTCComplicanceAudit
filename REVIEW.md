@@ -45,39 +45,62 @@ the full evidence-backed definition-of-done checklist.
 
 ## Scoring model: first-draft, needs HR-Pro calibration
 
+**2026-07-09 update:** a 9th question (new-hire paperwork, question 8 in the
+flow) was added, and the HR-support question (question 9) was changed to
+contribute zero scoring weight (pure lead-fit tag, does not move the grade at
+all, down from a prior max of 2). `MAX_POSSIBLE_SCORE` moved from 49 to 54.
+This is a deliberate, reviewed spec change (Noah, 2026-07-09), not yet HR-Pro
+reviewed. See `CLAUDE.md` and `VERIFICATION.md` section 2 for the
+re-reconciled golden-master scenarios.
+
 - [ ] **Every risk-point weight in `data/scoring.ts`** (headcount, states,
       contractor use, salaried classification, handbook status, harassment
-      training, leave process, HR support) is a first-draft proposal by
-      this build, not a finalized model. Review each weight against your
+      training, leave process, new-hire paperwork) is a first-draft proposal
+      by this build, not a finalized model. Review each weight against your
       actual experience of which gaps are riskiest relative to each other.
+      HR support itself is intentionally excluded from this list: it no
+      longer carries scoring weight, only a lead-fit tag.
+- [ ] **NEW_HIRE_PAPERWORK_POINTS** (`data/scoring.ts`, `complete: 0,
+      partial: 4, none: 7`), added 2026-07-09, has not been calibrated
+      against the other seven weights. Confirm the relative severity feels
+      right against, for example, handbook status (`stale: 5, none: 8`).
+- [ ] **HR_SUPPORT_POINTS zeroed to `0, 0, 0`**, added 2026-07-09: confirm
+      you are comfortable that HR support contributes nothing to the grade
+      at all, purely a lead-fit tag via `buildQualificationTag()`.
 - [ ] **The A-F band cutoffs** (`GRADE_BANDS` in `data/scoring.ts`, currently
-      A: 0-6, B: 7-14, C: 15-24, D: 25-34, F: 35-49 out of a 49-point max)
-      are a first-draft proposal. Confirm these feel right, especially
-      whether the C band is too wide or the A band too generous.
+      A: 0-7, B: 8-15, C: 16-26, D: 27-37, F: 38-54 out of a 54-point max,
+      re-derived proportionally from the prior 49-point A: 0-6, B: 7-14,
+      C: 15-24, D: 25-34, F: 35-49 bands after the 2026-07-09 rework) are a
+      first-draft proposal. Confirm these feel right, especially whether the
+      C band is too wide or the A band too generous.
 - [ ] Confirm you are comfortable that headcount and multi-state carry real
       scoring weight even when every practice-level answer is clean (see
       the design-principle comment at the top of `data/scoring.ts` and the
       golden-master scenario 3 reconciliation in `VERIFICATION.md`, a
-      120-employee multi-state company with a current handbook and
-      documented leave still lands in band C, not A, because of structural
-      complexity alone).
+      120-employee multi-state company with a current handbook, documented
+      leave, and complete new-hire paperwork still lands in band C, not A,
+      because of structural complexity alone).
 - [ ] **Question 2's three answer options** (`california_only`,
       `one_other_state`, `multi_state`) are this build's interpretation of
       the buildspec's ambiguous shorthand "(one / CA / multi-state)".
       Confirm this interpretation is what was intended, see `CLAUDE.md`
       "Discrepancies found in source material."
-- [ ] **8 vs 10 questions**: `btc-kb-lead-magnets.md` and
+- [ ] **8 vs 9 vs 10 questions**: `btc-kb-lead-magnets.md` and
       `btc-lead-magnets-sequences.html` both describe this tool as a
-      "10-question checklist," while the 2026-07-08 buildspec (used here)
-      specifies 8. Confirm 8 is correct and the other two files should be
-      updated, or that a 9th/10th question is actually wanted.
+      "10-question checklist," while the 2026-07-08 buildspec specified 8.
+      As of 2026-07-09 the tool has 9 questions (new-hire paperwork added as
+      question 8, per Noah's direct decision, not from either source
+      document). Confirm 9 is correct going forward and that the two source
+      documents' "10-question" framing should be treated as stale or
+      revisited.
 
 ## Every gap item's wording, source, and framing (data/gap-library.ts)
 
-Review each of the 11 items for: is the legal citation accurate, is the
-"why this matters" framing honest rather than alarmist, and does the scope
-of work list feel like the right level of detail (complete enough to show
-real complexity, but with no actual fix given away).
+Review each of the 13 items (11 from the original 2026-07-08 pass, plus 2
+added 2026-07-09) for: is the legal citation accurate, is the "why this
+matters" framing honest rather than alarmist, and does the scope of work
+list feel like the right level of detail (complete enough to show real
+complexity, but with no actual fix given away).
 
 - [ ] `gap-1099-mostly`, `gap-1099-some`: CA ABC test, Labor Code Section 2775. Flagged in `UNVERIFIED_RESEARCH_FLAGS`: whether the ABC test
       received any 2025/2026 amendment beyond 2020's AB 2257. Recommend a
@@ -100,6 +123,17 @@ real complexity, but with no actual fix given away).
       `gap-other-state` item explicitly tells a non-California visitor that
       the rest of the report is CA-anchored, confirm that honesty is the
       right call rather than a softer framing.
+- [ ] **`gap-newhire-none`, `gap-newhire-partial`** (added 2026-07-09, not
+      part of the original 2026-07-08 research pass): federal Form I-9 /
+      IRCA (8 U.S.C. Section 1324a, INA Section 274A), CA Wage Theft
+      Prevention Act notice at hire (Labor Code Section 2810.5), and
+      required state/federal workplace posters. The I-9 and WTPA citations
+      are well-established; this build did **not** independently confirm
+      the exact statutory/regulatory citation for California's specific
+      poster mandate (cited here only generally as "CA DIR poster
+      requirements"), flagged in `UNVERIFIED_RESEARCH_FLAGS`. Recommend a
+      full legal pass on both new items, same rigor as the original 11,
+      before launch.
 - [ ] **Industry lawsuit anchor** (`INDUSTRY_LAWSUIT_ANCHOR`, $200,000):
       confirm this still matches the current pitch deck figure in
       `btc-source-of-truth.md` and that the "industry figure, not a BTC
@@ -158,7 +192,8 @@ real complexity, but with no actual fix given away).
       sourced, non-BTC-pricing legal/industry figures. See
       `VERIFICATION.md`.
 - [x] Confirmed the tool can award an honest A grade to a genuinely clean
-      business (score 0 of 49, zero triggered gaps). See the golden-master
+      business (score 0 of 54 as of the 2026-07-09 rework, was 0 of 49
+      before, zero triggered gaps either way). See the golden-master
       "genuinely clean business" scenario in `VERIFICATION.md`.
 - [ ] Confirm the webhook payload shape in `channels/types.ts`
       (`SubmitPayload`) matches what the real n8n workflow expects once
@@ -166,8 +201,9 @@ real complexity, but with no actual fix given away).
       wiring it live.
 - [ ] Exercise the tool end to end in a real browser (not just curl/dev
       server, see `VERIFICATION.md` for the curl-based evidence already
-      captured): all 8 questions, the gate, the grade reveal, the booking
-      embed, and the hosted report link.
+      captured, which predates the 2026-07-09 9-question rework): all 9
+      questions, the gate, the grade reveal, the booking embed, and the
+      hosted report link.
 
 ## Sign-off
 

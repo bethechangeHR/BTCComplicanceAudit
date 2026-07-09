@@ -30,6 +30,7 @@ import type {
   HeadcountAnswer,
   HrSupportAnswer,
   LeaveProcessAnswer,
+  NewHirePaperworkAnswer,
   RiskGrade,
   SalariedClassificationAnswer,
   StatesAnswer,
@@ -84,15 +85,35 @@ export const LEAVE_PROCESS_POINTS: Record<LeaveProcessAnswer, number> = {
 };
 
 /**
- * Intentionally small. Question 8 is the qualifying screen, it tags the
- * lead for BTC's own follow-up (see lib/recommendation/qualification.ts),
- * it must not materially move the grade. Max contribution is 2 of 49
- * possible points, about 4%.
+ * Question 8, added 2026-07-09. TODO-flagged first-draft proposal, pending
+ * HR-Pro calibration, same as every other weight in this file. New-hire
+ * paperwork (offer letters, Form I-9, required notices/posters) is a
+ * practice-level answer, same family as handbook status and training: it
+ * measures whether the business is actually doing the required things, not
+ * structural exposure. See data/gap-library.ts gap-newhire-none and
+ * gap-newhire-partial for the cited legal basis.
+ */
+export const NEW_HIRE_PAPERWORK_POINTS: Record<NewHirePaperworkAnswer, number> =
+  {
+    complete: 0,
+    partial: 4,
+    none: 7,
+  };
+
+/**
+ * Zeroed out 2026-07-09, a deliberate spec change (see CLAUDE.md). Question
+ * 9 is now purely the qualifying screen, it tags the lead for BTC's own
+ * follow-up (see lib/recommendation/qualification.ts) and contributes
+ * nothing to the grade. buildQualificationTag() / qualificationTag still
+ * read this answer directly for lead-fit tagging, independent of scoring.
+ * Kept as a Record (rather than deleted) so the engine and validateAnswers
+ * still reference a single source of truth and the question stays wired
+ * for a future scoring reinstatement if HR-Pro decides otherwise.
  */
 export const HR_SUPPORT_POINTS: Record<HrSupportAnswer, number> = {
   in_house: 0,
-  outside: 1,
-  none: 2,
+  outside: 0,
+  none: 0,
 };
 
 export const MAX_POSSIBLE_SCORE =
@@ -103,25 +124,30 @@ export const MAX_POSSIBLE_SCORE =
   Math.max(...Object.values(HANDBOOK_STATUS_POINTS)) +
   Math.max(...Object.values(HARASSMENT_TRAINING_POINTS)) +
   Math.max(...Object.values(LEAVE_PROCESS_POINTS)) +
+  Math.max(...Object.values(NEW_HIRE_PAPERWORK_POINTS)) +
   Math.max(...Object.values(HR_SUPPORT_POINTS));
 
 /**
  * A-F band cutoffs, expressed as inclusive point ranges out of
- * MAX_POSSIBLE_SCORE (49 as currently weighted). First-draft proposal,
- * pending HR-Pro calibration. Verified honest by construction: an
- * all-lowest-risk answer set scores 0 (A) and an all-highest-risk answer
- * set scores 49 (F), see lib/engine/goldenMaster.test.ts.
+ * MAX_POSSIBLE_SCORE (54 as currently weighted, up from 49 after the
+ * 2026-07-09 rework: HR_SUPPORT_POINTS zeroed out, losing a max of 2, and
+ * NEW_HIRE_PAPERWORK_POINTS added, contributing a max of 7). Cutoffs are
+ * re-derived proportionally against the new max, preserving each band's
+ * original share of the range. First-draft proposal, pending HR-Pro
+ * calibration. Verified honest by construction: an all-lowest-risk answer
+ * set scores 0 (A) and an all-highest-risk answer set scores 54 (F), see
+ * lib/engine/goldenMaster.test.ts.
  */
 export const GRADE_BANDS: {
   grade: RiskGrade;
   minScore: number;
   maxScore: number;
 }[] = [
-  { grade: "A", minScore: 0, maxScore: 6 },
-  { grade: "B", minScore: 7, maxScore: 14 },
-  { grade: "C", minScore: 15, maxScore: 24 },
-  { grade: "D", minScore: 25, maxScore: 34 },
-  { grade: "F", minScore: 35, maxScore: MAX_POSSIBLE_SCORE },
+  { grade: "A", minScore: 0, maxScore: 7 },
+  { grade: "B", minScore: 8, maxScore: 15 },
+  { grade: "C", minScore: 16, maxScore: 26 },
+  { grade: "D", minScore: 27, maxScore: 37 },
+  { grade: "F", minScore: 38, maxScore: MAX_POSSIBLE_SCORE },
 ];
 
 export function scoreToGrade(score: number): RiskGrade {
@@ -211,5 +237,17 @@ export const ANSWER_GAP_TRIGGERS: {
     answer: "one_other_state",
     gapIds: ["gap-other-state"],
     category: "Multi-State Compliance",
+  },
+  {
+    question: "newHirePaperwork",
+    answer: "partial",
+    gapIds: ["gap-newhire-partial"],
+    category: "New-Hire Paperwork & Notices",
+  },
+  {
+    question: "newHirePaperwork",
+    answer: "none",
+    gapIds: ["gap-newhire-none"],
+    category: "New-Hire Paperwork & Notices",
   },
 ];

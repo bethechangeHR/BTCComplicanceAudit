@@ -1,10 +1,12 @@
 /**
  * data/questions.ts
  *
- * The 8 locked questions and their answer copy, keyed to the exact answer
- * literal values in lib/engine/types.ts. Wording locked by
+ * The 9 locked questions and their answer copy, keyed to the exact answer
+ * literal values in lib/engine/types.ts. The original 8 are locked by
  * btc-paid-ads-campaign-buildspec-v1-2026-07-08.md, question 2's three
- * options are an explicit interpretation flagged in CLAUDE.md.
+ * options are an explicit interpretation flagged in CLAUDE.md. Question 8
+ * (newHirePaperwork) was added 2026-07-09 as a deliberate, reviewed spec
+ * change, see CLAUDE.md.
  */
 
 import type { ComplianceAnswers } from "@/lib/engine/types";
@@ -87,6 +89,19 @@ export const QUESTIONS: Question[] = [
     options: [
       { value: "yes", label: "Yes" },
       { value: "no", label: "No" },
+    ],
+  },
+  {
+    key: "newHirePaperwork",
+    prompt: "What's your process for new-hire paperwork?",
+    options: [
+      {
+        value: "complete",
+        label:
+          "Complete: offer letters, I-9s, and required notices/posters every time",
+      },
+      { value: "partial", label: "Partial: some of it, inconsistently" },
+      { value: "none", label: "We don't have a consistent process" },
     ],
   },
   {

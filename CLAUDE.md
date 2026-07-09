@@ -5,7 +5,7 @@
 Give a small or mid-sized California business owner an honest, instant read on
 their HR compliance exposure in about 60 to 90 seconds, then make the risk
 they cannot currently see feel real and specific to them. This is a Meta
-paid-ads lead magnet. The visitor answers 8 questions and gets an on-screen
+paid-ads lead magnet. The visitor answers 9 questions and gets an on-screen
 A-F risk grade with named (not detailed) gap categories, plus a free 30-minute
 HR discovery call booked immediately below the grade. After they give an
 email, a short transactional email links to a personalized, hosted audit
@@ -15,6 +15,13 @@ actual fix (the compliant handbook language, the reclassification steps, the
 policy text), because that is the paid deliverable and the reason to book.
 The tool reads as a diagnostic instrument, not a quiz: an owner should be
 willing to screenshot the grade and show their business partner.
+
+A 9th question (new-hire paperwork, question 8 in the flow) was added
+2026-07-09 as a deliberate, reviewed spec change (see the "we are updating
+the graceful stardust" plan, Part A). At the same time, the HR-support
+question (question 9, the qualifying screen) was changed to contribute zero
+scoring weight: it is now purely a lead-fit tag via
+`buildQualificationTag()`/`qualificationTag` and never moves the grade.
 
 ## Report philosophy, the core strategic call, non-negotiable
 
@@ -91,8 +98,8 @@ honest report gains in urgency.
   gated, named-categories-only view. `buildReport()` returns the full
   diagnosis-plus-scope-of-work hosted report. `buildEmailPayload()` builds
   the transactional email's merge fields and the signed report URL.
-  `buildQualificationTag()` reads Q8 into a lead-quality tag that never
-  materially moves the grade.
+  `buildQualificationTag()` reads Q9 (HR support) into a lead-quality tag
+  that never moves the grade at all (zeroed out 2026-07-09).
 - `lib/token.ts`: HMAC-signs the answer set into a URL-safe token so
   `/report/[token]` is stateless and tamper-evident: no database, the report
   page recomputes the result by re-running the pure engine on the decoded
@@ -148,7 +155,7 @@ decision.
 ## The channel mode (paid ships now, email is a future seam)
 
 - Paid mode (default, no `mode` param needed): anonymous visitor from a Meta
-  ad. Fully self-contained. Answers all 8 questions, one per view, with a
+  ad. Fully self-contained. Answers all 9 questions, one per view, with a
   visible progress indicator. A single light gate (email required, phone
   optional with an explicit SMS opt-in) sits at the grade reveal.
 - Email mode (`?mode=email&...`, future): pre-filled from firmographics,
@@ -169,7 +176,7 @@ decision.
 ## The delivery pipeline (built and test-fired: see status below)
 
 `app/api/submit` -> n8n webhook -> HubSpot contact upsert (grade, numeric
-score, triggered gap IDs, all 8 answers, Q8 qualification tag,
+score, triggered gap IDs, all 9 answers, Q9 qualification tag,
 `source=meta-paid`, `fbclid`, signed report URL) -> transactional report
 email (HubSpot primary, n8n-fallback sender path staged since HubSpot's
 transactional-send capability is confirmed not currently enabled) -> SMS via
@@ -201,7 +208,7 @@ traffic until the Hard Gates below clear.
    (SMTP) path is built but disabled, pending a real SMTP credential.
 2. HR-Pro sign-off (LeiLani/Genevieve) on every scoring weight, band cutoff,
    and gap-item wording, liability gate, see `REVIEW.md`.
-3. Genevieve's pain-point/qualification-signal list to sharpen Q8 and the
+3. Genevieve's pain-point/qualification-signal list to sharpen Q9 and the
    lead-quality tag wording, seam left clean in `buildQualificationTag()`.
 4. Booking routing decision (round-robin vs. LeiLani-only), unresolved. Uses
    the existing single booking link only, no scheduler changes made.

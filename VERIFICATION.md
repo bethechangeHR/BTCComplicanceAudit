@@ -5,9 +5,28 @@ Evidence-backed definition-of-done for the California HR Risk Audit. See
 in this document is asserted without the actual command output or curl
 output that produced it.
 
+**2026-07-09 Part A logic rework note:** a 9th question (new-hire paperwork,
+question 8 in the flow) was added and the HR-support question (question 9)
+was zeroed out to a pure lead-fit tag. `MAX_POSSIBLE_SCORE` moved from 49 to
+54 and `GRADE_BANDS` was re-derived proportionally. Section 2 below (hand
+reconciliation) has been updated to the new numbers. Sections 6 and 7 contain
+dated, real command/curl/MCP evidence captured **before** this rework
+(2026-07-08 and 2026-07-09 respectively, prior to the Part A session) and are
+left as an accurate historical record rather than rewritten; the specific
+score/maxPossibleScore/gap-id values quoted there (39/49, etc.) reflect the
+pre-rework engine and are stale as a description of current live behavior.
+Re-verification against the new 54-point model (fresh `next dev` curl pass
+and a fresh n8n/HubSpot test-fire) is a follow-up item, not yet done as part
+of this Part A change, see the updated open-items list at the bottom of this
+file.
+
 ## 1. Test output
 
-`npx vitest run`, 2026-07-08, final run after all fixes:
+`npx vitest run`, 2026-07-08, original run. Re-run 2026-07-09 after the Part
+A logic rework (9th question, HR-support zeroed out, new 54-point max),
+same pass/fail shape, updated expected values inside the same 32 tests
+(golden-master and MAX_POSSIBLE_SCORE assertions hand-reconciled to the new
+numbers, see the note at the top of this file and section 2 below):
 
 ```
  Test Files  5 passed (5)
@@ -15,12 +34,14 @@ output that produced it.
 ```
 
 Covering: `lib/engine/index.test.ts` (10 tests: point contribution per
-answer, band-cutoff edges with no gaps or overlaps from 0 to 49, all-clean
-and all-risky extremes, "unsure" harassment training treated as a real
-gap not a free pass, single-state-CA vs single-other-state vs multi-state
-distinguished, question 8 never moving the grade more than one band,
-qualification tag exposed separately from the gap list, severity-descending
-ordering, handbook-stale vs handbook-none triggering distinct gaps),
+answer, band-cutoff edges with no gaps or overlaps from 0 to 54 as of
+2026-07-09 (was 0 to 49), all-clean and all-risky extremes, "unsure"
+harassment training treated as a real gap not a free pass, single-state-CA
+vs single-other-state vs multi-state distinguished, question 9 (HR support,
+renumbered from question 8 after the 9th question was added) never moving
+the grade more than one band, qualification tag exposed separately from the
+gap list, severity-descending ordering, handbook-stale vs handbook-none
+triggering distinct gaps),
 `lib/engine/goldenMaster.test.ts` (4 tests, see section 2),
 `lib/recommendation/index.test.ts` (8 tests: the on-page result never leaks
 diagnosis/scope-of-work text, the hosted report includes full diagnosis and
@@ -34,58 +55,73 @@ detection, malformed input, wrong-secret rejection).
 ## 2. Three hand-reconciled scenarios, plus the required clean-business proof
 
 All four locked as golden-master tests in `lib/engine/goldenMaster.test.ts`
-so a future scoring change cannot silently drift these results.
+so a future scoring change cannot silently drift these results. Updated
+2026-07-09 for the Part A logic rework (9th question added, HR-support
+zeroed out, new 54-point max); see the note at the top of this file.
 
 **Buildspec scenario 1** (6-employee single-state shop, no handbook, mostly
 1099s). Unstated fields assumed: single state read as California; remaining
-non-contractor staff assumed hourly; training, leave process, and HR support
-assumed absent, matching a very small, informally-run shop.
+non-contractor staff assumed hourly; training and leave process assumed
+absent, matching a very small, informally-run shop. New-hire paperwork
+(question 8, added 2026-07-09) assumed "none," consistent with that same
+profile. HR support no longer scores.
 
 ```
 0 (headcount 1-9) + 0 (California only) + 8 (mostly 1099) + 0 (hourly)
-+ 8 (no handbook) + 7 (no training) + 6 (no leave process) + 2 (no HR support)
-= 31 points -> grade D
++ 8 (no handbook) + 7 (no training) + 6 (no leave process)
++ 7 (no new-hire paperwork) + 0 (HR support, zeroed out) = 36 points -> grade D
 ```
 
 **Buildspec scenario 2** (40-employee California, all salaried, no
 harassment training). Unstated fields assumed: no contractor use; handbook
 assumed stale (a neutral middle assumption, not the flattering "current");
-leave process assumed documented; HR support assumed outsourced.
+leave process assumed documented; HR support assumed outsourced (no longer
+scores). New-hire paperwork (question 8, added 2026-07-09) assumed "partial,"
+the same neutral, non-flattering middle assumption as the stale handbook.
 
 ```
 2 (headcount 10-49) + 0 (California only) + 0 (no contractors)
 + 6 (all salaried) + 5 (stale handbook) + 7 (no training)
-+ 0 (documented leave) + 1 (outside HR support) = 21 points -> grade C
++ 0 (documented leave) + 4 (partial new-hire paperwork)
++ 0 (HR support, zeroed out) = 24 points -> grade C
 ```
 
 **Buildspec scenario 3** (120-employee multi-state, current handbook,
 documented leave). Unstated fields assumed: some contractor use, a mixed
 salaried/hourly workforce, harassment training current, HR support in-house.
+New-hire paperwork (question 8, added 2026-07-09) assumed "complete," the
+same deliberately-well-run profile as the current handbook and documented
+leave.
 
 ```
 4 (headcount 50-149) + 6 (multi-state) + 4 (some 1099) + 3 (mixed salaried)
 + 0 (current handbook) + 0 (training current) + 0 (documented leave)
-+ 0 (in-house HR) = 17 points -> grade C
++ 0 (complete new-hire paperwork) + 0 (HR support, zeroed out)
+= 17 points -> grade C
 ```
 
 10 of this scenario's 17 points come from headcount tier and multi-state
 structure, not from any practice failure: the company is doing the actual
-work right (current handbook, trained, documented leave) but still carries
-real structural complexity risk from its size and footprint. This is the
-honest reading, not a rigged one, see the design-principle comment in
-`data/scoring.ts`.
+work right (current handbook, trained, documented leave, complete new-hire
+paperwork) but still carries real structural complexity risk from its size
+and footprint. This is the honest reading, not a rigged one, see the
+design-principle comment in `data/scoring.ts`. Score is unchanged from the
+pre-rework 17, since this scenario's HR support was already in_house (0
+points either way) and its new-hire paperwork answer (complete) also scores
+0.
 
 **Genuinely clean business** (required separately by the verification gate,
 not a buildspec scenario): single-state California, 1 to 9 employees, no
 contractors, hourly staff, current handbook, trained, documented leave,
-in-house HR support.
+complete new-hire paperwork, in-house HR support.
 
 ```
-0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 = 0 points -> grade A, zero triggered gaps
+0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 = 0 points -> grade A, zero triggered gaps
 ```
 
 This is the proof the scoring model is not rigged to fail everyone
-regardless of actual compliance posture.
+regardless of actual compliance posture. Still holds after the Part A
+rework: every clean answer, including the new question 8, scores 0.
 
 ## 3. Gap-item source mapping
 
@@ -101,6 +137,7 @@ field. Summary:
 | `gap-leave-none`                           | Labor Code 245-249; Gov Code 12945/12945.2 (SB 1383, 2021); 29 CFR 825.105                         | High, all four thresholds independently confirmed                                                                        |
 | `gap-multistate`                           | General state-level employment law primacy (SHRM)                                                  | High as a structural principle, not a single-statute citation                                                            |
 | `gap-other-state`                          | btc-paid-ads-campaign-buildspec-v1-2026-07-08.md geo decision                                      | This build's own framing choice, not an external legal citation                                                          |
+| `gap-newhire-none`, `gap-newhire-partial` (added 2026-07-09) | Federal Form I-9 / IRCA (8 U.S.C. Section 1324a, INA Section 274A); Cal. Labor Code Section 2810.5 (WTPA notice at hire); CA DIR / US DOL workplace posters | I-9 and WTPA citations high confidence; the exact CA poster-mandate statute number was not independently confirmed by this build, flagged in `UNVERIFIED_RESEARCH_FLAGS` for a fresh legal pass |
 
 Full text of every claim, with exact statute numbers and a `lastVerified:
 2026-07-08` date, lives in each item's `sourceRef` field in
@@ -447,8 +484,14 @@ substitute.
 
 See `REVIEW.md` for the full checklist. Highest-priority items:
 
+- Re-run the section 6 curl walkthrough and the section 7 n8n/HubSpot
+  test-fire against the post-2026-07-09 Part A engine (54-point max, 9th
+  question). The values currently in sections 6 and 7 (39/49,
+  `compliance_check_max_score: "49"`, etc.) predate this rework and are
+  historical record only, not current expected output.
 - HR-Pro sign-off on every scoring weight, band cutoff, and gap-item
-  wording (liability gate).
+  wording (liability gate), including the two new gap-newhire-* items and
+  the newly-zeroed HR-support weight.
 - Resolve the HubSpot transactional email scope/template gap confirmed
   in section 7.6 above (Hard Gate 1), then re-test-fire the email leg
   specifically before enabling the "Send Report Email (HubSpot)" node.

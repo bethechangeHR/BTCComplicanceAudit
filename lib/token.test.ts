@@ -10,6 +10,7 @@ const ANSWERS: ComplianceAnswers = {
   handbookStatus: "stale",
   harassmentTraining: "no",
   leaveProcess: "yes",
+  newHirePaperwork: "partial",
   hrSupport: "outside",
 };
 

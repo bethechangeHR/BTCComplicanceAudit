@@ -15,6 +15,7 @@ import {
   HR_SUPPORT_POINTS,
   LEAVE_PROCESS_POINTS,
   MAX_POSSIBLE_SCORE,
+  NEW_HIRE_PAPERWORK_POINTS,
   SALARIED_CLASSIFICATION_POINTS,
   STATES_POINTS,
   scoreToGrade,
@@ -42,6 +43,7 @@ function computeScore(answers: ComplianceAnswers): number {
     HANDBOOK_STATUS_POINTS[answers.handbookStatus] +
     HARASSMENT_TRAINING_POINTS[answers.harassmentTraining] +
     LEAVE_PROCESS_POINTS[answers.leaveProcess] +
+    NEW_HIRE_PAPERWORK_POINTS[answers.newHirePaperwork] +
     HR_SUPPORT_POINTS[answers.hrSupport]
   );
 }

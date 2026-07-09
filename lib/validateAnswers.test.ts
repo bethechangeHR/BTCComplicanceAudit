@@ -9,6 +9,7 @@ const VALID_ANSWERS = {
   handbookStatus: "current",
   harassmentTraining: "yes",
   leaveProcess: "yes",
+  newHirePaperwork: "complete",
   hrSupport: "in_house",
 };
 

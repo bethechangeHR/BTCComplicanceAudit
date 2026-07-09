@@ -11,6 +11,7 @@ const CLEANEST: ComplianceAnswers = {
   handbookStatus: "current",
   harassmentTraining: "yes",
   leaveProcess: "yes",
+  newHirePaperwork: "complete",
   hrSupport: "in_house",
 };
 
@@ -22,6 +23,7 @@ const RISKIEST: ComplianceAnswers = {
   handbookStatus: "none",
   harassmentTraining: "no",
   leaveProcess: "no",
+  newHirePaperwork: "none",
   hrSupport: "none",
 };
 
@@ -41,11 +43,14 @@ describe("scoreComplianceAnswers", () => {
     expect(result.triggeredGapIds.length).toBeGreaterThan(0);
   });
 
-  it("MAX_POSSIBLE_SCORE is 49 given the current first-draft weights", () => {
+  it("MAX_POSSIBLE_SCORE is 54 given the current first-draft weights", () => {
     // Locks the constant so an accidental weight change is caught explicitly
     // rather than silently shifting every band. Update deliberately if
-    // HR-Pro calibration changes any weight.
-    expect(MAX_POSSIBLE_SCORE).toBe(49);
+    // HR-Pro calibration changes any weight. Was 49 before the 2026-07-09
+    // rework (HR_SUPPORT_POINTS zeroed out, losing a max of 2;
+    // NEW_HIRE_PAPERWORK_POINTS added, contributing a max of 7): 49 - 2 + 7
+    // = 54.
+    expect(MAX_POSSIBLE_SCORE).toBe(54);
   });
 
   it("covers every point from 0 to max with exactly one grade band, no gaps or overlaps", () => {
@@ -92,7 +97,7 @@ describe("scoreComplianceAnswers", () => {
     expect(otherState.score).toBeGreaterThan(caOnly.score);
   });
 
-  it("never lets question 8 (HR support) move the answer set more than one grade band on its own", () => {
+  it("never lets question 9 (HR support) move the answer set more than one grade band on its own", () => {
     const withInHouse = scoreComplianceAnswers({
       ...CLEANEST,
       hrSupport: "in_house",

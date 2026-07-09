@@ -19,7 +19,11 @@
  * Every legal claim cites a named statute/regulation, the enforcing agency,
  * and a lastVerified date from the 2026-07-08 research pass. Where the
  * research flagged something as not independently confirmed, it is marked
- * UNVERIFIED here too and excluded from confident claims.
+ * UNVERIFIED here too and excluded from confident claims. gap-newhire-none
+ * and gap-newhire-partial were added 2026-07-09, after the original
+ * research pass, for the new question 8 (newHirePaperwork); they are cited
+ * to real, dated sources but flagged separately in
+ * UNVERIFIED_RESEARCH_FLAGS for a fresh legal pass before launch.
  */
 
 import type {
@@ -235,6 +239,44 @@ export const GAP_LIBRARY: GapItem[] = [
       "General principle of state-level employment law primacy, SHRM State and Local Updates (shrm.org). This is a structural, cross-jurisdictional fact rather than a single statute citation. lastVerified 2026-07-08.",
   },
   {
+    id: "gap-newhire-none",
+    category: "New-Hire Paperwork & Notices",
+    jurisdiction: "CA",
+    severity: "high",
+    onPageStatement: "New-hire paperwork and required notices",
+    reportDiagnosis:
+      "Every employer, regardless of state, must complete a federal Form I-9 employment eligibility verification for each new hire under the Immigration Reform and Control Act (8 U.S.C. Section 1324a; Immigration and Nationality Act Section 274A). California additionally requires a written Wage Theft Prevention Act notice at the time of hire, covering pay rate, payday, and employer information (Labor Code Section 2810.5), and requires current state and federal workplace posters to be displayed. A business with no consistent new-hire paperwork process has no reliable record it has met any of these separately enforced requirements for a given hire, and Form I-9 violations in particular carry per-form penalties regardless of whether the underlying hire was authorized to work.",
+    scopeOfWork: [
+      "Establish a documented new-hire checklist covering Form I-9 completion and reverification timing for every hire",
+      "Confirm the Wage Theft Prevention Act written notice (Labor Code Section 2810.5) is issued at time of hire for every non-exempt employee",
+      "Audit current state and federal workplace posters against what is currently required and update as needed",
+      "Build a retained, audit-ready recordkeeping process for every new-hire document going forward",
+    ],
+    complianceAngle:
+      "New-hire onboarding and required-notice exposure. Added 2026-07-09 as part of the Part A scoring rework (question 8, newHirePaperwork). Not part of the original 2026-07-08 btc-kb-lead-magnets.md section 6 research pass, flagged for a fresh HR-Pro/legal review before launch, see UNVERIFIED_RESEARCH_FLAGS below.",
+    sourceRef:
+      "Federal Form I-9 requirement under the Immigration Reform and Control Act, 8 U.S.C. Section 1324a, INA Section 274A, uscis.gov; Cal. Labor Code Section 2810.5 (Wage Theft Prevention Act written notice at hire), leginfo.legislature.ca.gov; required state and federal workplace posters, CA DIR (dir.ca.gov) and US DOL. lastVerified 2026-07-09. This is a new addition made after the 2026-07-08 research pass and has not been through the same legal-pass rigor as the rest of this file, see UNVERIFIED_RESEARCH_FLAGS.",
+  },
+  {
+    id: "gap-newhire-partial",
+    category: "New-Hire Paperwork & Notices",
+    jurisdiction: "CA",
+    severity: "medium",
+    onPageStatement: "New-hire paperwork and required notices",
+    reportDiagnosis:
+      "Inconsistent new-hire paperwork carries the same underlying exposure as having no process at all, for whichever hires it was skipped on. Form I-9 (8 U.S.C. Section 1324a) must be completed for every hire, not most; California's Wage Theft Prevention Act notice (Labor Code Section 2810.5) is required at hire for every non-exempt employee; and posted workplace notices must stay current regardless of how many hires have gone through a complete process. A business that only completes this some of the time has no way to identify, without an audit, exactly which employees are missing which document.",
+    scopeOfWork: [
+      "Audit existing personnel files to identify which hires are missing a completed Form I-9, a Wage Theft Prevention Act notice, or both",
+      "Close any gaps found for current employees",
+      "Standardize the new-hire paperwork process so it runs the same way for every future hire",
+      "Confirm current state and federal workplace posters are up to date",
+    ],
+    complianceAngle:
+      "New-hire onboarding and required-notice exposure. Added 2026-07-09 as part of the Part A scoring rework (question 8, newHirePaperwork). Not part of the original 2026-07-08 btc-kb-lead-magnets.md section 6 research pass, flagged for a fresh HR-Pro/legal review before launch, see UNVERIFIED_RESEARCH_FLAGS below.",
+    sourceRef:
+      "Federal Form I-9 requirement under the Immigration Reform and Control Act, 8 U.S.C. Section 1324a, INA Section 274A, uscis.gov; Cal. Labor Code Section 2810.5 (Wage Theft Prevention Act written notice at hire), leginfo.legislature.ca.gov; required state and federal workplace posters, CA DIR (dir.ca.gov) and US DOL. lastVerified 2026-07-09. This is a new addition made after the 2026-07-08 research pass and has not been through the same legal-pass rigor as the rest of this file, see UNVERIFIED_RESEARCH_FLAGS.",
+  },
+  {
     id: "gap-other-state",
     category: "Multi-State Compliance",
     jurisdiction: "not-legal-requirement",
@@ -285,4 +327,5 @@ export const UNVERIFIED_RESEARCH_FLAGS = [
   "Whether Cal. Labor Code Section 2775 (the ABC test) received any material 2025 or 2026 amendment beyond the 2020 AB 2257 exemption update. No new amendment was found, but the research pass did not exhaustively review every 2025-2026 bill. Recommend a final legal pass before asserting the ABC test is unchanged.",
   "The current federal FLSA exempt salary threshold. It has been in active litigation flux since the US DOL's 2024 rule was vacated. This tool deliberately does not state a federal dollar figure anywhere, only the confirmed California figure ($70,304/yr, DIR News Release 2025-118).",
   "Whether any single CRD or DIR source states in so many words that California has 'no handbook mandate.' The individual component requirements (harassment policy, paid sick leave policy, wage notice, workers' comp notice) are each independently well-sourced; the negative framing itself is an absence-of-law finding, not a single citation.",
+  "gap-newhire-none and gap-newhire-partial (added 2026-07-09, not part of the 2026-07-08 research pass): the federal Form I-9 requirement (8 U.S.C. Section 1324a, INA Section 274A) and the CA Wage Theft Prevention Act notice at hire (Labor Code Section 2810.5) are both well-established, but this build did not independently confirm the exact current statutory or regulatory citation for California's specific workplace-poster mandate (referenced here only generally as 'CA DIR poster requirements'). Recommend a final legal pass confirming the precise poster-requirement citation before these two gap items reach a real prospect.",
 ];

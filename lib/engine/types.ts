@@ -2,8 +2,10 @@
  * lib/engine/types.ts
  *
  * Pure types for the compliance risk scoring engine. No React, no DOM, no
- * network. The 8 questions and their answer options are locked by
- * btc-paid-ads-campaign-buildspec-v1-2026-07-08.md.
+ * network. The original 8 questions and their answer options are locked by
+ * btc-paid-ads-campaign-buildspec-v1-2026-07-08.md. A 9th question,
+ * newHirePaperwork, was added 2026-07-09 as a deliberate, reviewed spec
+ * change, see CLAUDE.md and data/scoring.ts.
  */
 
 export type HeadcountAnswer = "1-9" | "10-49" | "50-149" | "150+";
@@ -28,9 +30,16 @@ export type HarassmentTrainingAnswer = "yes" | "unsure" | "no";
 export type LeaveProcessAnswer = "yes" | "no";
 
 /**
- * The qualifying screen (question 8). Tags the lead for BTC's own follow-up
- * qualification. Carries only a small, intentionally non-material scoring
- * weight, see data/scoring.ts HR_SUPPORT_POINTS.
+ * Question 8, added 2026-07-09. A risk question: adds points, see
+ * data/scoring.ts NEW_HIRE_PAPERWORK_POINTS.
+ */
+export type NewHirePaperworkAnswer = "complete" | "partial" | "none";
+
+/**
+ * The qualifying screen (question 9). Tags the lead for BTC's own follow-up
+ * qualification. As of 2026-07-09 it carries zero scoring weight (pure
+ * lead-fit tag, does not move the grade at all), see data/scoring.ts
+ * HR_SUPPORT_POINTS.
  */
 export type HrSupportAnswer = "in_house" | "outside" | "none";
 
@@ -42,6 +51,7 @@ export interface ComplianceAnswers {
   handbookStatus: HandbookStatusAnswer;
   harassmentTraining: HarassmentTrainingAnswer;
   leaveProcess: LeaveProcessAnswer;
+  newHirePaperwork: NewHirePaperworkAnswer;
   hrSupport: HrSupportAnswer;
 }
 
@@ -52,7 +62,8 @@ export type GapCategory =
   | "Handbook & Written Policies"
   | "Harassment Prevention Training"
   | "Leave & Accommodation Process"
-  | "Multi-State Compliance";
+  | "Multi-State Compliance"
+  | "New-Hire Paperwork & Notices";
 
 export type GapSeverity = "low" | "medium" | "high";
 
