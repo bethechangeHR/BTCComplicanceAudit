@@ -1,21 +1,24 @@
 # Delivery pipeline: n8n workflow + HubSpot wiring
 
-Status as of this build: **specified in full, not yet wired.** The n8n and
-HubSpot MCP connectors were not connected in this session (both returned
-"not connected" when called), so the workflow described below could not be
-created or test-fired live. This is a connection/authorization gap, not a
-design gap: the moment those connectors are authorized (via `/mcp` or the
-claude.ai connector settings), this document is a precise, node-by-node
-blueprint an agent or a human can build from directly, with no further
-design decisions required.
+Status as of 2026-07-09: **built, published, and test-fired with a test
+contact.** The n8n and HubSpot MCP connectors were confirmed live this
+session and used to build the workflow described below directly. See
+`VERIFICATION.md` section 7 for full evidence: the live production webhook
+URL, the 16 HubSpot custom properties (created and verified), a real test
+contact created with all properties populated correctly, a real engagement
+logged on the `tool_viewed` branch, and a real (failed) API call to
+HubSpot's transactional email endpoint that concretely confirms Hard Gate
+1's exact blocker (missing scope, not "unconfirmed").
 
 Do not connect real ad traffic to this pipeline before:
 
-1. It is actually built and test-fired end to end with a **test contact
-   only** (never a real prospect).
+1. The email leg is actually working end to end (Hard Gate 1: HubSpot has
+   confirmed it does not currently grant this app token the transactional-
+   send scope, see `VERIFICATION.md` section 7.6). SMS is also disabled,
+   pending a Twilio credential.
 2. HR-Pro sign-off clears (see `REVIEW.md`).
-3. Noah confirms HubSpot's transactional-send capability in the portal
-   (Hard Gate 1, see `CLAUDE.md`).
+3. Noah resolves HubSpot's transactional-send capability in the portal
+   (Hard Gate 1, see `CLAUDE.md` and `VERIFICATION.md` section 7.6).
 
 ## What the app already does (built and tested, see VERIFICATION.md)
 
@@ -116,6 +119,59 @@ two events.
    or simply no-ops if the visitor has not converted yet. This is the
    ungated interest-signal event, it should never block on finding a
    contact.
+7. **Slack notification branch**: a parallel output off `Upsert HubSpot
+   Contact` (does not block the SMS/email branch), node `Notify Slack: New
+   Submission`, posts to `#btc-risk-audit-alerts` (channel ID
+   `C0BG9RE3QDQ`, created 2026-07-09) with name, company, email, grade,
+   score, gap count, HR-support qualification tag, source, and report URL.
+   Built 2026-07-09 using the existing "BTC Slack" credential
+   (`R5amYUiLnbdeUVRR`). **Built but not live**: the node is `disabled:
+   true` and the update was saved as a new draft version only, the
+   currently *active/published* version of the workflow does not include
+   it, so it cannot fire even by accident. Two things need to happen before
+   it goes live: confirm the message format/channel with Noah, then
+   un-disable the node and publish the workflow.
+
+## Booked-call attribution: connecting a call back to this campaign
+
+Added 2026-07-09. HubSpot's meetings tool auto-populates three default
+contact properties whenever a visitor books through a link that carries
+UTM params: `engagements_last_meeting_booked_campaign`,
+`engagements_last_meeting_booked_source`, and
+`engagements_last_meeting_booked_medium`. No new infrastructure was needed,
+just consistent UTM tagging on every booking link this funnel emits.
+
+`lib/recommendation/index.ts` now has a `bookingUrlWithAttribution(source,
+medium)` helper. `utm_campaign` is fixed at `ca-hr-risk-audit` everywhere
+(so every booked call from this funnel rolls up under one campaign value),
+`utm_source` identifies the exact touchpoint, `utm_medium` is `web` or
+`email`:
+
+| Touchpoint               | Built by       | utm_source            | utm_medium |
+| ------------------------- | -------------- | ---------------------- | ---------- |
+| On-page CTA (grade reveal) | `buildOnPageResult()` | `landing-page-cta`     | `web`      |
+| Hosted report page         | `buildReport()`       | `hosted-report`        | `web`      |
+| Transactional report email | `buildEmailPayload()` | `transactional-email`  | `email`    |
+
+Because the contact record already carries `fbclid` and
+`compliance_check_source` from the original `tool_complete` submission, and
+HubSpot matches the meeting booking to that same contact by email, a booked
+call ties back to both the originating Meta ad (`fbclid`) and this specific
+campaign (`utm_campaign=ca-hr-risk-audit`) on one contact record, no manual
+reconciliation needed.
+
+**The 4 nurture emails are the one gap**, since they are authored directly
+in HubSpot's UI (not by this app's code, see below), so their `{{bookingUrl}}`
+merge field needs a literal URL pasted in per email rather than a computed
+one. Whoever builds that HubSpot workflow should use:
+
+- nurture-1-recap: `https://meetings.hubspot.com/bethechangehr/discoverycall?utm_campaign=ca-hr-risk-audit&utm_source=nurture-1-recap&utm_medium=email`
+- nurture-2-top-risk-insight: `https://meetings.hubspot.com/bethechangehr/discoverycall?utm_campaign=ca-hr-risk-audit&utm_source=nurture-2-top-risk-insight&utm_medium=email`
+- nurture-3-proof: `https://meetings.hubspot.com/bethechangehr/discoverycall?utm_campaign=ca-hr-risk-audit&utm_source=nurture-3-proof&utm_medium=email`
+- nurture-4-breakup: `https://meetings.hubspot.com/bethechangehr/discoverycall?utm_campaign=ca-hr-risk-audit&utm_source=nurture-4-breakup&utm_medium=email`
+
+If `NEXT_PUBLIC_BOOKING_URL` is ever changed from the default, rebuild these
+four literal URLs from the new base rather than reusing the ones above.
 
 ## Nurture sequence: handled by HubSpot's own workflow tool, not n8n waits
 
@@ -153,21 +209,45 @@ whoever owns that portal, not a per-lead n8n execution.
 
 ## Go-live checklist
 
-- [ ] n8n and HubSpot MCP connectors authorized, or a human builds this
-      directly in each tool's UI using this document.
-- [ ] Webhook node created, URL set as `COMPLIANCE_CHECK_WEBHOOK_URL` in
-      Vercel's environment variables (never committed to the repo).
-- [ ] All 16 custom HubSpot properties above created.
-- [ ] Primary and fallback email send paths built, and which one is active
-      is explicitly documented here once Gate 1 (HubSpot transactional-send
-      capability) is confirmed by Noah.
-- [ ] Twilio SMS node built and tested with a real test phone number.
+- [x] n8n and HubSpot MCP connectors authorized and confirmed live,
+      2026-07-09 (see `VERIFICATION.md` section 7.1).
+- [ ] Webhook node created (done, live at
+      `https://btchr.app.n8n.cloud/webhook/compliance-risk-check`), URL
+      set as `COMPLIANCE_CHECK_WEBHOOK_URL` in Vercel's environment
+      variables (not yet done, never committed to the repo).
+- [x] All 16 custom HubSpot properties above created and verified live,
+      2026-07-09 (see `VERIFICATION.md` section 7.2).
+- [ ] Primary and fallback email send paths built (done, both nodes exist
+      with correct field mapping), but neither is active: the primary
+      HubSpot node hit a confirmed scope error (Hard Gate 1, see
+      `VERIFICATION.md` section 7.6) and the SMTP fallback is disabled
+      pending a real SMTP credential. Which path is active must be
+      documented here once Gate 1 is resolved by Noah.
+- [ ] Twilio SMS node built (done, correct field mapping) but disabled,
+      pending a real Twilio account and credential and a real test phone
+      number (see `VERIFICATION.md` section 7.7).
 - [ ] HubSpot native nurture workflow built (4 emails, day 1 through day
-      10, unenroll on reply or `lead_meeting_booked`).
-- [ ] End-to-end test-fire completed with a **test contact only**:
-      submit the tool locally or in preview, confirm the HubSpot test
-      contact is created with every property populated correctly, confirm
-      the report email arrives with a working report link, confirm SMS
-      arrives if a test phone number with opt-in was used.
-- [ ] HR-Pro sign-off recorded in `REVIEW.md`.
+      10, unenroll on reply or `lead_meeting_booked`). Not started, a
+      manual HubSpot UI task for whoever owns that portal.
+- [x] End-to-end test-fire completed with a **test contact only**,
+      2026-07-09: submitted both `tool_complete` and `tool_viewed` events
+      against the live production webhook, confirmed the HubSpot test
+      contact (ID 234168017998) was created with every one of the 16
+      properties populated correctly, confirmed a real engagement was
+      logged on the `tool_viewed` branch. The report email did **not**
+      arrive (Hard Gate 1 blocker, confirmed not a workflow bug) and no
+      SMS was sent (node disabled, no credential). See `VERIFICATION.md`
+      section 7 for full evidence.
+- [ ] HR-Pro sign-off recorded in `REVIEW.md`. Untouched by this build,
+      remains a separate outstanding gate.
+- [ ] Slack notification branch built 2026-07-09 (`Notify Slack: New
+      Submission`, posts to `#btc-risk-audit-alerts`), but disabled and
+      only saved as a draft version, not published. Enable once Noah
+      confirms the message format and channel.
+- [x] Booked-call attribution wired 2026-07-09: `bookingUrlWithAttribution()`
+      in `lib/recommendation/index.ts` tags every code-controlled booking
+      link (on-page CTA, hosted report, transactional email) with
+      `utm_campaign=ca-hr-risk-audit`. The 4 nurture emails need the
+      literal per-email URLs above pasted in when that HubSpot workflow is
+      built.
 - [ ] Real ad traffic connected only after every box above is checked.

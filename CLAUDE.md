@@ -166,34 +166,39 @@ decision.
 - `/preview` route with seeded scenarios (including the three hand-reconciled
   golden-master scenarios) for local QA.
 
-## The delivery pipeline (fully specified, not yet wired: see status below)
+## The delivery pipeline (built and test-fired: see status below)
 
 `app/api/submit` -> n8n webhook -> HubSpot contact upsert (grade, numeric
 score, triggered gap IDs, all 8 answers, Q8 qualification tag,
 `source=meta-paid`, `fbclid`, signed report URL) -> transactional report
 email (HubSpot primary, n8n-fallback sender path staged since HubSpot's
-transactional-send capability is unconfirmed) -> SMS via Twilio if phone plus
-opt-in -> compressed 3-4 email nurture over 7-10 days, built as a native
-HubSpot workflow rather than n8n Wait nodes (see `ops/n8n-workflow.md` for
-why). The app side of this (the webhook POST from `app/api/submit`,
-validated and tested) is done. The n8n workflow and HubSpot property
-schema are fully specified, node by node, in `ops/n8n-workflow.md`, but
-**not yet built or test-fired**: the n8n and HubSpot MCP connectors were not
-connected in the session that built this app. Building and test-firing the
-actual workflow (with a test contact only, never a real prospect) is the
-next concrete step once those connectors are authorized. Not connected to
-real ad traffic until the Hard Gates below clear and the end-to-end
-test-fire evidence exists in `VERIFICATION.md`.
+transactional-send capability is confirmed not currently enabled) -> SMS via
+Twilio if phone plus opt-in -> compressed 3-4 email nurture over 7-10 days,
+built as a native HubSpot workflow rather than n8n Wait nodes (see
+`ops/n8n-workflow.md` for why). The app side of this (the webhook POST from
+`app/api/submit`, validated and tested) is done. The n8n workflow and
+HubSpot property schema are built, published, and test-fired with a test
+contact, 2026-07-09, see `VERIFICATION.md` section 7 for full evidence. The
+live production webhook is
+`https://btchr.app.n8n.cloud/webhook/compliance-risk-check`. The email leg
+(Send Report Email nodes) and SMS leg (Twilio node) are scaffolded and
+correctly wired but disabled, since neither a real HubSpot transactional
+scope/template nor a Twilio credential exist yet. Not connected to real ad
+traffic until the Hard Gates below clear.
 
 ## Hard gates before this reaches a real prospect (do not resolve, flag status)
 
-0. n8n and HubSpot MCP connectors were not connected when this app was
-   built, so the delivery pipeline in `ops/n8n-workflow.md` is fully
-   specified but not yet built or test-fired. Authorize both connectors
-   (via `/mcp` or claude.ai connector settings), then build and test-fire
-   the workflow with a test contact before anything else below matters.
-1. HubSpot transactional-send capability, unconfirmed (Noah verifies in
-   portal). n8n-fallback path is built as a config-flagged alternative.
+0. Resolved 2026-07-09. The n8n and HubSpot MCP connectors were
+   authorized and confirmed live, and the delivery pipeline in
+   `ops/n8n-workflow.md` was built, published, and test-fired with a
+   test contact. See `VERIFICATION.md` section 7 for full evidence.
+1. HubSpot transactional-send capability: confirmed **not enabled**,
+   2026-07-09, not merely unconfirmed. A real test-fire against
+   HubSpot's transactional email API returned a scope-forbidden error
+   (see `VERIFICATION.md` section 7.6). Noah needs to either grant the
+   HubSpot Service Key app the transactional-email scope or create a
+   real transactional email template and provide its ID. n8n-fallback
+   (SMTP) path is built but disabled, pending a real SMTP credential.
 2. HR-Pro sign-off (LeiLani/Genevieve) on every scoring weight, band cutoff,
    and gap-item wording, liability gate, see `REVIEW.md`.
 3. Genevieve's pain-point/qualification-signal list to sharpen Q8 and the

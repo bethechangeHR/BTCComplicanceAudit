@@ -20,14 +20,26 @@ the full evidence-backed definition-of-done checklist.
       yet, currently no-ops (logs instead of sending).
 - [ ] Set `REPORT_TOKEN_SECRET` to a real, long random secret in Vercel's
       environment variables. The `.env.example` placeholder is
-      dev-only and insecure, never use it in production.
+      dev-only and insecure, never use it in production. **This was the
+      cause of the 2026-07-09 Vercel build failure**: `/preview` was
+      statically prerendered at build time and crashed with `Error:
+      REPORT_TOKEN_SECRET is not set`. Fixed by marking `/preview` as
+      `export const dynamic = "force-dynamic"` (it is QA-only, never linked
+      from the live tool, so it has no reason to be baked into the static
+      build), which unblocks the build regardless of this env var. The
+      real pipeline (`/api/submit`, `/report/[token]`) still needs the
+      secret set in Vercel to actually function, that requirement did not
+      go away.
 - [ ] Set `NEXT_PUBLIC_SITE_URL` to the real production domain once known,
       so report links in emails resolve correctly.
-- [ ] The n8n workflow and HubSpot property schema in `ops/n8n-workflow.md`
-      are fully specified but **not yet built**: the n8n and HubSpot MCP
-      connectors were not connected in the session that built this app.
-      Authorize both, then build and test-fire the workflow with a test
-      contact before wiring the webhook URL above.
+- [x] The n8n workflow and HubSpot property schema in `ops/n8n-workflow.md`
+      are built, published, and test-fired with a test contact,
+      2026-07-09. See `VERIFICATION.md` section 7. The email leg is
+      blocked on a confirmed HubSpot scope gap (Hard Gate 1) and SMS is
+      disabled pending a Twilio credential; both are documented, neither
+      is wired live. Wire the real webhook URL
+      (`https://btchr.app.n8n.cloud/webhook/compliance-risk-check`) into
+      Vercel's `COMPLIANCE_CHECK_WEBHOOK_URL` only after Gate 1 clears.
 - [ ] `NEXT_PUBLIC_ENABLE_PIXEL` and `NEXT_PUBLIC_META_PIXEL_ID` stay unset
       until the Meta pixel/CAPI Hard Gate clears, per `CLAUDE.md`.
 
@@ -114,6 +126,21 @@ real complexity, but with no actual fix given away).
 - [ ] **Booking link**: confirm
       `https://meetings.hubspot.com/bethechangehr/discoverycall` is still
       correct and current.
+- [ ] **Booking link UTM attribution** (added 2026-07-09): the on-page CTA,
+      hosted report, and transactional email now append
+      `utm_campaign=ca-hr-risk-audit` plus a per-touchpoint `utm_source`/
+      `utm_medium` to the booking link, so a booked call rolls up in
+      HubSpot's native `engagements_last_meeting_booked_campaign/source/
+      medium` properties. See `ops/n8n-workflow.md` "Booked-call
+      attribution" for the full mapping and the 4 literal nurture-email
+      URLs that still need to be pasted in once that HubSpot workflow is
+      built. No sign-off action needed here beyond confirming the
+      `ca-hr-risk-audit` campaign name reads correctly in HubSpot reporting.
+- [ ] **Slack submission alerts** (added 2026-07-09): `#btc-risk-audit-alerts`
+      channel created, and an n8n node posting new-submission details to it
+      is built but disabled and unpublished, see `ops/n8n-workflow.md`.
+      Confirm the message format and that this is the right channel before
+      it's enabled.
 - [ ] **Transactional email and 4-email nurture sequence**
       (`content/emails/`): read all 5 for tone, and confirm the send-window
       timing (immediate, day 1-2, day 3-4, day 6-7, day 9-10) matches how

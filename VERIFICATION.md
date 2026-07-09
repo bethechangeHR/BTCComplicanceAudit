@@ -176,20 +176,204 @@ on `http://localhost:3000`). Verified with curl:
   invalid or has expired" fallback page, confirming a malformed or
   tampered token is rejected rather than silently accepted.
 
-## 7. Delivery pipeline: specified, not yet wired or test-fired
+## 7. Delivery pipeline: built and test-fired, 2026-07-09
 
-The n8n and HubSpot MCP connectors were not connected in this session
-(both returned "not connected" on every call attempted). The app side of
-the pipeline (`app/api/submit` posting a fully-formed `tool_complete`
-payload to an env-configured webhook URL) is built and tested (section 6
-above). The n8n workflow and HubSpot property schema are fully specified,
-node by node, in `ops/n8n-workflow.md`, but the actual workflow has not
-been built or test-fired with a test contact, and no real or test HubSpot
-contact has been created by this build. This is an open item, tracked as
-Hard Gate 0 in `CLAUDE.md` and the first unchecked item in
-`ops/n8n-workflow.md`'s go-live checklist. Do not consider the pipeline
-done until that test-fire happens and its evidence is added to this
-document.
+Both the n8n and HubSpot MCP connectors were confirmed live this session
+(`search_workflows` and `get_organization_details` both returned real
+data, portal ID 39710175). The pipeline in `ops/n8n-workflow.md` was
+built node by node and test-fired with a **test contact only**, never a
+real prospect. Evidence below.
+
+### 7.1 MCP connector confirmation
+
+`mcp__claude_ai_n8n__search_workflows` returned `{"data":[],"count":0}`
+(empty portal, connector live). `mcp__claude_ai_HubSpot__get_organization_details`
+returned real account data: `{"accountId":39710175,"timeZone":"US/Eastern","uiDomain":"app.hubspot.com"}`.
+
+### 7.2 16 HubSpot custom contact properties, created and verified
+
+Built as a one-time n8n setup workflow ("Setup: BTC Compliance Check
+HubSpot Properties v2", workflow ID `fNaVvL4V37k7mkro`, HTTP Request
+nodes calling HubSpot's Properties API directly, since neither the n8n
+HubSpot node nor the HubSpot MCP expose property-schema creation).
+Executed once; all 16 properties returned HTTP 201 with the exact
+`name`, `type`, `fieldType`, `groupName`, and enum `options` specified in
+this document's schema table. Verified independently afterward with a
+direct `mcp__claude_ai_HubSpot__get_properties` call for all 16 names:
+
+```
+propertiesNotFound: []
+```
+
+All 16 confirmed present with correct types and option sets:
+`compliance_check_grade` (enumeration A-F), `compliance_check_score`
+(number), `compliance_check_max_score` (number),
+`compliance_check_gap_ids` (string/textarea),
+`compliance_check_qualification_tag` (enumeration
+in_house/outside/none), `compliance_check_report_url` (string),
+`compliance_check_source` (enumeration meta-paid/email), `fbclid`
+(string), and `cc_headcount`/`cc_states`/`cc_contractor_use`/
+`cc_salaried_classification`/`cc_handbook_status`/
+`cc_harassment_training`/`cc_leave_process`/`cc_hr_support`
+(enumerations, options matching the literal values in
+`lib/engine/types.ts` exactly).
+
+Note: HubSpot already has a native `hs_facebook_click_id` field. This
+build created the custom `fbclid` property anyway, exactly as specified
+in `ops/n8n-workflow.md`'s schema table, since that document's wording
+is explicit ("exactly per"). Flagged here in case Noah prefers to
+consolidate onto the native field later.
+
+### 7.3 Main delivery pipeline workflow, built and published
+
+n8n workflow "BTC California HR Risk Audit: Delivery Pipeline" (ID
+`WZgb6WemXlxuamzz`), published and active. Live production webhook URL:
+
+```
+https://btchr.app.n8n.cloud/webhook/compliance-risk-check
+```
+
+This is the value to set as `COMPLIANCE_CHECK_WEBHOOK_URL` in Vercel
+once Noah approves (not set by this build, per `REVIEW.md`).
+
+Node map as built: Webhook (POST, responds immediately) -> Normalize
+Payload (Set node, optional-chains every field so `$json.body?.x ??
+$json.x` never breaks on a reshaped payload) -> Route by Event (Switch
+on `event`, 3 outputs: `tool_complete`, `tool_viewed`, and an explicit
+`Unknown Event` fallback so nothing is silently dropped) -> per the node
+map in `ops/n8n-workflow.md`.
+
+### 7.4 Test-fire 1: `tool_complete` event, real HubSpot contact created
+
+Fired via `execute_workflow` against the published production webhook
+with a payload shaped exactly like `app/api/submit`'s real
+`tool_complete` body (see `ops/n8n-workflow.md`), using a clearly
+labeled test identity:
+
+```json
+{
+  "email": "qa-test-riskaudit@bethechangehr.com",
+  "name": "QA Test Contact",
+  "company": "DO NOT CONTACT - BTC Pipeline Test",
+  "fbclid": "test-fbclid-verification-2026-07-08",
+  "grade": "F", "score": 39, "maxPossibleScore": 49
+}
+```
+
+The "Upsert HubSpot Contact" node returned
+`{"vid":234168017998,"isNew":true}` on first fire and
+`{"vid":234168017998,"isNew":false}` on a second fire (confirming upsert
+idempotency, not duplicate creation). Fetched the live record directly
+with `mcp__claude_ai_HubSpot__get_crm_objects`, contact ID
+234168017998:
+
+```json
+{
+  "email": "qa-test-riskaudit@bethechangehr.com",
+  "firstname": "QA Test Contact",
+  "company": "DO NOT CONTACT - BTC Pipeline Test",
+  "compliance_check_grade": "F",
+  "compliance_check_score": "39",
+  "compliance_check_max_score": "49",
+  "compliance_check_gap_ids": "gap-1099-mostly,gap-exempt-all,gap-handbook-none,gap-training-none,gap-leave-none",
+  "compliance_check_qualification_tag": "none",
+  "compliance_check_report_url": "https://compliance.bethechangehr.com/report/test-token-qa-2026-07-08",
+  "compliance_check_source": "meta-paid",
+  "fbclid": "test-fbclid-verification-2026-07-08",
+  "cc_headcount": "10-49",
+  "cc_states": "california_only",
+  "cc_contractor_use": "mostly",
+  "cc_salaried_classification": "all_salaried",
+  "cc_handbook_status": "none",
+  "cc_harassment_training": "no",
+  "cc_leave_process": "no",
+  "cc_hr_support": "none"
+}
+```
+
+Every one of the 16 custom properties is populated correctly from the
+webhook payload. Live record:
+`https://app.hubspot.com/contacts/39710175/record/0-1/234168017998`.
+
+### 7.5 Test-fire 2: `tool_viewed` event, engagement logged on existing contact
+
+Fired with
+`{"event":"tool_viewed","fbclid":"test-fbclid-verification-2026-07-08"}`
+(matching `app/api/track`'s real payload shape). The "Search Contact by
+fbclid" node found the test contact from 7.4 by its `fbclid` property,
+and "Log Tool Viewed Engagement" created a real HubSpot task engagement
+(ID `112595904429`) associated to that contact, body `"fbclid:
+test-fbclid-verification-2026-07-08, viewed at
+2026-07-09T05:36:00.000Z"`. Confirms the ungated `tool_viewed` branch
+correctly finds and annotates an existing contact rather than blocking
+or erroring.
+
+### 7.6 Email leg: real API call made, blocked on a scope grant, not test-fired to delivery
+
+The primary "Send Report Email (HubSpot)" node made a real POST to
+HubSpot's `marketing/v3/transactional/single-email/send` endpoint using
+the existing HubSpot Service Key (App Token) credential. HubSpot's API
+returned:
+
+```json
+{
+  "name": "NodeApiError",
+  "message": "Forbidden - perhaps check your credentials?",
+  "description": "This app hasn't been granted all required scopes to make this call. Read more about required scopes here: https://developers.hubspot.com/scopes."
+}
+```
+
+This is concrete, first-hand confirmation of Hard Gate 1 (`CLAUDE.md`,
+`REVIEW.md`): HubSpot transactional-send capability is not currently
+available to this app token. It is not merely "unconfirmed," it is
+confirmed **not enabled** as configured today. Fixing this requires
+either granting the HubSpot Service Key app the transactional-email
+scope (if the portal's plan includes that API) or creating a real
+transactional email template in the HubSpot UI and referencing its ID
+(the node currently uses a `placeholder()` for `emailId` since no real
+template exists yet), a decision for Noah, not resolvable by this
+build.
+
+`onError: 'continueErrorOutput'` on that node correctly routed the
+failure to the SMTP fallback node instead of crashing the workflow
+(execution status: `success` end to end). The SMTP fallback node itself
+is disabled, since no SMTP credential exists in this n8n instance
+(`list_credentials` returned only HubSpot and Slack credentials, no
+`smtp` type). No email was sent or received. **This is the one piece of
+"actual email received" evidence this session could not produce**, and
+it is a credential/scope gap, not a workflow-design gap: the node, its
+field mapping, and its error-fallback wiring are all built and
+confirmed to fire correctly.
+
+### 7.7 SMS leg: scaffolded, disabled, no Twilio credential exists
+
+The "Send SMS (Twilio)" node is built with the correct field mapping
+(`to`, `message` referencing the normalized payload, report URL, and
+booking link) but is disabled, since no `twilioApi` credential exists in
+this n8n instance. The "Has SMS Opt-in?" IF node correctly evaluates
+`smsOptIn && phone` (fixed a strict-boolean-type-validation bug hit
+during test-fire, resolved by enabling loose type validation on that
+node, then confirmed working in test-fire 1 above where
+`smsOptIn: false` correctly routed to the `False` branch).
+
+### 7.8 What is and is not done
+
+Done, with real evidence: MCP connector confirmation, all 16 HubSpot
+properties, the full node graph published and live, both webhook events
+(`tool_complete` and `tool_viewed`) test-fired against a real test
+contact with correct data end to end, the primary/fallback email
+error-handling path confirmed to fire correctly under a real failure.
+
+Not done, and not resolvable by this build: actual email delivery
+(blocked on a HubSpot scope grant or a real transactional email
+template, Noah's decision, Hard Gate 1), actual SMS delivery (blocked on
+provisioning a Twilio account and credential), the native HubSpot
+nurture workflow (a one-time manual setup task in the HubSpot UI, see
+`ops/n8n-workflow.md`), and HR-Pro sign-off (`REVIEW.md`, a separate
+liability gate, untouched by this build).
+
+Do not connect real ad traffic until the email leg above is resolved and
+HR-Pro sign-off clears.
 
 ## 8. Mobile responsiveness and accessibility, spot check
 
@@ -265,12 +449,18 @@ See `REVIEW.md` for the full checklist. Highest-priority items:
 
 - HR-Pro sign-off on every scoring weight, band cutoff, and gap-item
   wording (liability gate).
-- Build and test-fire the n8n workflow and HubSpot property schema (item
-  7 above).
+- Resolve the HubSpot transactional email scope/template gap confirmed
+  in section 7.6 above (Hard Gate 1), then re-test-fire the email leg
+  specifically before enabling the "Send Report Email (HubSpot)" node.
+- Provision a Twilio account and credential, then enable the "Send SMS
+  (Twilio)" node (section 7.7).
 - Confirm the question 2 answer-option interpretation and the 8-vs-10
   question discrepancy with LeiLani.
 - Insert a real, approved testimonial in `content/emails/nurture-3-proof.txt`
   before that email is used.
-- Set `COMPLIANCE_CHECK_WEBHOOK_URL`, `REPORT_TOKEN_SECRET`, and
-  `NEXT_PUBLIC_SITE_URL` to real production values in Vercel before
-  deploying.
+- Set `COMPLIANCE_CHECK_WEBHOOK_URL` to
+  `https://btchr.app.n8n.cloud/webhook/compliance-risk-check`, and set
+  `REPORT_TOKEN_SECRET` and `NEXT_PUBLIC_SITE_URL` to real production
+  values, in Vercel before deploying.
+- Build the native HubSpot nurture workflow (4 emails, day 1-10) in the
+  HubSpot UI, see `ops/n8n-workflow.md`.
