@@ -20,6 +20,46 @@ and a fresh n8n/HubSpot test-fire) is a follow-up item, not yet done as part
 of this Part A change, see the updated open-items list at the bottom of this
 file.
 
+**2026-07-09 end-of-session summary, Part B (design overhaul) and Part B7
+(pixel wiring):** after the Part A logic rework above, this same session
+also replaced the cream/Fraunces design system with the teal-instrument/
+Spectral system, reframed the hero copy away from an "instant grade" pitch,
+rebuilt the grade reveal into an instrument-panel scorecard (removing the
+on-page score line and the direct report link), added a loss-aversion CTA,
+simplified the booking embed, and rebuilt the hosted report page as the
+funnel's highest-perceived-value asset. None of this touched
+`lib/engine/`, `data/scoring.ts`, or `data/gap-library.ts`, so it does not
+invalidate the hand-reconciled scenarios in section 2 below or the
+gap-item source mapping in section 3; those still need the same
+re-verification against the new 54-point model called out in the note
+above, nothing more. `npx tsc --noEmit`, `next lint`, and `npx vitest run`
+(32 tests) were all re-run clean after both the pixel wiring and the design
+changes, see the fresh command output captured for this phase.
+
+Also this session: Meta Pixel client-side event firing was wired
+(`components/MetaPixel.tsx`, `channels/pixel.ts`'s `trackPixelEvent()`,
+and the `ToolStart`/`Lead`/`ToolComplete` call sites in
+`components/ComplianceCheckApp.tsx`), per Hard Gate 5 in `CLAUDE.md`. This
+is wiring only, confirmed still OFF by default: `NEXT_PUBLIC_ENABLE_PIXEL`
+grepped across the repo (excluding `node_modules`) is `false` in both
+`.env.local` and `.env.example` and unset everywhere else, and a `curl` of
+the rendered homepage HTML with the flag off contains no `fbq(` call, no
+`connect.facebook.net` script, and no `meta-pixel-base` script tag. This
+has not been tested with the flag actually turned on (no pixel ID exists
+to test with, and turning it on is explicitly out of scope, gated behind
+Hard Gate 5 clearing).
+
+**What still needs fresh verification evidence before real prospect
+traffic, unaffected by this session's design/pixel-wiring changes:** the
+full end-to-end delivery pipeline test-fire through the live production
+form, as scoped in `ops/NEXT-SESSION-HANDOFF.md` (a real submission through
+the live Vercel deploy, confirming a new n8n execution, a new/updated
+HubSpot contact with all 16 properties populated, and that the disabled
+Slack alert node correctly does not fire). That item was already
+outstanding before this session's design and pixel work started and
+remains outstanding now; nothing in this session's changes affects it
+either way.
+
 ## 1. Test output
 
 `npx vitest run`, 2026-07-08, original run. Re-run 2026-07-09 after the Part
@@ -449,6 +489,21 @@ One real lint fix was made along the way: `app/report/[token]/page.tsx`
 used a plain `<a href="/">` for the invalid-token fallback link, which
 `@next/next/no-html-link-for-pages` correctly flagged, fixed by switching
 to `next/link`'s `<Link>`.
+
+**Re-run 2026-07-09, end of session, after the Part B design overhaul and
+the Part B7 Meta Pixel wiring:**
+
+```
+npx tsc --noEmit  -> clean, no output
+npm run lint      -> "No ESLint warnings or errors"
+npx vitest run    -> 5 test files, 32 tests, all passed
+```
+
+`npx prettier --check .` was not re-run separately this pass (no formatting
+changes are expected outside what lint already covers); flagging that
+explicitly rather than silently asserting it. `npm run build` was not
+re-run either, per this phase's instructions, section 10 below still
+applies unchanged.
 
 ## 10. Environment limitation: `next build` fails locally, unrelated to app code
 

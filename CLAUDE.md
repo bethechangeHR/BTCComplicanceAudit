@@ -127,12 +127,39 @@ honest report gains in urgency.
   --btc-gray: #676766;
   --btc-white: #ffffff;
   --btc-gold: #c2a268;
+  --btc-surface: #f5f8f7;
+  --btc-ink: #14211e;
+  --btc-instrument: #0b211d;
+  --btc-instrument-line: rgba(255, 255, 255, 0.12);
 }
 ```
 
-Risk and urgency emphasis is carried by deep-teal shades, type weight, and
-iconography, never by a new hue. Font: Inter. This is a diagnostic
-instrument, not a quiz: confident type, generous spacing, real hierarchy.
+The four `--btc-surface`/`--btc-ink`/`--btc-instrument`/`--btc-instrument-line`
+tokens were added 2026-07-09 in the design overhaul below (see
+`app/globals.css` and the `surface`/`ink`/`instrument` entries in
+`tailwind.config.ts`). `--btc-surface` is the page background (a near-white
+teal-tinted surface, not cream). `--btc-ink` is the primary text/heading
+color. `--btc-instrument` is the deep-teal near-black panel background used
+for the grade-reveal scorecard and other "instrument panel" surfaces,
+paired with `--btc-instrument-line` for hairline borders on that dark
+surface. Risk and urgency emphasis is carried by deep-teal shades, type
+weight, and iconography, never by a new hue.
+
+Fonts: Spectral (display/heading serif, replaced Fraunces 2026-07-09) plus
+Inter (body/UI sans, unchanged). This is a diagnostic instrument, not a
+quiz: confident type, generous spacing, real hierarchy.
+
+**2026-07-09 design pass note:** a full design overhaul happened this
+session, per Noah's direct feedback: the old cream/Fraunces "AI tell"
+aesthetic was replaced with the teal-instrument/Spectral system above,
+grade-first framing was removed from the hero copy, the on-page score line
+and report link were removed from the grade reveal, the grade reveal was
+rebuilt as an instrument-panel scorecard, a loss-aversion CTA was added,
+and the hosted report page was rebuilt as the funnel's highest-perceived-
+value asset. See commit history (`git log --oneline`) for the individual
+changes. A future session should treat the current code, not this
+document's older prose elsewhere, as the source of truth for anything not
+explicitly called out as still-first-draft.
 
 ## Voice
 
@@ -166,8 +193,10 @@ decision.
   only after the email validates, POSTs the full submission to
   `COMPLIANCE_CHECK_WEBHOOK_URL` (env-driven, never hardcoded), captures
   `fbclid` from the URL and stores it with the payload.
-- Meta Pixel + CAPI hooks are built but feature-flagged OFF by default
-  (`NEXT_PUBLIC_ENABLE_PIXEL`). Never hardwired pixel IDs.
+- Meta Pixel client-side event firing (PageView, ToolStart, Lead,
+  ToolComplete) is wired but feature-flagged OFF by default
+  (`NEXT_PUBLIC_ENABLE_PIXEL`). Server-side CAPI is not built yet, a future
+  phase. Never hardwired pixel IDs.
 - Booking CTA everywhere: `https://meetings.hubspot.com/bethechangehr/discoverycall`
   (also read from `NEXT_PUBLIC_BOOKING_URL`).
 - `/preview` route with seeded scenarios (including the three hand-reconciled
@@ -212,7 +241,16 @@ traffic until the Hard Gates below clear.
    lead-quality tag wording, seam left clean in `buildQualificationTag()`.
 4. Booking routing decision (round-robin vs. LeiLani-only), unresolved. Uses
    the existing single booking link only, no scheduler changes made.
-5. Meta pixel/CAPI events live before spend, built but env-flagged off.
+5. Meta pixel/CAPI events live before spend, still unresolved. As of
+   2026-07-09, client-side Pixel firing is wired end to end
+   (`components/MetaPixel.tsx` conditionally injects the base snippet,
+   `channels/pixel.ts`'s `trackPixelEvent()` fires `ToolStart`, `Lead`, and
+   `ToolComplete` from `components/ComplianceCheckApp.tsx`, PageView fires
+   from the base snippet itself), but `NEXT_PUBLIC_ENABLE_PIXEL` is `false`
+   (`.env.local`, `.env.example`) and `NEXT_PUBLIC_META_PIXEL_ID` is unset
+   everywhere, so nothing fires. Server-side CAPI is not built at all, out of scope for this
+   session, a separate future integration requiring a Meta access token.
+   Do not set either env var to a real value before this gate clears.
 6. Site geo-consistency (the funnel's landing page must not contradict BTC's
    confirmed all-50-state service area), owned by the site/IT vendor, not
    this app.

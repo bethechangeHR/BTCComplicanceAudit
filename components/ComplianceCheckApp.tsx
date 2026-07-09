@@ -10,6 +10,7 @@ import { QUESTIONS } from "@/data/questions";
 import type { ComplianceAnswers } from "@/lib/engine/types";
 import type { OnPageResult } from "@/lib/recommendation/types";
 import type { ChannelMode } from "@/channels/types";
+import { trackPixelEvent } from "@/channels/pixel";
 
 type Stage =
   | { name: "intro" }
@@ -49,6 +50,9 @@ export function ComplianceCheckApp({
     if (stage.name !== "question") return;
     const question = QUESTIONS[stage.index];
     if (!question) return;
+    if (stage.index === 0 && Object.keys(answers).length === 0) {
+      trackPixelEvent("ToolStart");
+    }
     const nextAnswers = { ...answers, [question.key]: value };
     setAnswers(nextAnswers);
 
@@ -60,6 +64,7 @@ export function ComplianceCheckApp({
   }
 
   async function handleGateSubmit(submission: GateSubmission) {
+    trackPixelEvent("Lead");
     setStage({ name: "submitting" });
     try {
       const response = await fetch("/api/submit", {
@@ -83,6 +88,7 @@ export function ComplianceCheckApp({
       }
 
       const data = await response.json();
+      trackPixelEvent("ToolComplete", { grade: data.onPageResult?.grade });
       setStage({
         name: "result",
         onPageResult: data.onPageResult,

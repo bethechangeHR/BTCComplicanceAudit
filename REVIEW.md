@@ -41,7 +41,13 @@ the full evidence-backed definition-of-done checklist.
       (`https://btchr.app.n8n.cloud/webhook/compliance-risk-check`) into
       Vercel's `COMPLIANCE_CHECK_WEBHOOK_URL` only after Gate 1 clears.
 - [ ] `NEXT_PUBLIC_ENABLE_PIXEL` and `NEXT_PUBLIC_META_PIXEL_ID` stay unset
-      until the Meta pixel/CAPI Hard Gate clears, per `CLAUDE.md`.
+      until the Meta pixel/CAPI Hard Gate clears, per `CLAUDE.md`. As of
+      2026-07-09, client-side event firing (`components/MetaPixel.tsx`,
+      `channels/pixel.ts`, the `ToolStart`/`Lead`/`ToolComplete` call sites
+      in `components/ComplianceCheckApp.tsx`) is wired and confirmed to
+      inject nothing into the rendered page while the flag is off. This
+      does not close the gate: server-side CAPI is not built, and no real
+      pixel ID has been tested end to end with the flag on.
 
 ## Scoring model: first-draft, needs HR-Pro calibration
 

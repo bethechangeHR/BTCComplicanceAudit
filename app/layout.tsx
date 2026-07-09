@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Spectral, Inter } from "next/font/google";
+import { MetaPixel } from "@/components/MetaPixel";
 import "./globals.css";
 
 const spectral = Spectral({
@@ -30,6 +31,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${spectral.variable} ${inter.variable}`}>
       <body className="min-h-screen bg-surface font-sans text-btc-gray antialiased">
+        <MetaPixel />
         {children}
       </body>
     </html>
