@@ -21,13 +21,13 @@ const config: Config = {
       },
       fontFamily: {
         sans: [
-          "var(--font-inter)",
+          "var(--font-hanken)",
           "ui-sans-serif",
           "system-ui",
           "-apple-system",
           "sans-serif",
         ],
-        display: ["var(--font-spectral)", "ui-serif", "Georgia", "serif"],
+        display: ["var(--font-newsreader)", "ui-serif", "Georgia", "serif"],
       },
       boxShadow: {
         document:

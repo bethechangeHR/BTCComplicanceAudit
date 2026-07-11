@@ -121,17 +121,14 @@ export function ComplianceCheckApp({
         </div>
       )}
 
-      {stage.name === "gate" && (
-        <EmailGateStep onSubmit={handleGateSubmit} submitting={false} />
+      {(stage.name === "gate" || stage.name === "submitting") && (
+        <EmailGateStep
+          onSubmit={handleGateSubmit}
+          submitting={stage.name === "submitting"}
+        />
       )}
 
-      {stage.name === "submitting" && (
-        <EmailGateStep onSubmit={() => {}} submitting />
-      )}
-
-      {stage.name === "result" && (
-        <ResultView result={stage.onPageResult} reportUrl={stage.reportUrl} />
-      )}
+      {stage.name === "result" && <ResultView result={stage.onPageResult} />}
 
       {stage.name === "error" && (
         <div className="mx-auto max-w-md space-y-4 text-center">

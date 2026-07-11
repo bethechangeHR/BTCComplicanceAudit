@@ -1,19 +1,19 @@
 import type { Metadata } from "next";
-import { Spectral, Inter } from "next/font/google";
+import { Newsreader, Hanken_Grotesk } from "next/font/google";
 import { MetaPixel } from "@/components/MetaPixel";
 import "./globals.css";
 
-const spectral = Spectral({
+const newsreader = Newsreader({
   subsets: ["latin"],
-  variable: "--font-spectral",
+  variable: "--font-newsreader",
   weight: ["400", "500", "600"],
   style: ["normal", "italic"],
   display: "swap",
 });
 
-const inter = Inter({
+const hankenGrotesk = Hanken_Grotesk({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-hanken",
   display: "swap",
 });
 
@@ -29,7 +29,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${spectral.variable} ${inter.variable}`}>
+    <html
+      lang="en"
+      className={`${newsreader.variable} ${hankenGrotesk.variable}`}
+    >
       <body className="min-h-screen bg-surface font-sans text-btc-gray antialiased">
         <MetaPixel />
         {children}

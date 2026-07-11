@@ -5,35 +5,26 @@ import { BookingEmbed } from "./BookingEmbed";
 import { Disclaimer } from "./Disclaimer";
 import type { OnPageResult } from "@/lib/recommendation/types";
 
-/**
- * `reportUrl` is rendered as a direct fallback link as of 2026-07-11: the
- * sending domain is still warming up its email reputation, so some report
- * emails land in spam or are delayed. This temporarily overrides the
- * 2026-07-09 email-only decision in CLAUDE.md, "Report philosophy," so no
- * lead is ever fully cut off from their report. Remove this link once
- * inbox delivery is confirmed reliable (see VERIFICATION.md).
- */
-export function ResultView({
-  result,
-  reportUrl,
-}: {
-  result: OnPageResult;
-  reportUrl: string;
-}) {
+export function ResultView({ result }: { result: OnPageResult }) {
   return (
-    <div className="mx-auto max-w-xl space-y-8 text-center">
-      <GradeBadge
-        grade={result.grade}
-        riskTierLabel={result.riskTierLabel}
-        flaggedCount={result.categoryRisks.length}
-      />
+    <div className="animate-reveal-in mx-auto max-w-xl space-y-10">
+      <div className="space-y-6 text-center">
+        <GradeBadge
+          grade={result.grade}
+          riskTierLabel={result.riskTierLabel}
+          flaggedCount={result.categoryRisks.length}
+        />
 
-      <p className="font-display text-xl text-ink sm:text-2xl">
-        {result.verdictLine}
-      </p>
+        <p className="font-display text-xl text-ink sm:text-2xl">
+          {result.verdictLine}
+        </p>
+      </div>
 
       {result.categoryRisks.length > 0 && (
-        <div className="space-y-3 text-left">
+        <div
+          className="animate-rise-in space-y-3 text-left"
+          style={{ animationDelay: "120ms" }}
+        >
           <h3 className="text-center text-base font-semibold text-ink sm:text-lg">
             Flagged risk categories
           </h3>
@@ -41,21 +32,21 @@ export function ResultView({
         </div>
       )}
 
-      <p className="animate-rise-in text-sm text-btc-gray">
-        Your full audit report, with the complete reasoning behind every
-        flagged area, is on its way to your inbox. You can also view it right
-        now:{" "}
-        <a
-          href={reportUrl}
-          className="font-semibold text-btc-teal-dark underline"
-        >
-          Open your full report
-        </a>
+      <p
+        className="animate-rise-in text-center text-sm text-btc-gray"
+        style={{ animationDelay: "220ms" }}
+      >
+        Your full audit report is being sent to your inbox.
       </p>
 
-      <RiskAssessmentCTA />
-      <BookingEmbed bookingUrl={result.bookingUrl} />
-      <Disclaimer text={result.disclaimer} />
+      <div
+        className="animate-rise-in space-y-8"
+        style={{ animationDelay: "300ms" }}
+      >
+        <RiskAssessmentCTA />
+        <BookingEmbed bookingUrl={result.bookingUrl} />
+        <Disclaimer text={result.disclaimer} />
+      </div>
     </div>
   );
 }

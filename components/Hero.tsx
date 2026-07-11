@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export function Hero({ onStart }: { onStart: () => void }) {
   return (
-    <div className="animate-reveal-in mx-auto max-w-xl space-y-8 text-center">
+    <div className="animate-reveal-in mx-auto max-w-2xl space-y-8 text-center">
       <Image
         src="/btc-logo-color.png"
         alt="Be the Change HR"
@@ -11,15 +11,14 @@ export function Hero({ onStart }: { onStart: () => void }) {
         className="mx-auto h-auto w-36 sm:w-40"
         priority
       />
-      <div className="space-y-4">
-        <h1 className="text-balance font-display text-4xl font-medium leading-tight text-ink sm:text-5xl">
-          See exactly where your HR practices are exposing your business,
-          before it becomes a claim.
+      <div className="space-y-6">
+        <h1 className="text-balance font-display text-4xl font-medium text-ink sm:text-5xl">
+          The HR gaps exposing your California business, before they become
+          a claim.
         </h1>
         <p className="text-base text-btc-gray sm:text-lg">
-          California employment law leaves little room for guesswork. Answer
-          a few short questions and get a real HR risk grade for your
-          business, plus the specific areas creating exposure right now.
+          9 quick questions. A real A-F risk grade and the specific gaps
+          putting you at risk right now.
         </p>
       </div>
       <button

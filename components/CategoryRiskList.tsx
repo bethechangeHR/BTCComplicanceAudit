@@ -2,18 +2,25 @@ import type { CategoryRisk } from "@/lib/engine/types";
 
 const SEVERITY_STYLE: Record<
   CategoryRisk["severity"],
-  { dot: string; label: string; text: string }
+  { dot: string; label: string; text: string; border: string }
 > = {
-  high: { dot: "bg-[#b3452f]", label: "High exposure", text: "text-[#8a3421]" },
+  high: {
+    dot: "bg-[#b3452f]",
+    label: "High exposure",
+    text: "text-[#8a3421]",
+    border: "border-[#b3452f]/25",
+  },
   medium: {
     dot: "bg-btc-gold",
     label: "Moderate exposure",
     text: "text-[#8f7442]",
+    border: "border-btc-gold/30",
   },
   low: {
     dot: "bg-btc-teal",
     label: "Worth reviewing",
     text: "text-btc-teal-dark",
+    border: "border-btc-teal/25",
   },
 };
 
@@ -42,14 +49,14 @@ export function CategoryRiskList({
         return (
           <li
             key={risk.category}
-            className="animate-rise-in flex items-center justify-between gap-4 rounded-xl border border-ink/8 bg-white px-5 py-4 shadow-document"
+            className="animate-rise-in flex items-center justify-between gap-4 rounded-xl border border-ink/10 bg-white px-5 py-4 shadow-document"
             style={{ animationDelay: `${index * 70}ms` }}
           >
-            <span className="font-display text-base text-ink sm:text-lg">
+            <span className="font-display text-base font-medium text-ink sm:text-lg">
               {risk.category}
             </span>
             <span
-              className={`flex shrink-0 items-center gap-2 text-xs font-semibold uppercase tracking-wide ${style.text}`}
+              className={`flex shrink-0 items-center gap-2 rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-wide ${style.text} ${style.border}`}
             >
               <span className={`h-2 w-2 rounded-full ${style.dot}`} />
               {style.label}

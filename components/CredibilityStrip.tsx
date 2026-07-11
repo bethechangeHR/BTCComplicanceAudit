@@ -6,14 +6,24 @@
  * should supply an approved testimonial line here once selected, rather
  * than one being invented.
  */
+const POINTS = [
+  "Reviewed by HR Pros with 15+ years of experience",
+  "Serving employers nationwide",
+  "No cost, no obligation",
+];
+
 export function CredibilityStrip() {
   return (
-    <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2 border-y border-ink/8 py-4 text-xs font-medium uppercase tracking-wide text-btc-gray/80 sm:text-sm">
-      <span>Reviewed by HR Pros with 15+ years of experience</span>
-      <span className="hidden h-1 w-1 rounded-full bg-btc-gray/40 sm:block" />
-      <span>Serving employers nationwide</span>
-      <span className="hidden h-1 w-1 rounded-full bg-btc-gray/40 sm:block" />
-      <span>No cost, no obligation</span>
+    <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
+      {POINTS.map((point) => (
+        <span
+          key={point}
+          className="flex items-center gap-2 text-sm font-medium text-btc-gray"
+        >
+          <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-btc-teal" />
+          {point}
+        </span>
+      ))}
     </div>
   );
 }

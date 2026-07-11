@@ -41,7 +41,7 @@ body::before {
 }
 
 .font-display {
-  font-family: var(--font-spectral), ui-serif, Georgia, serif;
+  font-family: var(--font-newsreader), ui-serif, Georgia, serif;
   font-feature-settings: "ss01" 1;
 }
 

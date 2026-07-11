@@ -8,6 +8,14 @@ const GRADE_ACCENT: Record<RiskGrade, string> = {
   F: "text-btc-gold",
 };
 
+const TIER_BADGE: Record<RiskGrade, string> = {
+  A: "border-btc-teal/40 bg-btc-teal/10 text-btc-teal",
+  B: "border-btc-teal/40 bg-btc-teal/10 text-btc-teal",
+  C: "border-btc-gold/40 bg-btc-gold/10 text-btc-gold",
+  D: "border-btc-gold/40 bg-btc-gold/10 text-btc-gold",
+  F: "border-[#b3452f]/40 bg-[#b3452f]/10 text-[#e08a6f]",
+};
+
 function flaggedCountLine(flaggedCount: number): string {
   if (flaggedCount === 0) {
     return "No flagged areas from your answers";
@@ -36,10 +44,10 @@ export function GradeBadge({
 }) {
   return (
     <div
-      className={`rounded-3xl border bg-instrument px-8 py-10 sm:px-12 sm:py-14 ${animated ? "animate-reveal-in" : ""}`}
+      className={`rounded-3xl border bg-instrument px-8 py-8 shadow-document sm:px-10 sm:py-10 ${animated ? "animate-reveal-in" : ""}`}
       style={{ borderColor: "var(--btc-instrument-line)" }}
     >
-      <div className="flex flex-col items-center gap-5 text-center">
+      <div className="flex flex-col items-center gap-4 text-center">
         <span
           className={`font-display text-8xl font-medium leading-none sm:text-9xl ${GRADE_ACCENT[grade]}`}
         >
@@ -47,7 +55,9 @@ export function GradeBadge({
         </span>
 
         {riskTierLabel && (
-          <span className="text-lg font-semibold text-white sm:text-xl">
+          <span
+            className={`rounded-full border px-4 py-1 text-sm font-bold uppercase tracking-wide ${TIER_BADGE[grade]}`}
+          >
             {riskTierLabel}
           </span>
         )}

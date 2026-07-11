@@ -145,9 +145,11 @@ paired with `--btc-instrument-line` for hairline borders on that dark
 surface. Risk and urgency emphasis is carried by deep-teal shades, type
 weight, and iconography, never by a new hue.
 
-Fonts: Spectral (display/heading serif, replaced Fraunces 2026-07-09) plus
-Inter (body/UI sans, unchanged). This is a diagnostic instrument, not a
-quiz: confident type, generous spacing, real hierarchy.
+Fonts: Newsreader (display/heading serif, replaced Spectral 2026-07-11) plus
+Hanken Grotesk (body/UI sans, replaced Inter 2026-07-11). Both changed in
+the 2026-07-11 design pass below, per Noah's direct feedback that Spectral
+and Inter read as generic. This is a diagnostic instrument, not a quiz:
+confident type, generous spacing, real hierarchy.
 
 **2026-07-09 design pass note:** a full design overhaul happened this
 session, per Noah's direct feedback: the old cream/Fraunces "AI tell"
@@ -160,6 +162,36 @@ value asset. See commit history (`git log --oneline`) for the individual
 changes. A future session should treat the current code, not this
 document's older prose elsewhere, as the source of truth for anything not
 explicitly called out as still-first-draft.
+
+**2026-07-11 copy and design pass note:** hero copy tightened for a
+loss-aversion read and its cramped spacing loosened (`components/Hero.tsx`).
+The gate-to-submitting empty-form flash was fixed by rendering a single
+persistent `EmailGateStep` instance instead of two separate elements
+(`components/ComplianceCheckApp.tsx`); the result screen now animates in
+with the existing reveal/rise keyframes. The on-page result no longer
+shows or links to the full report (`components/ResultView.tsx`); it now
+reads only "Your full audit report is being sent to your inbox," email-only,
+per Noah's direct instruction. **This means the 2026-07-11 on-page fallback
+link is gone again, and email delivery (Hard Gate #1 below) must be
+resolved before this reaches real ad traffic, or a lead gets neither
+surface.** Fonts changed to Newsreader/Hanken Grotesk (see above). The
+hosted report (`components/ReportView.tsx`) was substantially redesigned:
+the cover band now runs the white logo directly on the instrument surface
+and is filled with contact/grade/flagged-count information instead of
+empty space; `GradeBadge` and the severity badges carry more visual weight;
+every gap item's legal citation moved from an inline `Source:` line to a
+superscript marker resolving to one numbered Sources list at the report's
+end (`sourceRef` values unchanged, still fully cited); the $200K industry
+anchor box was enlarged into a focal statistic and its visible
+self-citation to BTC's own pitch deck was removed, the in-sentence
+disclaimer ("not a BTC guarantee") already carries the required industry-
+figure framing; the CTA was rebuilt around the booking embed with
+`CredibilityStrip`'s three confirmed proof points as supporting trust
+signals rather than the CTA itself. Every `reportDiagnosis` and
+`scopeOfWork` entry in `data/gap-library.ts` was also rewritten tighter and
+more scannable, same legal substance and `sourceRef`s, fewer words. **This
+re-triggers the HR-Pro sign-off liability gate in `REVIEW.md`** since the
+wording changed after the original review.
 
 ## Voice
 
