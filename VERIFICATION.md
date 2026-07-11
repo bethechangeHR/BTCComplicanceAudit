@@ -607,6 +607,69 @@ should not hit this at all. Recommend confirming a clean `vercel build` or
 a real Vercel preview deploy before relying solely on this local
 substitute.
 
+## 12. HubSpot marketing-email workflow: built, debugged, and delivery confirmed, 2026-07-11
+
+The native HubSpot workflow ("California HR Risk Audit: report + nurture,"
+3 emails: Initial/Follow-up/Breakup, replacing the earlier 5-email/4-email
+drafts per Noah's 2026-07-11 decision) was built by Noah via HubSpot's
+in-app AI assistant, activated, and end-to-end tested with real production
+submissions through `app/api/submit` (not synthetic n8n test-fires). Full
+evidence trail:
+
+- **Enrollment confirmed real**: contact `234573459107` (test submission via
+  live production endpoint, 2026-07-11T04:23:13Z) enrolled in the workflow
+  within seconds, confirmed via the contact's Workflows history panel.
+- **Bug found #1, marketing-contact suppression**: the first real send
+  attempt was suppressed by HubSpot with reason `NON_MARKETABLE_CONTACT`.
+  Root cause, confirmed via `query_crm_data`: 3 of 4 contacts this funnel
+  had ever created were `hs_marketable_status = false`, since contacts
+  created via API/integration default to non-marketing unless explicitly
+  set otherwise (documented HubSpot behavior). This affected every real
+  contact this funnel would ever create, not just the test contact.
+- **Bug found #2, action misconfigured**: Noah added a "Set marketing
+  contact status" action as the first workflow step, but its value was
+  initially set backwards (`Set as non-marketing contact` instead of
+  `Set as marketing contact`). Corrected 2026-07-11.
+- **Fix verified**: contact `234577063823` (fresh test, 2026-07-11T05:43:35Z)
+  enrolled, was correctly flipped to `hs_marketable_status: true`, and
+  received a real send: `hs_email_last_send_date: 2026-07-11T05:43:40Z`,
+  `hs_email_last_email_name: "CA Risk Audit - Initial"`, `hs_email_delivered:
+  1`, zero bounces.
+- **Deliverability issue found**: despite `hs_email_delivered: 1`, the email
+  did not reach the test Gmail inbox at all (confirmed via exhaustive Gmail
+  search: inbox, spam, trash, promotions, sender-domain search, and an
+  unfiltered newest-first listing of the entire mailbox, all empty). Sending
+  domain `bethechangehr.com` was confirmed authenticated in HubSpot
+  (Settings > Domains & URLs > Email Sending, screenshot evidence) and via
+  direct DNS lookup (SPF include, both HubSpot DKIM CNAMEs present, DMARC
+  published at `p=none`). Diagnosed as a sending-reputation/cold-domain
+  issue, not an authentication failure: HubSpot's "delivered" status reflects
+  SMTP-level acceptance, not final mailbox placement.
+- **Mitigations applied**: the email's From address was changed from a
+  generic address to `info@bethechangehr.com`, an actively-used Google
+  Workspace mailbox on the same domain with real prior send history
+  (confirmed via MX records pointing to Google Workspace, and real prior
+  Slack-alert sender activity from `operations@bethechangehr.com`).
+- **Result after the From-address fix**: fresh test (contact `234641273162`,
+  2026-07-11T16:02:24Z, `hs_marketable_status: true`) landed in the test
+  Gmail account's **Promotions tab**, confirmed directly by Noah. This is a
+  successful, visible delivery, a materially different outcome from the
+  prior full silent drop. Promotions-tab categorization is normal, expected
+  Gmail behavior for automated marketing email with a booking CTA and is not
+  evidence of a continuing deliverability problem.
+- **Still open**: continued warm-up (steady real send volume, ideally with
+  real opens/clicks, over the following days) to move future sends toward
+  Primary; DMARC should be tightened from `p=none` to `p=quarantine` at
+  whoever manages `bethechangehr.com`'s DNS (not done this session); whether
+  the reply-based unenrollment trigger (`hs_email_last_reply_date is known`)
+  was ever added to the workflow's Settings tab was never confirmed, only
+  the meeting-booked branch-check stop condition is confirmed present.
+- An on-page fallback link to the full hosted report (`ResultView.tsx`) was
+  added 2026-07-11 as a temporary safety net during the warm-up period,
+  since the original design intentionally omitted a direct on-page report
+  link in favor of email-only delivery. Remove once inbox (not just
+  Promotions-tab) delivery is consistently confirmed.
+
 ## 11. Open items needing human verification (summary)
 
 See `REVIEW.md` for the full checklist. Highest-priority items:
@@ -619,18 +682,20 @@ See `REVIEW.md` for the full checklist. Highest-priority items:
 - HR-Pro sign-off on every scoring weight, band cutoff, and gap-item
   wording (liability gate), including the two new gap-newhire-* items and
   the newly-zeroed HR-support weight.
-- Resolve the HubSpot transactional email scope/template gap confirmed
-  in section 7.6 above (Hard Gate 1), then re-test-fire the email leg
-  specifically before enabling the "Send Report Email (HubSpot)" node.
 - Provision a Twilio account and credential, then enable the "Send SMS
-  (Twilio)" node (section 7.7).
+  (Twilio)" node (section 7.7). Out of scope per Noah for now.
 - Confirm the question 2 answer-option interpretation and the 8-vs-10
   question discrepancy with LeiLani.
 - Insert a real, approved testimonial in `content/emails/nurture-3-proof.txt`
-  before that email is used.
+  before that email is used (note: the live 3-email sequence, "Initial /
+  Follow-up / Breakup," does not include the testimonial email at all,
+  per Noah's 2026-07-11 decision, so this file is currently unused).
 - Set `COMPLIANCE_CHECK_WEBHOOK_URL` to
   `https://btchr.app.n8n.cloud/webhook/compliance-risk-check`, and set
   `REPORT_TOKEN_SECRET` and `NEXT_PUBLIC_SITE_URL` to real production
   values, in Vercel before deploying.
-- Build the native HubSpot nurture workflow (4 emails, day 1-10) in the
-  HubSpot UI, see `ops/n8n-workflow.md`.
+- Tighten `bethechangehr.com`'s DMARC record from `p=none` to
+  `p=quarantine`, and continue the HubSpot sending-domain warm-up (see
+  section 12), before pushing real ad spend into this funnel.
+- Confirm whether the reply-based unenrollment trigger was ever added to
+  the HubSpot workflow's Settings tab (see section 12).

@@ -168,36 +168,47 @@ two events.
    above), these fields will populate for real going forward instead of
    showing blank.
 
-## HubSpot marketing-email workflow, manual build task
+## HubSpot marketing-email workflow: built, live, 2026-07-11
 
-Not buildable through the connected n8n or HubSpot MCP tools (no "create
-workflow" / "create marketing email" tool exists in either toolset). A
-manual task in the HubSpot UI for Noah or LeiLani, folding the previously
-separate "send the report email" and "build the nurture workflow" tasks
-into one build:
+Built by Noah in the HubSpot UI (via HubSpot's in-app AI assistant), not
+through any n8n or HubSpot MCP tool (no "create workflow" / "create
+marketing email" tool exists in either connected toolset). Superseded the
+plan below: the sequence actually shipped is 3 emails (**Initial, Follow-up,
+Breakup**), not the originally-planned 5. The testimonial-dependent "Proof"
+email and one nurture email were dropped by Noah's 2026-07-11 decision;
+`content/emails/nurture-3-proof.txt` is currently unused.
 
-1. Create the report email as a HubSpot marketing/automated email using
-   `content/emails/transactional-report.txt` as the copy source. Merge
-   fields already computed and available on the contact record:
-   `firstname`, `company`, `compliance_check_grade`,
-   `compliance_check_report_url`, plus the standard booking link
-   (`https://meetings.hubspot.com/bethechangehr/discoverycall`, already
-   UTM-tagged per "Booked-call attribution" below when sent from the app's
-   own booking CTAs, use the plain link or the same UTM pattern for this
-   email).
-2. Build one contact-based HubSpot workflow: enrollment trigger
-   `compliance_check_report_url is known` (or `compliance_check_source is
-   known`, either works since both are set together by `Upsert HubSpot
-   Contact`). First step sends the email from (1) immediately. Following
-   steps: the existing nurture-1 through nurture-4 sequence
-   (`content/emails/nurture-1-recap.txt` through `nurture-4-breakup.txt`),
-   day 1 through day 10, using the literal per-email booking URLs already
-   listed under "Booked-call attribution" below. Unenroll on reply or
-   `lead_meeting_booked`.
-3. Once built, re-run the verification test-fire in `VERIFICATION.md` and
-   confirm the email actually lands, then update this file and
-   `VERIFICATION.md` with real delivery evidence before connecting real ad
-   traffic.
+Workflow name: "California HR Risk Audit: report + nurture." Enrollment
+trigger: `compliance_check_report_url is known`. First action: **Set
+marketing contact status to Marketing contact** (required, see below),
+then sends the Initial email immediately, Follow-up after a delay, Breakup
+after a further delay. Stop condition: a branch-check on
+`engagements_last_meeting_booked_campaign = ca-hr-risk-audit` (a native
+workflow-level Goal wasn't reachable through the assistant's own tools, this
+branch-check is the accepted native workaround). **Not confirmed**: whether
+a reply-based unenrollment trigger (`hs_email_last_reply_date is known`) was
+ever added under the workflow's own Settings tab, separate from the visual
+canvas.
+
+**Critical dependency, do not skip if this workflow is ever rebuilt**:
+contacts created via API/integration (which is how this n8n pipeline always
+creates them) default to `hs_marketable_status = false` (non-marketing),
+per documented HubSpot behavior. Without the "Set marketing contact status"
+action as the very first step, HubSpot silently suppresses the email send
+with reason `NON_MARKETABLE_CONTACT` even though the contact enrolls
+successfully and shows no visible error, see `VERIFICATION.md` section 12
+for the full evidence trail (this cost significant debugging time
+2026-07-11, do not repeat).
+
+Sending domain: `bethechangehr.com`, confirmed authenticated in HubSpot and
+via direct DNS lookup. From address: `info@bethechangehr.com` (an
+actively-used Google Workspace mailbox on the same domain, changed from a
+generic address 2026-07-11 to inherit that address's existing send
+reputation rather than starting cold). First real delivery after this
+change landed in the test recipient's Promotions tab, not Primary and not
+Spam, a working, visible delivery. Continued warm-up (steady real volume,
+ideally with real opens/clicks) is expected to improve inbox placement over
+time; see `VERIFICATION.md` section 12 for the full test-by-test evidence.
 
 ## Booked-call attribution: connecting a call back to this campaign
 
@@ -289,10 +300,12 @@ whoever owns that portal, not a per-lead n8n execution.
       `VERIFICATION.md`) rather than left erroring. The SMTP fallback stays
       disabled (no credential, no longer the intended path). Superseded by
       the HubSpot marketing-email workflow described above.
-- [ ] HubSpot marketing-email workflow built (report email + the existing
-      4-email nurture sequence, one combined workflow, see "HubSpot
-      marketing-email workflow, manual build task" above). Not started, a
-      manual HubSpot UI task for Noah or LeiLani.
+- [x] HubSpot marketing-email workflow built, activated, and delivery
+      confirmed 2026-07-11 (3-email sequence: Initial/Follow-up/Breakup,
+      not the originally-planned 5. See "HubSpot marketing-email workflow,
+      built, live" above and `VERIFICATION.md` section 12). Reply-based
+      unenrollment trigger status unconfirmed; DMARC still needs tightening
+      from `p=none` to `p=quarantine`; domain warm-up ongoing.
 - [ ] Twilio SMS node built (done, correct field mapping) but disabled,
       pending a real Twilio account and credential and a real test phone
       number (see `VERIFICATION.md` section 7.7). Explicitly out of scope

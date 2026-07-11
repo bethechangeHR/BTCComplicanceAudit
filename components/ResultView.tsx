@@ -6,17 +6,19 @@ import { Disclaimer } from "./Disclaimer";
 import type { OnPageResult } from "@/lib/recommendation/types";
 
 /**
- * `reportUrl` is accepted for backward compatibility with
- * ComplianceCheckApp.tsx (out of scope this phase), but is intentionally
- * never rendered as a link. Per client feedback (2026-07-09), the on-page
- * result must not offer immediate access to the full report; it only ships
- * by email. See CLAUDE.md, "Report philosophy."
+ * `reportUrl` is rendered as a direct fallback link as of 2026-07-11: the
+ * sending domain is still warming up its email reputation, so some report
+ * emails land in spam or are delayed. This temporarily overrides the
+ * 2026-07-09 email-only decision in CLAUDE.md, "Report philosophy," so no
+ * lead is ever fully cut off from their report. Remove this link once
+ * inbox delivery is confirmed reliable (see VERIFICATION.md).
  */
 export function ResultView({
   result,
+  reportUrl,
 }: {
   result: OnPageResult;
-  reportUrl?: string;
+  reportUrl: string;
 }) {
   return (
     <div className="mx-auto max-w-xl space-y-8 text-center">
@@ -41,7 +43,14 @@ export function ResultView({
 
       <p className="animate-rise-in text-sm text-btc-gray">
         Your full audit report, with the complete reasoning behind every
-        flagged area, is on its way to your inbox.
+        flagged area, is on its way to your inbox. You can also view it right
+        now:{" "}
+        <a
+          href={reportUrl}
+          className="font-semibold text-btc-teal-dark underline"
+        >
+          Open your full report
+        </a>
       </p>
 
       <RiskAssessmentCTA />
