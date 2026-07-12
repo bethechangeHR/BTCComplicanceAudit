@@ -45,6 +45,24 @@ and `Upsert HubSpot Contact` nodes, already expected and used `name`/
 `company`, so this was a two-file app fix (collect the fields, thread them
 into the submit payload), not a pipeline change.
 
+**2026-07-12 fix: emails now greet by first name only, Slack keeps the full
+name.** The `Upsert HubSpot Contact` node previously mapped HubSpot's
+`firstname` property to the entire submitted `name` string, so the live
+report email (via the HubSpot marketing workflow's First name
+personalization token) greeted "Hi Jordan Smith," instead of "Hi Jordan,".
+Fixed by splitting `name` at the node level: `firstName` is now `{{
+($json.name || '').trim().split(' ')[0] }}` (first word), and a new
+`lastName` field was added, `{{ ($json.name || '').trim().split(' ').slice(1)
+.join(' ') }}` (everything after the first word). Republished
+(`activeVersionId 8b80b09e-7abd-42be-ac6a-724851478c16`), confirmed the
+active version reflects it. `Notify Slack: New Submission` was not touched;
+it still reads `{{ $('Normalize Payload').item.json.name }}`, the full name
+on one line. The form still collects a single "Your name" field, this split
+happens entirely downstream. Same-session app change: the result screen
+(`components/ResultView.tsx`) now also tells visitors to check
+promotions/spam, since the live report email lands in Promotions (see the
+2026-07-11 delivery evidence above), not Primary.
+
 Do not connect real ad traffic to this pipeline before:
 
 1. The marketing-email workflow described below is built in HubSpot and
