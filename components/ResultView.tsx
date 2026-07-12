@@ -32,12 +32,18 @@ export function ResultView({ result }: { result: OnPageResult }) {
         </div>
       )}
 
-      <p
-        className="animate-rise-in text-center text-sm text-btc-gray"
+      <div
+        className="animate-rise-in space-y-1.5 text-center"
         style={{ animationDelay: "220ms" }}
       >
-        Your full audit report is being sent to your inbox.
-      </p>
+        <p className="text-sm text-btc-gray">
+          Your full audit report is being sent to your inbox.
+        </p>
+        <p className="text-base font-semibold text-ink">
+          Check your promotions and spam folders in case it does not land in
+          your inbox.
+        </p>
+      </div>
 
       <div
         className="animate-rise-in space-y-8"
