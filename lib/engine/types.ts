@@ -55,9 +55,11 @@ export type WorkersCompAnswer = "yes" | "unsure" | "no";
  * The qualifying screen (question 11, last in the flow). Tags the lead for
  * BTC's own follow-up qualification. As of 2026-07-09 it carries zero
  * scoring weight (pure lead-fit tag, does not move the grade at all), see
- * data/scoring.ts HR_SUPPORT_POINTS.
+ * data/scoring.ts HR_SUPPORT_POINTS. `self_no_pro` added 2026-07-14 per
+ * LeiLani's request, distinct from `none`: the owner is handling HR
+ * themselves rather than having no support at all.
  */
-export type HrSupportAnswer = "in_house" | "outside" | "none";
+export type HrSupportAnswer = "in_house" | "outside" | "self_no_pro" | "none";
 
 export interface ComplianceAnswers {
   headcount: HeadcountAnswer;

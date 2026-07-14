@@ -153,6 +153,7 @@ export const WORKERS_COMP_POINTS: Record<WorkersCompAnswer, number> = {
 export const HR_SUPPORT_POINTS: Record<HrSupportAnswer, number> = {
   in_house: 0,
   outside: 0,
+  self_no_pro: 0,
   none: 0,
 };
 

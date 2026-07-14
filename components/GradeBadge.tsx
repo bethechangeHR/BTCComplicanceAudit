@@ -21,7 +21,7 @@ function flaggedCountLine(flaggedCount: number): string {
     return "No flagged areas from your answers";
   }
   return flaggedCount === 1
-    ? "1 risk area flagged"
+    ? "One risk area flagged"
     : `${flaggedCount} risk areas flagged`;
 }
 

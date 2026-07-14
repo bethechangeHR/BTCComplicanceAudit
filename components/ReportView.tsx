@@ -84,7 +84,7 @@ export function ReportView({ report }: { report: ReportViewData }) {
                 {report.gapSections.length === 0
                   ? "No flagged risk areas from your answers."
                   : report.gapSections.length === 1
-                    ? "1 risk area flagged below, in full."
+                    ? "One risk area flagged below, in full."
                     : `${report.gapSections.length} risk areas flagged below, in full.`}
               </p>
             </div>

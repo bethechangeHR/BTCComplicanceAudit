@@ -103,7 +103,7 @@ export const QUESTIONS: Question[] = [
         label:
           "Complete: offer letters, I-9s, and required notices/posters every time",
       },
-      { value: "partial", label: "Partial: some of it, inconsistently" },
+      { value: "partial", label: "Some of it, done inconsistently" },
       { value: "none", label: "We don't have a consistent process" },
     ],
   },
@@ -136,6 +136,10 @@ export const QUESTIONS: Question[] = [
       {
         value: "outside",
         label: "Outside support (consultant, PEO, fractional HR)",
+      },
+      {
+        value: "self_no_pro",
+        label: "I handle it myself, but I'm not an HR pro",
       },
       { value: "none", label: "None right now" },
     ],

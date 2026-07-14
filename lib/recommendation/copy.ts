@@ -48,6 +48,11 @@ export const QUALIFICATION_TAGS: Record<HrSupportAnswer, QualificationTag> = {
     label: "No current HR support",
     leadPriority: "high",
   },
+  self_no_pro: {
+    value: "self_no_pro",
+    label: "Owner handles HR themselves, not an HR pro",
+    leadPriority: "high",
+  },
   outside: {
     value: "outside",
     label: "Uses outside or contract HR support",

@@ -185,12 +185,25 @@ reviewed the prior wording.
       same exposure as skipping it" line and was reframed: the burden of
       proving compliant, documented training sits with the employer, so "not
       sure" means you cannot currently prove it, per LeiLani's correction.
-- [ ] `gap-leave-none`: CFRA and Pregnancy Disability Leave at five or more
-      employees, federal FMLA at 50+. `scopeOfWork` now includes a line that
-      be the change HR provides the legally mandated forms for any type of
-      leave of absence (Yaz's request, a service-scope statement, not a legal
-      claim). Confirm the headcount tiers referenced match your own
-      understanding.
+- [ ] **`gap-leave-none`** (reworded 2026-07-14, second pass): LeiLani flagged
+      the original four-leave framing (paid sick leave, CFRA, pregnancy
+      disability leave, federal FMLA) as understating the real leave stack.
+      Nine more CA leaves were researched and added: jury duty and witness
+      leave and kin care (any size), bereavement leave and reproductive loss
+      leave (5+), organ and bone marrow donor leave (15+), school-activity
+      leave and military spouse leave (25+), and victims of qualifying acts
+      of violence leave and accommodation (any size for the employee's own
+      leave, regardless of headcount). Deliberately excluded: SB 590 (not
+      effective until 2028-07-01), voting leave (Elections Code Section
+      14000, no independently confirmed enforcing agency), and alcohol/drug
+      rehab and adult literacy leave (accommodation duties, not scheduled
+      leave entitlements). See `UNVERIFIED_RESEARCH_FLAGS` in
+      `data/gap-library.ts` for the full reasoning. `scopeOfWork` still
+      includes the line that be the change HR provides the legally mandated
+      forms for any type of leave of absence (Yaz's request, a service-scope
+      statement, not a legal claim). This has not been through the same
+      HR-Pro sign-off rigor as the original 11 items, confirm every new
+      citation and headcount tier before this reaches a real prospect.
 - [ ] `gap-multistate`, `gap-other-state`: the multi-state framing is a
       structural/general principle, not a single statute citation. The
       `gap-other-state` item explicitly tells a non-California visitor that
