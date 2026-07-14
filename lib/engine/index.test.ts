@@ -12,6 +12,8 @@ const CLEANEST: ComplianceAnswers = {
   harassmentTraining: "yes",
   leaveProcess: "yes",
   newHirePaperwork: "complete",
+  wageHour: "complete",
+  workersComp: "yes",
   hrSupport: "in_house",
 };
 
@@ -24,6 +26,8 @@ const RISKIEST: ComplianceAnswers = {
   harassmentTraining: "no",
   leaveProcess: "no",
   newHirePaperwork: "none",
+  wageHour: "none",
+  workersComp: "no",
   hrSupport: "none",
 };
 
@@ -43,14 +47,13 @@ describe("scoreComplianceAnswers", () => {
     expect(result.triggeredGapIds.length).toBeGreaterThan(0);
   });
 
-  it("MAX_POSSIBLE_SCORE is 54 given the current first-draft weights", () => {
+  it("MAX_POSSIBLE_SCORE is 69 given the current first-draft weights", () => {
     // Locks the constant so an accidental weight change is caught explicitly
     // rather than silently shifting every band. Update deliberately if
-    // HR-Pro calibration changes any weight. Was 49 before the 2026-07-09
-    // rework (HR_SUPPORT_POINTS zeroed out, losing a max of 2;
-    // NEW_HIRE_PAPERWORK_POINTS added, contributing a max of 7): 49 - 2 + 7
-    // = 54.
-    expect(MAX_POSSIBLE_SCORE).toBe(54);
+    // HR-Pro calibration changes any weight. Was 54 before the 2026-07-14
+    // rework (WAGE_HOUR_POINTS added, contributing a max of 7;
+    // WORKERS_COMP_POINTS added, contributing a max of 8): 54 + 7 + 8 = 69.
+    expect(MAX_POSSIBLE_SCORE).toBe(69);
   });
 
   it("covers every point from 0 to max with exactly one grade band, no gaps or overlaps", () => {

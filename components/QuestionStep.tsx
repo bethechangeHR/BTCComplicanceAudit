@@ -5,9 +5,11 @@ import type { Question } from "@/data/questions";
 export function QuestionStep({
   question,
   onAnswer,
+  onBack,
 }: {
   question: Question;
   onAnswer: (value: string) => void;
+  onBack?: () => void;
 }) {
   return (
     <div key={question.key} className="animate-rise-in space-y-6">
@@ -37,6 +39,17 @@ export function QuestionStep({
           </button>
         ))}
       </div>
+      {onBack && (
+        <div className="text-center">
+          <button
+            type="button"
+            onClick={onBack}
+            className="text-sm font-medium text-btc-gray underline underline-offset-2 hover:text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-btc-teal focus-visible:ring-offset-2"
+          >
+            Back
+          </button>
+        </div>
+      )}
     </div>
   );
 }

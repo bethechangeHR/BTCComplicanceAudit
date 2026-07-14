@@ -5,7 +5,9 @@
  * network. The original 8 questions and their answer options are locked by
  * btc-paid-ads-campaign-buildspec-v1-2026-07-08.md. A 9th question,
  * newHirePaperwork, was added 2026-07-09 as a deliberate, reviewed spec
- * change, see CLAUDE.md and data/scoring.ts.
+ * change, see CLAUDE.md and data/scoring.ts. Two more, wageHour and
+ * workersComp, were added 2026-07-14 per LEGAL-RESEARCH-2026-07-14.md items 8
+ * and 9, bringing the total to 11.
  */
 
 export type HeadcountAnswer = "1-9" | "10-49" | "50-149" | "150+";
@@ -36,10 +38,24 @@ export type LeaveProcessAnswer = "yes" | "no";
 export type NewHirePaperworkAnswer = "complete" | "partial" | "none";
 
 /**
- * The qualifying screen (question 9). Tags the lead for BTC's own follow-up
- * qualification. As of 2026-07-09 it carries zero scoring weight (pure
- * lead-fit tag, does not move the grade at all), see data/scoring.ts
- * HR_SUPPORT_POINTS.
+ * Question 9, added 2026-07-14 per LEGAL-RESEARCH-2026-07-14.md item 8. The
+ * single highest-volume CA wage-and-hour litigation area. A risk question:
+ * adds points, see data/scoring.ts WAGE_HOUR_POINTS.
+ */
+export type WageHourAnswer = "complete" | "partial" | "none";
+
+/**
+ * Question 10, added 2026-07-14 per LEGAL-RESEARCH-2026-07-14.md item 9. A
+ * bright-line legal mandate (Labor Code Section 3700). A risk question: adds
+ * points, see data/scoring.ts WORKERS_COMP_POINTS.
+ */
+export type WorkersCompAnswer = "yes" | "unsure" | "no";
+
+/**
+ * The qualifying screen (question 11, last in the flow). Tags the lead for
+ * BTC's own follow-up qualification. As of 2026-07-09 it carries zero
+ * scoring weight (pure lead-fit tag, does not move the grade at all), see
+ * data/scoring.ts HR_SUPPORT_POINTS.
  */
 export type HrSupportAnswer = "in_house" | "outside" | "none";
 
@@ -52,6 +68,8 @@ export interface ComplianceAnswers {
   harassmentTraining: HarassmentTrainingAnswer;
   leaveProcess: LeaveProcessAnswer;
   newHirePaperwork: NewHirePaperworkAnswer;
+  wageHour: WageHourAnswer;
+  workersComp: WorkersCompAnswer;
   hrSupport: HrSupportAnswer;
 }
 
@@ -63,7 +81,9 @@ export type GapCategory =
   | "Harassment Prevention Training"
   | "Leave & Accommodation Process"
   | "Multi-State Compliance"
-  | "New-Hire Paperwork & Notices";
+  | "New-Hire Paperwork & Notices"
+  | "Wage & Hour"
+  | "Workers' Compensation";
 
 export type GapSeverity = "low" | "medium" | "high";
 

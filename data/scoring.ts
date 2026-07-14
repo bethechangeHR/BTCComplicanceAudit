@@ -34,6 +34,8 @@ import type {
   RiskGrade,
   SalariedClassificationAnswer,
   StatesAnswer,
+  WageHourAnswer,
+  WorkersCompAnswer,
 } from "@/lib/engine/types";
 
 export const HEADCOUNT_POINTS: Record<HeadcountAnswer, number> = {
@@ -55,6 +57,12 @@ export const CONTRACTOR_USE_POINTS: Record<ContractorUseAnswer, number> = {
   mostly: 8,
 };
 
+/**
+ * Scores the practice-level answer only; the underlying CA exempt salary
+ * floor and duties-test facts live in data/gap-library.ts (gap-exempt-all,
+ * gap-exempt-mix). See the ANNUAL MAINTENANCE comment there, the floor
+ * changes every year around 2026-08-01 for the following January.
+ */
 export const SALARIED_CLASSIFICATION_POINTS: Record<
   SalariedClassificationAnswer,
   number
@@ -101,6 +109,38 @@ export const NEW_HIRE_PAPERWORK_POINTS: Record<NewHirePaperworkAnswer, number> =
   };
 
 /**
+ * Question 9, added 2026-07-14. TODO-flagged first-draft proposal, pending
+ * HR-Pro calibration, same as every other weight in this file. A
+ * practice-level answer, same family and scale as newHirePaperwork and
+ * harassmentTraining: it measures whether the business is actually doing the
+ * required things (timekeeping, meal/rest breaks, overtime), not structural
+ * exposure. This is the single highest-volume CA wage-and-hour litigation
+ * area, see data/gap-library.ts gap-wage-hour-none and gap-wage-hour-partial
+ * for the cited legal basis.
+ */
+export const WAGE_HOUR_POINTS: Record<WageHourAnswer, number> = {
+  complete: 0,
+  partial: 4,
+  none: 7,
+};
+
+/**
+ * Question 10, added 2026-07-14. TODO-flagged first-draft proposal, pending
+ * HR-Pro calibration, same as every other weight in this file. Weighted
+ * top-of-scale for "no," matching handbookStatus:none and
+ * contractorUse:mostly, because this is a bright-line legal mandate (Labor
+ * Code Section 3700, every employer with one or more employees) and being
+ * uninsured is a misdemeanor carrying penalties up to $100,000. See
+ * data/gap-library.ts gap-workerscomp-none and gap-workerscomp-unsure for
+ * the cited legal basis.
+ */
+export const WORKERS_COMP_POINTS: Record<WorkersCompAnswer, number> = {
+  yes: 0,
+  unsure: 3,
+  no: 8,
+};
+
+/**
  * Zeroed out 2026-07-09, a deliberate spec change (see CLAUDE.md). Question
  * 9 is now purely the qualifying screen, it tags the lead for BTC's own
  * follow-up (see lib/recommendation/qualification.ts) and contributes
@@ -125,17 +165,21 @@ export const MAX_POSSIBLE_SCORE =
   Math.max(...Object.values(HARASSMENT_TRAINING_POINTS)) +
   Math.max(...Object.values(LEAVE_PROCESS_POINTS)) +
   Math.max(...Object.values(NEW_HIRE_PAPERWORK_POINTS)) +
+  Math.max(...Object.values(WAGE_HOUR_POINTS)) +
+  Math.max(...Object.values(WORKERS_COMP_POINTS)) +
   Math.max(...Object.values(HR_SUPPORT_POINTS));
 
 /**
  * A-F band cutoffs, expressed as inclusive point ranges out of
- * MAX_POSSIBLE_SCORE (54 as currently weighted, up from 49 after the
- * 2026-07-09 rework: HR_SUPPORT_POINTS zeroed out, losing a max of 2, and
- * NEW_HIRE_PAPERWORK_POINTS added, contributing a max of 7). Cutoffs are
- * re-derived proportionally against the new max, preserving each band's
- * original share of the range. First-draft proposal, pending HR-Pro
- * calibration. Verified honest by construction: an all-lowest-risk answer
- * set scores 0 (A) and an all-highest-risk answer set scores 54 (F), see
+ * MAX_POSSIBLE_SCORE (69 as currently weighted, up from 54 after the
+ * 2026-07-14 rework: WAGE_HOUR_POINTS added, contributing a max of 7, and
+ * WORKERS_COMP_POINTS added, contributing a max of 8; 54 + 7 + 8 = 69).
+ * Cutoffs are re-derived proportionally against the new max (scaling each
+ * prior upper cutoff by 69/54 and rounding), preserving each band's original
+ * share of the range, the same method used in the 2026-07-09 49-to-54
+ * rework. First-draft proposal, pending HR-Pro calibration. Verified honest
+ * by construction: an all-lowest-risk answer set scores 0 (A) and an
+ * all-highest-risk answer set scores 69 (F), see
  * lib/engine/goldenMaster.test.ts.
  */
 export const GRADE_BANDS: {
@@ -143,11 +187,11 @@ export const GRADE_BANDS: {
   minScore: number;
   maxScore: number;
 }[] = [
-  { grade: "A", minScore: 0, maxScore: 7 },
-  { grade: "B", minScore: 8, maxScore: 15 },
-  { grade: "C", minScore: 16, maxScore: 26 },
-  { grade: "D", minScore: 27, maxScore: 37 },
-  { grade: "F", minScore: 38, maxScore: MAX_POSSIBLE_SCORE },
+  { grade: "A", minScore: 0, maxScore: 9 },
+  { grade: "B", minScore: 10, maxScore: 19 },
+  { grade: "C", minScore: 20, maxScore: 33 },
+  { grade: "D", minScore: 34, maxScore: 47 },
+  { grade: "F", minScore: 48, maxScore: MAX_POSSIBLE_SCORE },
 ];
 
 export function scoreToGrade(score: number): RiskGrade {
@@ -249,5 +293,29 @@ export const ANSWER_GAP_TRIGGERS: {
     answer: "none",
     gapIds: ["gap-newhire-none"],
     category: "New-Hire Paperwork & Notices",
+  },
+  {
+    question: "wageHour",
+    answer: "partial",
+    gapIds: ["gap-wage-hour-partial"],
+    category: "Wage & Hour",
+  },
+  {
+    question: "wageHour",
+    answer: "none",
+    gapIds: ["gap-wage-hour-none"],
+    category: "Wage & Hour",
+  },
+  {
+    question: "workersComp",
+    answer: "unsure",
+    gapIds: ["gap-workerscomp-unsure"],
+    category: "Workers' Compensation",
+  },
+  {
+    question: "workersComp",
+    answer: "no",
+    gapIds: ["gap-workerscomp-none"],
+    category: "Workers' Compensation",
   },
 ];

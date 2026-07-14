@@ -13,9 +13,9 @@ export function RiskAssessmentCTA() {
         Want to know why these gaps exist?
       </p>
       <p className="text-sm text-btc-gray sm:text-base">
-        A free 30-minute HR risk assessment with a Be the Change HR Pro walks
-        through exactly what is driving your score, and what closing each gap
-        actually takes.
+        A free 30-minute HR risk assessment with be the change HR walks through
+        exactly what is driving your score, and what closing each gap actually
+        takes.
       </p>
     </div>
   );

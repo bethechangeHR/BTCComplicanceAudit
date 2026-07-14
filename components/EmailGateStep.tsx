@@ -14,10 +14,12 @@ export function EmailGateStep({
   onSubmit,
   submitting,
   error,
+  onBack,
 }: {
   onSubmit: (submission: GateSubmission) => void;
   submitting: boolean;
   error?: string;
+  onBack?: () => void;
 }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -43,8 +45,8 @@ export function EmailGateStep({
           Your grade is ready.
         </h2>
         <p className="text-sm text-btc-gray/80">
-          Enter your email to see your grade now and get the full audit
-          report sent to your inbox.
+          Enter your email to see your grade now and get the full audit report
+          sent to your inbox.
         </p>
       </div>
       <form onSubmit={handleSubmit} className="space-y-4 text-left">
@@ -134,10 +136,19 @@ export function EmailGateStep({
           {submitting ? "Grading your business..." : "Reveal my grade"}
         </button>
         <p className="text-center text-xs text-btc-gray/60">
-          No spam. Just your result and, if you want it, a follow-up from a real
-          HR Pro.
+          No spam. Just your result and, if you want it, a follow-up from be the
+          change HR.
         </p>
       </form>
+      {onBack && !submitting && (
+        <button
+          type="button"
+          onClick={onBack}
+          className="text-sm font-medium text-btc-gray underline underline-offset-2 hover:text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-btc-teal focus-visible:ring-offset-2"
+        >
+          Back
+        </button>
+      )}
     </div>
   );
 }

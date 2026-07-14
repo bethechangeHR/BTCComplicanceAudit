@@ -5,7 +5,7 @@ export function Hero({ onStart }: { onStart: () => void }) {
     <div className="animate-reveal-in mx-auto max-w-2xl space-y-8 text-center">
       <Image
         src="/btc-logo-color.png"
-        alt="Be the Change HR"
+        alt="be the change HR"
         width={168}
         height={56}
         className="mx-auto h-auto w-36 sm:w-40"
@@ -13,12 +13,12 @@ export function Hero({ onStart }: { onStart: () => void }) {
       />
       <div className="space-y-6">
         <h1 className="text-balance font-display text-4xl font-medium text-ink sm:text-5xl">
-          The HR gaps exposing your California business, before they become
-          a claim.
+          The HR gaps exposing your California business, before they become a
+          claim.
         </h1>
         <p className="text-base text-btc-gray sm:text-lg">
-          9 quick questions. A real A-F risk grade and the specific gaps
-          putting you at risk right now.
+          11 quick questions. A real A-F grade and the specific gaps putting you
+          at risk right now.
         </p>
       </div>
       <button

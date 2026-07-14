@@ -11,6 +11,8 @@ const ANSWERS: ComplianceAnswers = {
   harassmentTraining: "no",
   leaveProcess: "yes",
   newHirePaperwork: "partial",
+  wageHour: "partial",
+  workersComp: "yes",
   hrSupport: "outside",
 };
 

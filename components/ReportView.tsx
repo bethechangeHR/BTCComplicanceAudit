@@ -3,7 +3,10 @@ import { GradeBadge } from "./GradeBadge";
 import { CredibilityStrip } from "./CredibilityStrip";
 import { BookingEmbed } from "./BookingEmbed";
 import { Disclaimer } from "./Disclaimer";
-import { REPORT_INTRO_COPY } from "@/lib/recommendation/copy";
+import {
+  LOCAL_ORDINANCE_DISCLAIMER,
+  REPORT_INTRO_COPY,
+} from "@/lib/recommendation/copy";
 import type { ReportView as ReportViewData } from "@/lib/recommendation/types";
 
 const SEVERITY_BADGE: Record<string, string> = {
@@ -50,7 +53,7 @@ export function ReportView({ report }: { report: ReportViewData }) {
           <div className="flex flex-wrap items-center justify-between gap-6 border-b border-white/10 pb-8">
             <Image
               src="/btc-logo-white.png"
-              alt="Be the Change HR"
+              alt="be the change HR"
               width={168}
               height={56}
               className="h-auto w-36 sm:w-40"
@@ -173,7 +176,7 @@ export function ReportView({ report }: { report: ReportViewData }) {
         <section className="mb-16 space-y-8 rounded-2xl border border-ink/10 bg-white px-8 py-10 text-center shadow-document sm:px-12 sm:py-12">
           <div className="space-y-2">
             <h2 className="font-display text-2xl text-ink">
-              Talk it through with a Be the Change HR Pro
+              Talk it through with be the change HR
             </h2>
             <p className="mx-auto max-w-md text-sm text-btc-gray">
               A free 30-minute call to walk through what closes these gaps
@@ -185,6 +188,9 @@ export function ReportView({ report }: { report: ReportViewData }) {
         </section>
 
         <Disclaimer text={report.disclaimer} />
+        <p className="mx-auto mt-4 max-w-xl text-center text-xs leading-relaxed text-btc-gray/70">
+          {LOCAL_ORDINANCE_DISCLAIMER}
+        </p>
 
         {sources.length > 0 && (
           <ol className="mx-auto mt-10 max-w-xl space-y-1.5 text-xs text-btc-gray/60">

@@ -10,6 +10,8 @@ const VALID_ANSWERS = {
   harassmentTraining: "yes",
   leaveProcess: "yes",
   newHirePaperwork: "complete",
+  wageHour: "complete",
+  workersComp: "yes",
   hrSupport: "in_house",
 };
 

@@ -23,12 +23,14 @@ const SCENARIOS: {
       harassmentTraining: "yes",
       leaveProcess: "yes",
       newHirePaperwork: "complete",
+      wageHour: "complete",
+      workersComp: "yes",
       hrSupport: "in_house",
     },
   },
   {
     label: "Buildspec scenario 1: 6-employee shop, no handbook, mostly 1099s",
-    description: "Golden master, expected score 36, grade D.",
+    description: "Golden master, expected score 46, grade D.",
     answers: {
       headcount: "1-9",
       states: "california_only",
@@ -38,12 +40,14 @@ const SCENARIOS: {
       harassmentTraining: "no",
       leaveProcess: "no",
       newHirePaperwork: "none",
+      wageHour: "none",
+      workersComp: "unsure",
       hrSupport: "none",
     },
   },
   {
     label: "Buildspec scenario 2: 40-employee CA, all salaried, no training",
-    description: "Golden master, expected score 24, grade C.",
+    description: "Golden master, expected score 28, grade C.",
     answers: {
       headcount: "10-49",
       states: "california_only",
@@ -53,6 +57,8 @@ const SCENARIOS: {
       harassmentTraining: "no",
       leaveProcess: "yes",
       newHirePaperwork: "partial",
+      wageHour: "partial",
+      workersComp: "yes",
       hrSupport: "outside",
     },
   },
@@ -60,7 +66,7 @@ const SCENARIOS: {
     label:
       "Buildspec scenario 3: 120-employee multi-state, current handbook, documented leave",
     description:
-      "Golden master, expected score 17, grade C, driven by structure not practice gaps.",
+      "Golden master, expected score 17, grade B, driven by structure not practice gaps.",
     answers: {
       headcount: "50-149",
       states: "multi_state",
@@ -70,6 +76,8 @@ const SCENARIOS: {
       harassmentTraining: "yes",
       leaveProcess: "yes",
       newHirePaperwork: "complete",
+      wageHour: "complete",
+      workersComp: "yes",
       hrSupport: "in_house",
     },
   },
@@ -85,6 +93,8 @@ const SCENARIOS: {
       harassmentTraining: "no",
       leaveProcess: "no",
       newHirePaperwork: "none",
+      wageHour: "none",
+      workersComp: "no",
       hrSupport: "none",
     },
   },

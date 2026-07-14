@@ -15,18 +15,20 @@ one worth understanding first. It is not just a paperwork issue. It is the
 kind of gap that turns into a real claim the moment one employee situation
 goes sideways: a contractor dispute, a termination, a complaint.
 
-The average employment lawsuit costs an estimated $200,000. That is an
-industry-wide figure, not a prediction about your business specifically, but
-it is the reason gaps like this one do not stay theoretical for long.
+Defending an employment claim through trial can exceed $200,000 (Novian Law,
+2026), and among smaller employers, defense and settlement costs average
+around $160,000 (Hiscox). These are industry-wide figures, not a prediction
+about your business specifically, but they are the reason gaps like this one
+do not stay theoretical for long.
 
 Your full report walks through exactly why {{topCategory}} is flagged and the
-complete scope of what it takes to close it:
+scope of what it takes to close it:
 
 {{reportUrl}}
 
 The fastest way to actually close it, instead of just knowing about it, is a
-30-minute call with a Be the Change HR Pro. No cost, no obligation.
+30-minute call with be the change HR. No cost, no obligation.
 
 {{bookingUrl}}
 
-Be the Change HR
+be the change HR

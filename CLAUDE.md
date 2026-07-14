@@ -5,7 +5,7 @@
 Give a small or mid-sized California business owner an honest, instant read on
 their HR compliance exposure in about 60 to 90 seconds, then make the risk
 they cannot currently see feel real and specific to them. This is a Meta
-paid-ads lead magnet. The visitor answers 9 questions and gets an on-screen
+paid-ads lead magnet. The visitor answers 11 questions and gets an on-screen
 A-F risk grade with named (not detailed) gap categories, plus a free 30-minute
 HR discovery call booked immediately below the grade. After they give an
 email, a short transactional email links to a personalized, hosted audit
@@ -19,9 +19,15 @@ willing to screenshot the grade and show their business partner.
 A 9th question (new-hire paperwork, question 8 in the flow) was added
 2026-07-09 as a deliberate, reviewed spec change (see the "we are updating
 the graceful stardust" plan, Part A). At the same time, the HR-support
-question (question 9, the qualifying screen) was changed to contribute zero
-scoring weight: it is now purely a lead-fit tag via
+question (the qualifying screen) was changed to contribute zero scoring
+weight: it is now purely a lead-fit tag via
 `buildQualificationTag()`/`qualificationTag` and never moves the grade.
+Two more scored questions, wage/hour practices (`wageHour`) and workers'
+compensation coverage (`workersComp`), were added 2026-07-14 per
+`LEGAL-RESEARCH-2026-07-14.md` items 8 and 9, placed after new-hire
+paperwork and before the HR-support qualifying screen (now the 11th and
+last question), bringing `MAX_POSSIBLE_SCORE` to 69 and re-deriving
+`GRADE_BANDS` proportionally, see `data/scoring.ts` and `REVIEW.md`.
 
 ## Report philosophy, the core strategic call, non-negotiable
 
@@ -214,9 +220,10 @@ decision.
 ## The channel mode (paid ships now, email is a future seam)
 
 - Paid mode (default, no `mode` param needed): anonymous visitor from a Meta
-  ad. Fully self-contained. Answers all 9 questions, one per view, with a
-  visible progress indicator. A single light gate (email required, phone
-  optional with an explicit SMS opt-in) sits at the grade reveal.
+  ad. Fully self-contained. Answers all 11 questions, one per view, with a
+  visible progress indicator and a back control to review or change a prior
+  answer. A single light gate (email required, phone optional with an
+  explicit SMS opt-in) sits at the grade reveal.
 - Email mode (`?mode=email&...`, future): pre-filled from firmographics,
   ungated first reveal. Only the adapter type/seam is stubbed in
   `channels/`, not implemented.
@@ -308,8 +315,11 @@ HR-Pro sign-off checklist before this reaches real prospects.
   (section 6: compliance angles and fear-based content framework, the
   primary source for gap-item wording and voice)
 - `D:/claude/_PROJECTS/clients/BTC/strategy/btc-source-of-truth.md`
-  ($200K industry lawsuit anchor, booking link, always cited as an industry
-  figure, never a BTC guarantee)
+  (booking link; the $200K industry lawsuit anchor was re-sourced 2026-07-14
+  away from this file's pitch-deck citation to Novian Law and Hiscox, see
+  `LEGAL-RESEARCH-2026-07-14.md` item 10 and `data/gap-library.ts`
+  `INDUSTRY_LAWSUIT_ANCHOR`, always cited as an industry figure, never a
+  guarantee)
 - `D:/claude/_PROJECTS/clients/BTC/knowledge-base/btc-kb-client-facing.md`
 - `D:/claude/_PROJECTS/clients/BTC/brand-and-voice/btc-brand-kit.md`
   (colors, corrected 2026-07-06: orange removed, it is not a brand color)
@@ -322,6 +332,12 @@ HR-Pro sign-off checklist before this reaches real prospects.
   Department of Industrial Relations (DIR), California Labor Code and
   Government Code text via leginfo.legislature.ca.gov, US DOL Wage and Hour
   Division. Research pass conducted 2026-07-08.
+- `LEGAL-RESEARCH-2026-07-14.md` (second research pass: the salary-basis-plus-
+  duties conjunctive test, corrected sick-leave bill citations, the SB 294
+  current-obligation reframe, CRD definition and FEHA individual supervisor
+  liability, AB 1514, the local-ordinance disclaimer, the re-sourced lawsuit
+  anchor, and items 8 and 9, the wage/hour and workers' compensation
+  questions added 2026-07-14)
 
 ## Discrepancies found in source material, not silently resolved
 

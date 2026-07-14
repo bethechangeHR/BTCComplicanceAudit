@@ -19,17 +19,18 @@ Hi {{firstName}},
 
 Your California HR Risk Audit is complete. Your business scored a {{grade}}.
 
-Your full report is ready now. It names every general risk area your answers
-point to, the reasoning behind each one, and the complete scope of work it
-would take to close it:
+Your full report is ready now. It walks through the risk areas your answers
+point to, the reasoning behind each one, and the scope of work it would take
+to close them. It is not an exhaustive list of every issue your business
+could face:
 
 {{reportUrl}}
 
 The area flagged as your biggest exposure right now: {{topCategory}}.
 
 If you'd rather talk it through directly, book a free 30-minute HR risk
-assessment with a Be the Change HR Pro. No cost, no obligation.
+assessment with be the change HR. No cost, no obligation.
 
 {{bookingUrl}}
 
-Be the Change HR
+be the change HR

@@ -18,9 +18,9 @@ const hankenGrotesk = Hanken_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "California HR Risk Audit | Be the Change HR",
+  title: "California HR Risk Audit | be the change HR",
   description:
-    "Get an instant A to F HR compliance risk grade for your California business, then book a free 30-minute HR risk assessment with a Be the Change HR Pro.",
+    "Get an instant A to F HR compliance risk grade for your California business, then book a free 30-minute HR risk assessment with be the change HR.",
 };
 
 export default function RootLayout({

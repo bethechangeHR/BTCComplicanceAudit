@@ -32,8 +32,15 @@ export const RISK_TIER_LABELS: Record<RiskGrade, string> = {
   F: "Severe exposure",
 };
 
+/**
+ * "be the change HR" per LeiLani's naming correction (2026-07-14), dropping
+ * "HR Pro" from the consultant/booking phrase per her literal instruction.
+ * TODO confirm with LeiLani: she may still want the consultant referred to
+ * as "an HR Pro from be the change HR" rather than just the brand name, see
+ * REVIEW.md FLAG 1.
+ */
 export const RESULT_DISCLAIMER =
-  "This is an educational estimate and a directional risk indicator, not legal advice. It does not tell you which laws apply to your specific business as settled fact. For a full review of your actual exposure, book a free 30-minute HR risk assessment with a Be the Change HR Pro.";
+  "This is an educational estimate and a directional risk indicator, not legal advice. It does not tell you which laws apply to your specific business as settled fact. For a full review of your actual exposure, book a free 30-minute HR risk assessment with be the change HR.";
 
 export const QUALIFICATION_TAGS: Record<HrSupportAnswer, QualificationTag> = {
   none: {
@@ -54,4 +61,13 @@ export const QUALIFICATION_TAGS: Record<HrSupportAnswer, QualificationTag> = {
 };
 
 export const REPORT_INTRO_COPY =
-  "This report names every general risk area your answers point to, the reasoning behind each one, and the full scope of work it would take to close it. It does not include the specific fixes themselves, the compliant policy language, the reclassification steps, or the training rollout. That is what a Be the Change HR Pro builds with you on a call.";
+  "This report walks through the risk areas your answers point to, the reasoning behind each one, and the scope of work it would take to close them. It is not an exhaustive list of every issue your business could face. It does not include the specific fixes themselves, the compliant policy language, the reclassification steps, or the training rollout. That is what be the change HR builds with you on a call.";
+
+/**
+ * Report-only, per LEGAL-RESEARCH-2026-07-14.md item 11: many California
+ * cities and counties set their own higher minimum wage and paid-sick-leave
+ * rules. Never shown on the lead form, only on the hosted report, see
+ * CLAUDE.md "Report philosophy."
+ */
+export const LOCAL_ORDINANCE_DISCLAIMER =
+  "Many California cities and counties set their own minimum wage and paid sick leave rules, often higher than the statewide requirements referenced in this report. This audit reflects statewide California law only. Local city or county rules may add obligations based on where your business operates.";

@@ -49,6 +49,15 @@ export interface GapItem {
   sourceRef: string;
 }
 
+/**
+ * ANNUAL MAINTENANCE: the CA exempt salary floor ($70,304, used in
+ * gap-exempt-all and gap-exempt-mix below) and the CA state minimum wage
+ * ($16.90/hr, its basis) change every year. CA DIR announces the next year's
+ * minimum wage by August 1, effective the following January 1. The 2027
+ * figures were NOT published as of this 2026-07-14 pass, do not state them.
+ * Update both gap items and this comment once CA DIR publishes the 2027
+ * figure, expected around 2026-08-01.
+ */
 export const GAP_LIBRARY: GapItem[] = [
   {
     id: "gap-1099-mostly",
@@ -57,7 +66,7 @@ export const GAP_LIBRARY: GapItem[] = [
     severity: "high",
     onPageStatement: "Independent contractor classification",
     reportDiagnosis:
-      "California's ABC test (Labor Code Section 2775) presumes every worker is an employee, not a contractor, unless you prove all three prongs: they control their own work, the work falls outside your usual business, and they run an independent trade. Businesses built mainly on 1099 contractors carry serious reclassification exposure, back pay, unpaid payroll taxes, and penalties, if that test is not met.",
+      "California's ABC test (Labor Code Section 2775) presumes every worker is an employee, not a contractor, unless you prove all three prongs: they control their own work, the work falls outside your usual business, and they run an independent trade. Businesses built mainly on 1099 contractors carry serious reclassification exposure, back pay, unpaid payroll taxes, and penalties, if that test is not met. AB 1514 (effective January 1, 2026) adjusted some professional-services exemptions to the test, but the core ABC standard itself is unchanged. The ABC test is California law. If your employees are governed by a different state, it may not apply the same way there.",
     scopeOfWork: [
       "Audit every 1099 relationship against the ABC test, not industry convention",
       "Check which roles fall within the narrow exemptions (Labor Code Sections 2776-2787)",
@@ -67,7 +76,7 @@ export const GAP_LIBRARY: GapItem[] = [
     complianceAngle:
       "California classification / exempt vs non-exempt errors that trigger back pay (btc-kb-lead-magnets.md section 6)",
     sourceRef:
-      "Cal. Labor Code Section 2775 (AB 5, 2019; amended by AB 2257, 2020), leginfo.legislature.ca.gov, enforced by CA DIR / Labor Commissioner. lastVerified 2026-07-08.",
+      "Cal. Labor Code Section 2775 (AB 5, 2019; amended by AB 2257, 2020), leginfo.legislature.ca.gov, enforced by CA DIR / Labor Commissioner; AB 1514 (2026), leginfo.legislature.ca.gov. lastVerified 2026-07-14.",
   },
   {
     id: "gap-1099-some",
@@ -76,7 +85,7 @@ export const GAP_LIBRARY: GapItem[] = [
     severity: "medium",
     onPageStatement: "Independent contractor classification",
     reportDiagnosis:
-      "The same ABC test (Labor Code Section 2775) applies to every 1099 relationship, even a single one. One misclassified contractor can still trigger back pay, unpaid payroll taxes, and penalties.",
+      "The same ABC test (Labor Code Section 2775) applies to every 1099 relationship, even a single one. One misclassified contractor can still trigger back pay, unpaid payroll taxes, and penalties. AB 1514 (effective January 1, 2026) adjusted some professional-services exemptions to the test, but the core ABC standard itself is unchanged. The ABC test is California law. If your employees are governed by a different state, it may not apply the same way there.",
     scopeOfWork: [
       "Audit every current 1099 relationship against the ABC test",
       "Confirm which roles fall within the statutory exemptions (Labor Code Sections 2776-2787)",
@@ -85,7 +94,7 @@ export const GAP_LIBRARY: GapItem[] = [
     complianceAngle:
       "California classification / exempt vs non-exempt errors that trigger back pay (btc-kb-lead-magnets.md section 6)",
     sourceRef:
-      "Cal. Labor Code Section 2775 (AB 5, 2019; amended by AB 2257, 2020), leginfo.legislature.ca.gov, enforced by CA DIR / Labor Commissioner. lastVerified 2026-07-08.",
+      "Cal. Labor Code Section 2775 (AB 5, 2019; amended by AB 2257, 2020), leginfo.legislature.ca.gov, enforced by CA DIR / Labor Commissioner; AB 1514 (2026), leginfo.legislature.ca.gov. lastVerified 2026-07-14.",
   },
   {
     id: "gap-exempt-all",
@@ -94,17 +103,18 @@ export const GAP_LIBRARY: GapItem[] = [
     severity: "high",
     onPageStatement: "Exempt / salaried classification",
     reportDiagnosis:
-      "California's bar for exempt, no-overtime status is stricter than federal law: a duties test plus a minimum salary of twice the state minimum wage, $70,304 per year as of January 1, 2026 (Labor Code Section 515(a)). Businesses that classify staff as exempt using only federal assumptions often miss this higher floor, and back-overtime exposure compounds for every misclassified employee.",
+      "California's bar for exempt, no-overtime status is stricter than federal law and requires passing both of two tests. First, the salary basis test: a fixed salary of at least twice the state minimum wage, $70,304 per year as of January 1, 2026 (Labor Code Section 515(a); this floor changes annually, see the maintenance note below). Second, the duties test: more than half of actual work time spent on exempt duties, a strict quantitative standard, stricter than the federal test. Businesses that classify staff as exempt using only federal assumptions or salary alone often miss one of these two requirements, and back-overtime exposure compounds for every misclassified employee.",
     scopeOfWork: [
-      "Run the California duties test, not the federal test, against every exempt role",
-      "Confirm every exempt salary meets the current $70,304 California floor",
+      "Confirm every exempt salary meets the current $70,304 California floor (the salary basis test)",
+      "Run the California duties test against every exempt role: confirm more than half of actual work time is spent on exempt duties",
+      "Write down an exempt or nonexempt designation for every role, not just salaried ones",
       "Identify misclassified roles and estimate the back-overtime exposure window",
       "Document a defensible classification rationale for every exempt role",
     ],
     complianceAngle:
       "California classification / exempt vs non-exempt errors that trigger back pay, BTC's own June 2026 blog post: Are Your Salaried Employees Really Exempt? The FLSA Error That Triggers Back Pay (btc-kb-lead-magnets.md section 6)",
     sourceRef:
-      "Cal. Labor Code Section 515(a); CA DIR News Release 2025-118 confirming the 2026 minimum wage increase to $16.90/hr, dir.ca.gov. lastVerified 2026-07-08.",
+      "Cal. Labor Code Section 515(a); CA DIR News Release 2025-118 confirming the 2026 minimum wage increase to $16.90/hr, dir.ca.gov. lastVerified 2026-07-14.",
   },
   {
     id: "gap-exempt-mix",
@@ -113,16 +123,17 @@ export const GAP_LIBRARY: GapItem[] = [
     severity: "medium",
     onPageStatement: "Exempt / salaried classification",
     reportDiagnosis:
-      "For your salaried staff, the same standard applies: a duties test plus a minimum salary of twice the state minimum wage, currently $70,304 per year (Labor Code Section 515(a)). Mixed teams need every salaried role checked individually, partial rollouts are where undocumented exceptions tend to hide.",
+      "For your salaried staff, the same two-part standard applies. First, the salary basis test: a fixed salary of at least twice the state minimum wage, currently $70,304 per year (Labor Code Section 515(a)). Second, the duties test: more than half of actual work time spent on exempt duties, a strict quantitative standard. Mixed teams need every salaried role checked individually against both tests, partial rollouts are where undocumented exceptions tend to hide. Nonexempt roles in a mixed team also carry meal, rest break, and overtime obligations.",
     scopeOfWork: [
+      "Confirm each salaried role's salary meets the current $70,304 California floor (the salary basis test)",
       "Run the California duties test against each salaried role individually",
-      "Confirm each salary meets the current $70,304 California floor",
+      "Write down an exempt or nonexempt designation for every role",
       "Document why each role qualifies as exempt",
     ],
     complianceAngle:
       "California classification / exempt vs non-exempt errors that trigger back pay (btc-kb-lead-magnets.md section 6)",
     sourceRef:
-      "Cal. Labor Code Section 515(a); CA DIR News Release 2025-118. lastVerified 2026-07-08.",
+      "Cal. Labor Code Section 515(a); CA DIR News Release 2025-118. lastVerified 2026-07-14.",
   },
   {
     id: "gap-handbook-none",
@@ -131,17 +142,17 @@ export const GAP_LIBRARY: GapItem[] = [
     severity: "high",
     onPageStatement: "No employee handbook",
     reportDiagnosis:
-      "California requires several written policies regardless of format: harassment prevention (2 CCR Section 11023), paid sick leave (Labor Code Sections 245-249), a wage notice at hire (Labor Code Section 2810.5), a workers' compensation rights notice (Labor Code Section 3550), and, starting February 1, 2026, a Know Your Rights notice (SB 294). Without a handbook, you have no consistent record of meeting any of them.",
+      "California requires several written policies regardless of format: harassment prevention (2 CCR Section 11023), paid sick leave (Labor Code Sections 245-249), a wage notice at hire (Labor Code Section 2810.5), a workers' compensation rights notice (Labor Code Section 3550), and a Workplace Know Your Rights notice (SB 294), a current, recurring annual obligation, not a future requirement: employers must give each employee a stand-alone written notice by February 1 each year and to every new hire on hire. Without a handbook, you have no consistent record of meeting any of them.",
     scopeOfWork: [
-      "Draft the required policies: harassment prevention, sick leave, wage notice, workers' comp rights, 2026 Know Your Rights notice",
+      "Draft the required policies: harassment prevention, sick leave, wage notice, workers' comp rights, Know Your Rights notice",
       "Add practice-level policies that reduce dispute risk: meal and rest breaks, PTO, discipline, termination",
-      "Set a review cadence to keep the handbook current",
+      "Set a review cadence to keep the handbook current, including the annual Know Your Rights notice",
       "Roll out acknowledgment and signature tracking for every employee",
     ],
     complianceAngle:
       "Outdated or missing handbook exposure (btc-kb-lead-magnets.md section 6)",
     sourceRef:
-      "Cal. Gov Code Section 12950.1 and 2 CCR Section 11023 (CRD, calcivilrights.ca.gov); Cal. Labor Code Sections 245-249, 2810.5, 3550; SB 294 Workplace Know Your Rights Act, effective 2026-02-01 (The Employer Report, Jan 2026). lastVerified 2026-07-08.",
+      "Cal. Gov Code Section 12950.1 and 2 CCR Section 11023 (CRD, calcivilrights.ca.gov); Cal. Labor Code Sections 245-249, 2810.5, 3550; SB 294 Workplace Know Your Rights Act (2025-2026 session), leginfo.legislature.ca.gov, CA Labor Commissioner model notice. lastVerified 2026-07-14.",
   },
   {
     id: "gap-handbook-stale",
@@ -150,17 +161,18 @@ export const GAP_LIBRARY: GapItem[] = [
     severity: "medium",
     onPageStatement: "Outdated employee handbook",
     reportDiagnosis:
-      "A handbook untouched for two or more years is very likely missing recent law: paid sick leave changes (AB 2288 2024, SB 616, AB 406 2025) and the new Know Your Rights notice taking effect February 2026 (SB 294). Its age is a direct measure of how much it is missing.",
+      "A handbook untouched for two or more years is very likely missing recent law: the paid sick leave expansion to five days or 40 hours (SB 616, 2023) and the added sick-leave-use rights for crime victims and jury or witness duty (AB 406, 2025), plus the Workplace Know Your Rights notice (SB 294), a current, recurring annual obligation, not a future requirement. Its age is a direct measure of how much it is missing.",
     scopeOfWork: [
       "Compare the handbook against every California requirement that has changed",
-      "Update paid sick leave, wage notice, and 2026 Know Your Rights language",
+      "Update paid sick leave and wage notice language",
+      "Add the annual Know Your Rights notice to the review cadence",
       "Set an annual review cadence tied to California's legislative calendar",
       "Redistribute with fresh acknowledgment and signature tracking",
     ],
     complianceAngle:
       "Outdated or missing handbook exposure (btc-kb-lead-magnets.md section 6)",
     sourceRef:
-      "Cal. Labor Code Sections 245-249 (AB 2288 2024, AB 406 2025 amendments); SB 294, effective 2026-02-01 (The Employer Report, Jan 2026). lastVerified 2026-07-08.",
+      "Cal. Labor Code Sections 245-249 (SB 616, 2023, effective 2024-01-01) and Labor Code Section 246.5 (AB 406, 2025); SB 294 Workplace Know Your Rights Act (2025-2026 session), leginfo.legislature.ca.gov. lastVerified 2026-07-14.",
   },
   {
     id: "gap-training-none",
@@ -169,17 +181,17 @@ export const GAP_LIBRARY: GapItem[] = [
     severity: "high",
     onPageStatement: "Harassment-prevention training",
     reportDiagnosis:
-      "California employers with five or more employees, including temporary and seasonal staff, must provide sexual harassment prevention training, 2 hours for supervisors and 1 hour for staff, every two years (Government Code Section 12950.1). With no training on record, you have no documented proof of this legally required step, and that absence can count against you if a claim is filed.",
+      "California employers with five or more employees, including temporary and seasonal staff, must provide sexual harassment prevention training through the California Civil Rights Department, CRD (formerly DFEH), two hours for supervisors and one hour for staff, every two years (Government Code Section 12950.1). Supervisors carry the higher two-hour requirement, and under FEHA (Government Code Section 12940(j)(3)) an individual supervisor can be held personally liable for harassment, unlike discrimination or retaliation claims and unlike federal law. With no training on record, you have no documented proof of this legally required step, and that absence can count against you if a claim is filed.",
     scopeOfWork: [
-      "Confirm headcount against the 5-employee threshold, all locations and temp staff",
-      "Deliver CRD-compliant training: 2 hours for supervisors, 1 hour for staff",
+      "Confirm headcount against the five-employee threshold, all locations and temp staff",
+      "Deliver CRD-compliant training: two hours for supervisors, one hour for staff",
       "Document completion records for every employee",
-      "Build a recurring 2-year retraining cadence",
+      "Build a recurring two-year retraining cadence",
     ],
     complianceAngle:
       "Harassment-prevention training requirements, CA, 5+ employees (btc-kb-lead-magnets.md section 6)",
     sourceRef:
-      "Cal. Gov Code Section 12950.1 (SB 1343, 2018, compliance deadline 2020-01-01); CRD Sexual Harassment Prevention Training FAQ, calcivilrights.ca.gov. lastVerified 2026-07-08.",
+      "Cal. Gov Code Section 12950.1 (SB 1343, 2018, compliance deadline 2020-01-01); Gov Code Section 12940(j)(3) and CACI 2521 on individual harassment liability; CRD Sexual Harassment Prevention Training FAQ, calcivilrights.ca.gov. lastVerified 2026-07-14.",
   },
   {
     id: "gap-training-unsure",
@@ -188,17 +200,17 @@ export const GAP_LIBRARY: GapItem[] = [
     severity: "medium",
     onPageStatement: "Harassment-prevention training",
     reportDiagnosis:
-      "Not knowing whether your training meets the state's standard carries the same exposure as skipping it. The burden of proving compliance (Government Code Section 12950.1) sits with you, and informal or undocumented training cannot meet that burden.",
+      "Harassment-prevention training is a legal requirement for California employers with five or more employees, through the California Civil Rights Department, CRD (formerly DFEH). The burden of proving compliant, documented training sits with the employer (Government Code Section 12950.1), so answering 'not sure' means you cannot currently prove it, even if the training itself turns out to be fine. Supervisors carry a higher two-hour requirement and, under FEHA (Government Code Section 12940(j)(3)), can be held personally liable for harassment, unlike federal law.",
     scopeOfWork: [
       "Pull existing training records and confirm hours and content for every employee",
       "Identify anyone missing documented, CRD-compliant training within two years",
       "Close any gaps and document completion going forward",
-      "Build a recurring 2-year retraining cadence",
+      "Build a recurring two-year retraining cadence",
     ],
     complianceAngle:
       "Harassment-prevention training requirements, CA, 5+ employees (btc-kb-lead-magnets.md section 6)",
     sourceRef:
-      "Cal. Gov Code Section 12950.1 (SB 1343, 2018); CRD Sexual Harassment Prevention Training FAQ. lastVerified 2026-07-08.",
+      "Cal. Gov Code Section 12950.1 (SB 1343, 2018); Gov Code Section 12940(j)(3) and CACI 2521 on individual harassment liability; CRD Sexual Harassment Prevention Training FAQ. lastVerified 2026-07-14.",
   },
   {
     id: "gap-leave-none",
@@ -207,17 +219,18 @@ export const GAP_LIBRARY: GapItem[] = [
     severity: "high",
     onPageStatement: "Documented leave process",
     reportDiagnosis:
-      "California leave law stacks by headcount: paid sick leave applies at any size (Labor Code Sections 245-249), CFRA and pregnancy disability leave apply at 5 or more employees (Government Code Sections 12945.2 and 12945), and federal FMLA layers on at 50 or more. Without a documented process for requests, eligibility, and job protection, you are exposed under whichever law applies at your current size, and that changes as you grow.",
+      "California leave law stacks by headcount: paid sick leave applies at any size (Labor Code Sections 245-249), CFRA and pregnancy disability leave apply at five or more employees (Government Code Sections 12945.2 and 12945), and federal FMLA layers on at 50 or more. Without a documented process for requests, eligibility, and job protection, you are exposed under whichever law applies at your current size, and that changes as you grow.",
     scopeOfWork: [
       "Map headcount against every leave-law threshold that applies",
       "Build a documented intake and eligibility-tracking process",
       "Train managers on job-protection obligations during leave",
       "Set a review trigger tied to headcount growth",
+      "be the change HR provides the legally mandated forms for any type of leave of absence",
     ],
     complianceAngle:
       "Leave-law exposure, FMLA at 50+, plus more generous state laws that hit small employers (btc-kb-lead-magnets.md section 6)",
     sourceRef:
-      "Cal. Labor Code Sections 245-249; Cal. Gov Code Sections 12945 and 12945.2 (SB 1383, 2021), calcivilrights.ca.gov; 29 U.S.C. Section 2611 / 29 CFR Section 825.105, US DOL Fact Sheet #28. lastVerified 2026-07-08.",
+      "Cal. Labor Code Sections 245-249; Cal. Gov Code Sections 12945 and 12945.2 (SB 1383, 2021), calcivilrights.ca.gov; 29 U.S.C. Section 2611 / 29 CFR Section 825.105, US DOL Fact Sheet #28. lastVerified 2026-07-14.",
   },
   {
     id: "gap-multistate",
@@ -277,6 +290,82 @@ export const GAP_LIBRARY: GapItem[] = [
       "Federal Form I-9 requirement under the Immigration Reform and Control Act, 8 U.S.C. Section 1324a, INA Section 274A, uscis.gov; Cal. Labor Code Section 2810.5 (Wage Theft Prevention Act written notice at hire), leginfo.legislature.ca.gov; required state and federal workplace posters, CA DIR (dir.ca.gov) and US DOL. lastVerified 2026-07-09. This is a new addition made after the 2026-07-08 research pass and has not been through the same legal-pass rigor as the rest of this file, see UNVERIFIED_RESEARCH_FLAGS.",
   },
   {
+    id: "gap-wage-hour-none",
+    category: "Wage & Hour",
+    jurisdiction: "CA",
+    severity: "high",
+    onPageStatement: "Wage and hour practices",
+    reportDiagnosis:
+      "Meal and rest breaks and overtime are the single highest-volume area of California wage-and-hour litigation. A compliant meal break is a 30-minute unpaid break starting before the end of the fifth hour when a shift exceeds five hours, and a second 30-minute meal before the end of the tenth hour when a shift exceeds ten hours (Labor Code Section 512). A paid 10-minute rest break is owed for every four hours worked or major fraction of it. Missing a compliant meal or rest break on a given day owes one additional hour of pay at the regular rate of compensation, per missed break type (Labor Code Section 226.7), and per Ferra v. Loews Hollywood Hotel (Cal. 2021) that regular rate includes nondiscretionary bonuses and incentives, not just base hourly pay, recoverable for a four-year window. With no consistent process, and no accurate timekeeping records to show otherwise, this exposure compounds across every shift for every employee.",
+    scopeOfWork: [
+      "Audit current meal and rest break practices against the fifth-hour and tenth-hour meal triggers and the four-hour rest-break interval",
+      "Confirm timekeeping records accurately capture meal and rest break timing",
+      "Identify any history of missed or short breaks and estimate the premium-pay exposure window",
+      "Build a documented, consistent timekeeping and overtime process",
+    ],
+    complianceAngle:
+      "Wage and hour exposure, the highest-volume CA litigation area (LEGAL-RESEARCH-2026-07-14.md item 8, question A, added 2026-07-14)",
+    sourceRef:
+      "Cal. Labor Code Section 512 (meal breaks); IWC Wage Orders and Labor Code Section 226.7 (rest breaks, premium pay), leginfo.legislature.ca.gov, DIR faq_mealperiods.htm; Ferra v. Loews Hollywood Hotel, LLC (Cal. 2021). lastVerified 2026-07-14. Added 2026-07-14, not part of the original 2026-07-08 research pass, flagged for a fresh HR-Pro/legal review before launch, see UNVERIFIED_RESEARCH_FLAGS below.",
+  },
+  {
+    id: "gap-wage-hour-partial",
+    category: "Wage & Hour",
+    jurisdiction: "CA",
+    severity: "medium",
+    onPageStatement: "Wage and hour practices",
+    reportDiagnosis:
+      "An informal or inconsistent meal and rest break and timekeeping process still carries real exposure. The meal break rule (30 minutes before the end of the fifth hour, a second before the end of the tenth hour on longer shifts, Labor Code Section 512), the rest break rule (paid 10 minutes per four hours, Labor Code Section 226.7), and accurate overtime records apply to every shift, not most. Missing a compliant break owes one additional hour of pay at the regular rate, including nondiscretionary bonuses per Ferra v. Loews Hollywood Hotel (Cal. 2021), recoverable for a four-year window, and inconsistent practices make it hard to show which shifts were compliant.",
+    scopeOfWork: [
+      "Audit current timekeeping and break records for consistency across employees and shifts",
+      "Identify where the fifth-hour and tenth-hour meal triggers and the four-hour rest-break interval are not being met",
+      "Standardize the process for every future shift",
+      "Document a consistent overtime calculation method",
+    ],
+    complianceAngle:
+      "Wage and hour exposure, the highest-volume CA litigation area (LEGAL-RESEARCH-2026-07-14.md item 8, question A, added 2026-07-14)",
+    sourceRef:
+      "Cal. Labor Code Section 512 (meal breaks); IWC Wage Orders and Labor Code Section 226.7 (rest breaks, premium pay), leginfo.legislature.ca.gov, DIR faq_mealperiods.htm; Ferra v. Loews Hollywood Hotel, LLC (Cal. 2021). lastVerified 2026-07-14. Added 2026-07-14, not part of the original 2026-07-08 research pass, flagged for a fresh HR-Pro/legal review before launch, see UNVERIFIED_RESEARCH_FLAGS below.",
+  },
+  {
+    id: "gap-workerscomp-none",
+    category: "Workers' Compensation",
+    jurisdiction: "CA",
+    severity: "high",
+    onPageStatement: "Workers' compensation coverage",
+    reportDiagnosis:
+      "Every California employer with one or more employees, including part-time, temporary, and family-member employees, must carry workers' compensation insurance (Labor Code Section 3700). There is no small-employer exemption. Being uninsured is a misdemeanor (Labor Code Section 3700.5), carrying a minimum $10,000 fine or up to a year in county jail, or both, plus civil and administrative penalties up to $100,000. If an injury occurs while uninsured, penalties run $10,000 per employee on payroll for a compensable claim, up to $100,000. The Division of Labor Standards Enforcement can issue a Stop Order halting all use of employee labor until coverage is secured. SB 291 (effective January 1, 2026) raised the minimum penalties for uninsured contractors further.",
+    scopeOfWork: [
+      "Confirm current headcount, including part-time, temporary, and family-member employees, against the coverage requirement",
+      "Secure workers' compensation coverage for every employee",
+      "Document proof of coverage and keep it current",
+      "Build a process to confirm coverage stays active as headcount changes",
+    ],
+    complianceAngle:
+      "Workers' compensation coverage, a bright-line legal mandate with hard penalties (LEGAL-RESEARCH-2026-07-14.md item 9, question B, added 2026-07-14)",
+    sourceRef:
+      "Cal. Labor Code Sections 3700 and 3700.5, leginfo.legislature.ca.gov; CA DIR Division of Workers' Compensation employer FAQ, dir.ca.gov; SB 291 (2026). lastVerified 2026-07-14. Added 2026-07-14, not part of the original 2026-07-08 research pass, flagged for a fresh HR-Pro/legal review before launch, see UNVERIFIED_RESEARCH_FLAGS below.",
+  },
+  {
+    id: "gap-workerscomp-unsure",
+    category: "Workers' Compensation",
+    jurisdiction: "CA",
+    severity: "medium",
+    onPageStatement: "Workers' compensation coverage",
+    reportDiagnosis:
+      "Every California employer with one or more employees must carry workers' compensation insurance (Labor Code Section 3700), no small-employer exemption, and being uninsured is a misdemeanor with penalties up to $100,000 (Labor Code Section 3700.5). Not knowing whether every employee, including part-time, temporary, and family-member employees, is actually covered means you cannot currently confirm you meet this bright-line requirement.",
+    scopeOfWork: [
+      "Confirm current coverage actually extends to every employee, including part-time, temporary, and family-member employees",
+      "Pull proof of coverage and confirm it is active",
+      "Close any coverage gaps immediately",
+      "Build a process to confirm coverage stays current as headcount changes",
+    ],
+    complianceAngle:
+      "Workers' compensation coverage, a bright-line legal mandate with hard penalties (LEGAL-RESEARCH-2026-07-14.md item 9, question B, added 2026-07-14)",
+    sourceRef:
+      "Cal. Labor Code Sections 3700 and 3700.5, leginfo.legislature.ca.gov; CA DIR Division of Workers' Compensation employer FAQ, dir.ca.gov; SB 291 (2026). lastVerified 2026-07-14. Added 2026-07-14, not part of the original 2026-07-08 research pass, flagged for a fresh HR-Pro/legal review before launch, see UNVERIFIED_RESEARCH_FLAGS below.",
+  },
+  {
     id: "gap-other-state",
     category: "Multi-State Compliance",
     jurisdiction: "not-legal-requirement",
@@ -305,27 +394,38 @@ export function getGapItem(id: string): GapItem {
 }
 
 /**
- * The industry lawsuit-cost anchor. Always shown as an industry figure
- * sourced to BTC's own pitch deck, never a claim about this specific
- * business's likely exposure. Not tied to any answer, always included in
- * the hosted report's cost-context section.
+ * The industry lawsuit-cost anchor. Re-sourced 2026-07-14 away from BTC's own
+ * pitch deck (Genevieve flagged the prior self-citation) to two named,
+ * citable third-party sources, per LEGAL-RESEARCH-2026-07-14.md item 10 and
+ * Noah's FLAG 2 decision: keep the $200,000 headline, re-source it. TODO
+ * confirm with BTC that this framing (Novian Law's through-trial figure, with
+ * Hiscox's SME-specific average as supporting context) is the final wording.
+ * Always shown as an industry figure, never a claim about this specific
+ * business's likely exposure. Not tied to any answer, always included in the
+ * hosted report's cost-context section.
  */
 export const INDUSTRY_LAWSUIT_ANCHOR = {
   amountUsd: 200000,
   framing:
-    "The average employment lawsuit costs an estimated $200,000. This is an industry-wide figure, not a prediction about this business specifically and not a BTC guarantee.",
+    "Defending an employment claim through trial can exceed $200,000 (Novian Law, 2026). Among small and mid-size employers, defense and settlement costs average an estimated $160,000 (Hiscox). These are industry-wide figures, not a prediction about this business specifically and not a guarantee.",
   source:
-    "Be the Change HR pitch deck (2026 Pitch Deck v2), citing an industry-wide average. See btc-source-of-truth.md. lastVerified 2026-07-06.",
+    "novianlaw.com, cost of defending and resolving an employment claim (2026); Hiscox Guide to Employee Lawsuits, average defense and settlement costs among small and mid-size employers (2015-2017 data, flagged as dated). lastVerified 2026-07-14.",
 };
 
 /**
  * Legal facts flagged UNVERIFIED during the 2026-07-08 research pass.
  * Excluded from any confident claim in the gap library above. Kept here so
  * they are visible to the HR-Pro reviewer rather than silently dropped.
+ *
+ * RESOLVED 2026-07-14 and removed from this list: whether Cal. Labor Code
+ * Section 2775 (the ABC test) received a material 2025/2026 amendment. AB
+ * 1514 (effective 2026-01-01) is that amendment, it adjusts some
+ * professional-services exemptions and leaves the core ABC standard
+ * unchanged. See gap-1099-mostly and gap-1099-some sourceRef.
  */
 export const UNVERIFIED_RESEARCH_FLAGS = [
-  "Whether Cal. Labor Code Section 2775 (the ABC test) received any material 2025 or 2026 amendment beyond the 2020 AB 2257 exemption update. No new amendment was found, but the research pass did not exhaustively review every 2025-2026 bill. Recommend a final legal pass before asserting the ABC test is unchanged.",
   "The current federal FLSA exempt salary threshold. It has been in active litigation flux since the US DOL's 2024 rule was vacated. This tool deliberately does not state a federal dollar figure anywhere, only the confirmed California figure ($70,304/yr, DIR News Release 2025-118).",
   "Whether any single CRD or DIR source states in so many words that California has 'no handbook mandate.' The individual component requirements (harassment policy, paid sick leave policy, wage notice, workers' comp notice) are each independently well-sourced; the negative framing itself is an absence-of-law finding, not a single citation.",
   "gap-newhire-none and gap-newhire-partial (added 2026-07-09, not part of the 2026-07-08 research pass): the federal Form I-9 requirement (8 U.S.C. Section 1324a, INA Section 274A) and the CA Wage Theft Prevention Act notice at hire (Labor Code Section 2810.5) are both well-established, but this build did not independently confirm the exact current statutory or regulatory citation for California's specific workplace-poster mandate (referenced here only generally as 'CA DIR poster requirements'). Recommend a final legal pass confirming the precise poster-requirement citation before these two gap items reach a real prospect.",
+  "gap-wage-hour-none and gap-wage-hour-partial, and gap-workerscomp-none and gap-workerscomp-unsure (added 2026-07-14, questions A and B of the LEGAL-RESEARCH-2026-07-14.md pass): the underlying statutes (Labor Code Sections 512, 226.7, 3700, 3700.5; SB 291) are well-established and dated 2026-07-14, but these four items have not yet been through the same HR-Pro sign-off rigor as the original 11. Recommend a fresh legal pass before launch, see REVIEW.md.",
 ];

@@ -5,6 +5,24 @@ Evidence-backed definition-of-done for the California HR Risk Audit. See
 in this document is asserted without the actual command output or curl
 output that produced it.
 
+**2026-07-14 rework note:** a brand/naming pass, a legal-accuracy pass
+against `LEGAL-RESEARCH-2026-07-14.md` (correcting the sick-leave citation,
+reframing SB 294 as a current obligation, adding the conjunctive exempt
+salary-basis-plus-duties test, defining CRD, adding FEHA supervisor
+liability, and re-sourcing the $200,000 lawsuit anchor), two new scored
+questions (wage/hour and workers' compensation, `MAX_POSSIBLE_SCORE` moved
+from 54 to 69, `GRADE_BANDS` re-derived), a local-ordinance disclaimer, and a
+back button were all completed this session. Sections 1, 2, 3, 4, 5, and 9
+below are updated with fresh command output from this pass. Sections 6, 7,
+8, 10, and 12 predate this session (curl walkthroughs, the n8n/HubSpot
+pipeline test-fire, the mobile/a11y spot check, the build-environment note,
+and the HubSpot marketing-email workflow debug) and are left as an accurate
+historical record; none of them touched `lib/engine/`, `data/scoring.ts`, or
+`data/gap-library.ts`, so a fresh end-to-end curl pass and pipeline test-fire
+against the new 11-question, 69-point model is still a follow-up item, not
+done as part of this pass, see the updated open-items list at the bottom of
+this file.
+
 **2026-07-09 Part A logic rework note:** a 9th question (new-hire paperwork,
 question 8 in the flow) was added and the HR-support question (question 9)
 was zeroed out to a pure lead-fit tag. `MAX_POSSIBLE_SCORE` moved from 49 to
@@ -92,7 +110,7 @@ channel was done before any change:
   exactly one message ever: the automated channel-join notice from
   2026-07-09T08:37:46 PDT. Zero submission alerts, confirming Noah's report.
   Root cause: `get_workflow_details` showed the `Notify Slack: New
-  Submission` node genuinely present in the *active/published* version of
+Submission` node genuinely present in the _active/published_ version of
   the workflow (not just a draft, contrary to what a prior session worried
   might happen), but individually `disabled: true`. Not a bug, the
   documented pending state.
@@ -116,7 +134,7 @@ channel was done before any change:
    `setNodeDisabled` operations) and republished via `publish_workflow`:
    `Notify Slack: New Submission` enabled, `Send Report Email (HubSpot)`
    disabled (was live but always erroring on the confirmed scope block).
-   Confirmed via a fresh `get_workflow_details` call that the *active*
+   Confirmed via a fresh `get_workflow_details` call that the _active_
    version (`activeVersionId 8981beb3-445f-4a4a-b30e-0c1c95ee0801`)
    reflects both changes, not a draft.
 3. Email strategy changed on Noah's direction: his HubSpot AI Assistant
@@ -135,22 +153,34 @@ Twilio SMS (explicitly out of scope for this fix per Noah).
 ## 1. Test output
 
 `npx vitest run`, 2026-07-08, original run. Re-run 2026-07-09 after the Part
-A logic rework (9th question, HR-support zeroed out, new 54-point max),
-same pass/fail shape, updated expected values inside the same 32 tests
+A logic rework (9th question, HR-support zeroed out, new 54-point max), same
+pass/fail shape, updated expected values inside the same 32 tests
 (golden-master and MAX_POSSIBLE_SCORE assertions hand-reconciled to the new
-numbers, see the note at the top of this file and section 2 below):
+numbers, see the note at the top of this file). Re-run again 2026-07-14
+after adding the wageHour/workersComp questions (new 69-point max), real
+`npm test` output from this session:
 
 ```
  Test Files  5 passed (5)
       Tests  32 passed (32)
 ```
 
+Same 32 tests as before, same file/test count (no new test files or cases
+added, existing fixtures and golden-master scenarios were extended with the
+two new answer fields and hand-reconciled to the new numbers instead, see
+section 2 below). One fixture (`lib/validateAnswers.test.ts`'s
+`VALID_ANSWERS`) was initially missed and failed on the first re-run
+(`expected null to deeply equal {...}`, since `validateComplianceAnswers`
+correctly rejected an answer set missing the two new required fields); fixed
+by adding `wageHour: "complete"` and `workersComp: "yes"` to that fixture,
+then the full suite passed clean.
+
 Covering: `lib/engine/index.test.ts` (10 tests: point contribution per
-answer, band-cutoff edges with no gaps or overlaps from 0 to 54 as of
-2026-07-09 (was 0 to 49), all-clean and all-risky extremes, "unsure"
-harassment training treated as a real gap not a free pass, single-state-CA
-vs single-other-state vs multi-state distinguished, question 9 (HR support,
-renumbered from question 8 after the 9th question was added) never moving
+answer, band-cutoff edges with no gaps or overlaps from 0 to 69 as of
+2026-07-14 (was 0 to 54, then 0 to 49 before that), all-clean and all-risky
+extremes, "unsure" harassment training treated as a real gap not a free
+pass, single-state-CA vs single-other-state vs multi-state distinguished,
+the HR-support question (now question 11, last in the flow) never moving
 the grade more than one band, qualification tag exposed separately from the
 gap list, severity-descending ordering, handbook-stale vs handbook-none
 triggering distinct gaps),
@@ -169,19 +199,27 @@ detection, malformed input, wrong-secret rejection).
 All four locked as golden-master tests in `lib/engine/goldenMaster.test.ts`
 so a future scoring change cannot silently drift these results. Updated
 2026-07-09 for the Part A logic rework (9th question added, HR-support
-zeroed out, new 54-point max); see the note at the top of this file.
+zeroed out, new 54-point max), then re-reconciled again 2026-07-14 after
+adding the wageHour and workersComp questions (new 69-point max); see the
+note at the top of this file.
 
 **Buildspec scenario 1** (6-employee single-state shop, no handbook, mostly
 1099s). Unstated fields assumed: single state read as California; remaining
 non-contractor staff assumed hourly; training and leave process assumed
 absent, matching a very small, informally-run shop. New-hire paperwork
 (question 8, added 2026-07-09) assumed "none," consistent with that same
-profile. HR support no longer scores.
+profile. Wage/hour (added 2026-07-14) assumed "none" and workers' comp
+(added 2026-07-14) assumed "unsure," the same informally-run profile
+(no consistent timekeeping/break process; not confident about coverage
+rather than confidently uninsured, a documented non-flattering middle
+assumption). HR support no longer scores.
 
 ```
 0 (headcount 1-9) + 0 (California only) + 8 (mostly 1099) + 0 (hourly)
 + 8 (no handbook) + 7 (no training) + 6 (no leave process)
-+ 7 (no new-hire paperwork) + 0 (HR support, zeroed out) = 36 points -> grade D
++ 7 (no new-hire paperwork) + 7 (no wage/hour process)
++ 3 (unsure workers' comp) + 0 (HR support, zeroed out)
+= 46 points -> grade D
 ```
 
 **Buildspec scenario 2** (40-employee California, all salaried, no
@@ -190,12 +228,18 @@ assumed stale (a neutral middle assumption, not the flattering "current");
 leave process assumed documented; HR support assumed outsourced (no longer
 scores). New-hire paperwork (question 8, added 2026-07-09) assumed "partial,"
 the same neutral, non-flattering middle assumption as the stale handbook.
+Wage/hour (added 2026-07-14) assumed "partial" for the same reason; workers'
+comp (added 2026-07-14) assumed "yes," on the reasoning that a 40-employee
+company past the earliest startup stage with outsourced HR support is the
+profile most likely to already carry the legally required coverage even
+while other practices lag.
 
 ```
 2 (headcount 10-49) + 0 (California only) + 0 (no contractors)
 + 6 (all salaried) + 5 (stale handbook) + 7 (no training)
 + 0 (documented leave) + 4 (partial new-hire paperwork)
-+ 0 (HR support, zeroed out) = 24 points -> grade C
++ 4 (partial wage/hour process) + 0 (workers' comp covered)
++ 0 (HR support, zeroed out) = 28 points -> grade C
 ```
 
 **Buildspec scenario 3** (120-employee multi-state, current handbook,
@@ -203,59 +247,74 @@ documented leave). Unstated fields assumed: some contractor use, a mixed
 salaried/hourly workforce, harassment training current, HR support in-house.
 New-hire paperwork (question 8, added 2026-07-09) assumed "complete," the
 same deliberately-well-run profile as the current handbook and documented
-leave.
+leave. Wage/hour and workers' comp (added 2026-07-14) assumed "complete" and
+"yes" respectively, the same deliberately-well-run profile.
 
 ```
 4 (headcount 50-149) + 6 (multi-state) + 4 (some 1099) + 3 (mixed salaried)
 + 0 (current handbook) + 0 (training current) + 0 (documented leave)
-+ 0 (complete new-hire paperwork) + 0 (HR support, zeroed out)
-= 17 points -> grade C
++ 0 (complete new-hire paperwork) + 0 (complete wage/hour process)
++ 0 (workers' comp covered) + 0 (HR support, zeroed out)
+= 17 points -> grade B
 ```
 
 10 of this scenario's 17 points come from headcount tier and multi-state
 structure, not from any practice failure: the company is doing the actual
 work right (current handbook, trained, documented leave, complete new-hire
-paperwork) but still carries real structural complexity risk from its size
-and footprint. This is the honest reading, not a rigged one, see the
-design-principle comment in `data/scoring.ts`. Score is unchanged from the
-pre-rework 17, since this scenario's HR support was already in_house (0
-points either way) and its new-hire paperwork answer (complete) also scores
-0.
+paperwork, documented wage/hour process, covered) but still carries real
+structural complexity risk from its size and footprint. This is the honest
+reading, not a rigged one, see the design-principle comment in
+`data/scoring.ts`. The raw score is unchanged at 17 (this scenario's HR
+support was already in_house and its new-hire paperwork answer was already
+"complete," both zero points either way, and the two new questions are also
+answered clean), but the **grade moved from C to B** because the new
+69-point max lowers this score's relative position: 17/54 (31 percent of
+the old max) landed in band C (16-26), while 17/69 (25 percent of the new
+max) lands in band B (10-19). This is an expected, honest consequence of
+adding two clean-scoring practice dimensions to the model, not a scoring
+bug.
 
 **Genuinely clean business** (required separately by the verification gate,
 not a buildspec scenario): single-state California, 1 to 9 employees, no
 contractors, hourly staff, current handbook, trained, documented leave,
-complete new-hire paperwork, in-house HR support.
+complete new-hire paperwork, documented wage/hour process, workers' comp
+coverage, in-house HR support.
 
 ```
-0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 = 0 points -> grade A, zero triggered gaps
+0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 = 0 points -> grade A, zero triggered gaps
 ```
 
 This is the proof the scoring model is not rigged to fail everyone
-regardless of actual compliance posture. Still holds after the Part A
-rework: every clean answer, including the new question 8, scores 0.
+regardless of actual compliance posture. Still holds after both the Part A
+rework and the 2026-07-14 rework: every clean answer, including the two
+newest questions, scores 0.
 
 ## 3. Gap-item source mapping
 
 Every item in `data/gap-library.ts` cites a named source in its `sourceRef`
-field. Summary:
+field. Summary, updated 2026-07-14 (rows marked "reworded 2026-07-14" changed
+wording per `LEGAL-RESEARCH-2026-07-14.md`, not just a date bump; four new
+rows added for the wage/hour and workers' compensation items):
 
-| Gap ID(s)                                  | Legal source                                                                                       | Confidence                                                                                                               |
-| ------------------------------------------ | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `gap-1099-mostly`, `gap-1099-some`         | Cal. Labor Code Section 2775 (AB 5, 2019; AB 2257, 2020)                                           | High, primary statute. ABC-test stability since 2020 not exhaustively re-checked, flagged in `UNVERIFIED_RESEARCH_FLAGS` |
-| `gap-exempt-all`, `gap-exempt-mix`         | Cal. Labor Code Section 515(a); DIR News Release 2025-118 ($70,304/yr 2026 floor)                  | High, primary agency source                                                                                              |
-| `gap-handbook-none`, `gap-handbook-stale`  | Gov Code Section 12950.1, 2 CCR Section 11023, Labor Code 245-249/2810.5/3550, SB 294 (2026-02-01) | High on each component requirement; the "no single handbook mandate" framing is an absence-of-law finding                |
-| `gap-training-none`, `gap-training-unsure` | Gov Code Section 12950.1 (SB 1343, 2018)                                                           | High, primary statute plus CRD FAQ                                                                                       |
-| `gap-leave-none`                           | Labor Code 245-249; Gov Code 12945/12945.2 (SB 1383, 2021); 29 CFR 825.105                         | High, all four thresholds independently confirmed                                                                        |
-| `gap-multistate`                           | General state-level employment law primacy (SHRM)                                                  | High as a structural principle, not a single-statute citation                                                            |
-| `gap-other-state`                          | btc-paid-ads-campaign-buildspec-v1-2026-07-08.md geo decision                                      | This build's own framing choice, not an external legal citation                                                          |
-| `gap-newhire-none`, `gap-newhire-partial` (added 2026-07-09) | Federal Form I-9 / IRCA (8 U.S.C. Section 1324a, INA Section 274A); Cal. Labor Code Section 2810.5 (WTPA notice at hire); CA DIR / US DOL workplace posters | I-9 and WTPA citations high confidence; the exact CA poster-mandate statute number was not independently confirmed by this build, flagged in `UNVERIFIED_RESEARCH_FLAGS` for a fresh legal pass |
+| Gap ID(s)                                                          | Legal source                                                                                                                                                        | Confidence                                                                                                                                                                                                                                                                           |
+| ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `gap-1099-mostly`, `gap-1099-some` (reworded 2026-07-14)           | Cal. Labor Code Section 2775 (AB 5, 2019; AB 2257, 2020); AB 1514 (2026)                                                                                            | High, primary statute. The prior open question (whether the ABC test received a 2025/2026 amendment) is RESOLVED: AB 1514 is that amendment, core test unchanged                                                                                                                     |
+| `gap-exempt-all`, `gap-exempt-mix` (reworded 2026-07-14)           | Cal. Labor Code Section 515(a); DIR News Release 2025-118 ($70,304/yr 2026 floor)                                                                                   | High, primary agency source. Now states the conjunctive salary-basis-then-duties test correctly, per LeiLani's correction                                                                                                                                                            |
+| `gap-handbook-none`, `gap-handbook-stale` (reworded 2026-07-14)    | Gov Code Section 12950.1, 2 CCR Section 11023, Labor Code 245-249/2810.5/3550, SB 616 (2023), Labor Code 246.5 (AB 406, 2025), SB 294                               | High on each component requirement; sick-leave citation corrected (AB 2288 removed, it is the PAGA bill, not sick leave); SB 294 reframed as a current annual obligation, not future-dated; the "no single handbook mandate" framing remains an absence-of-law finding, still a FLAG |
+| `gap-training-none`, `gap-training-unsure` (reworded 2026-07-14)   | Gov Code Section 12950.1 (SB 1343, 2018); Gov Code Section 12940(j)(3) (FEHA individual supervisor liability)                                                       | High, primary statute plus CRD FAQ. CRD now defined on first use; supervisor personal-liability point added; `gap-training-unsure`'s inaccurate "same exposure as skipping it" line removed                                                                                          |
+| `gap-leave-none`                                                   | Labor Code 245-249; Gov Code 12945/12945.2 (SB 1383, 2021); 29 CFR 825.105                                                                                          | High, all four thresholds independently confirmed                                                                                                                                                                                                                                    |
+| `gap-multistate`                                                   | General state-level employment law primacy (SHRM)                                                                                                                   | High as a structural principle, not a single-statute citation                                                                                                                                                                                                                        |
+| `gap-other-state`                                                  | btc-paid-ads-campaign-buildspec-v1-2026-07-08.md geo decision                                                                                                       | This build's own framing choice, not an external legal citation                                                                                                                                                                                                                      |
+| `gap-newhire-none`, `gap-newhire-partial` (added 2026-07-09)       | Federal Form I-9 / IRCA (8 U.S.C. Section 1324a, INA Section 274A); Cal. Labor Code Section 2810.5 (WTPA notice at hire); CA DIR / US DOL workplace posters         | I-9 and WTPA citations high confidence; the exact CA poster-mandate statute number was not independently confirmed by this build, flagged in `UNVERIFIED_RESEARCH_FLAGS` for a fresh legal pass                                                                                      |
+| `gap-wage-hour-none`, `gap-wage-hour-partial` (new, 2026-07-14)    | Cal. Labor Code Section 512 (meal breaks); IWC Wage Orders and Labor Code Section 226.7 (rest breaks, premium pay); Ferra v. Loews Hollywood Hotel, LLC (Cal. 2021) | High, primary statutes plus a controlling Cal. Supreme Court case. Not part of the original 2026-07-08 pass, flagged in `UNVERIFIED_RESEARCH_FLAGS` for a fresh legal pass                                                                                                           |
+| `gap-workerscomp-none`, `gap-workerscomp-unsure` (new, 2026-07-14) | Cal. Labor Code Sections 3700 and 3700.5; SB 291 (2026)                                                                                                             | High, primary statutes. Not part of the original 2026-07-08 pass, flagged in `UNVERIFIED_RESEARCH_FLAGS` for a fresh legal pass                                                                                                                                                      |
 
-Full text of every claim, with exact statute numbers and a `lastVerified:
-2026-07-08` date, lives in each item's `sourceRef` field in
-`data/gap-library.ts`. Everything the 2026-07-08 legal research pass could
-not independently confirm is listed verbatim in `UNVERIFIED_RESEARCH_FLAGS`
-in that same file, and repeated in `REVIEW.md`.
+Full text of every claim, with exact statute numbers, lives in each item's
+`sourceRef` field in `data/gap-library.ts`; the eight reworded items and
+four new items above carry `lastVerified: 2026-07-14`, the rest still carry
+`lastVerified: 2026-07-08` or `2026-07-09`. Everything either research pass
+could not independently confirm is listed verbatim in
+`UNVERIFIED_RESEARCH_FLAGS` in that same file, and repeated in `REVIEW.md`.
 
 ## 4. Em dash / en dash scan
 
@@ -270,6 +329,28 @@ This is the rule text itself describing the ban, not a violation. No other
 file in the repo, including every `.ts`, `.tsx`, and `.txt` email file,
 matched.
 
+**Re-run 2026-07-14** after the naming, legal-accuracy, new-questions, and
+copy-softening pass. `Grep` for `[\x{2012}-\x{2015}]|&mdash;|&ndash;`
+(Unicode figure/en/em/horizontal-bar dashes plus the HTML entities) across
+the full repo, excluding `node_modules`, `.next`, and `.planning`. Three
+files matched, all the rule text itself naming the banned entities, not a
+violation:
+
+```
+CLAUDE.md:56:   copy, or HTML entities (`&mdash;`, `&ndash;` count as violations). Use a
+VERIFICATION.md:262:`Grep` for `—|–|&mdash;|&ndash;` across the full repo, 2026-07-08. One file
+VERIFICATION.md:266:copy, or HTML entities (`&mdash;`, `&ndash;` count as violations). Use a
+REVIEW.md:192:      copy, email copy), including `&mdash;`/`&ndash;` entities, other than
+```
+
+`REVIEW.md` newly appears in this list only because the 2026-07-08 scan
+predates the point where `REVIEW.md`'s own structural-checks section started
+quoting the rule text; it is the same kind of quoted-rule-text exception as
+the `CLAUDE.md` line, not a new violation. Every `.ts`, `.tsx`, and `.txt`
+file this pass touched (data/gap-library.ts, data/scoring.ts,
+data/questions.ts, lib/engine/*, lib/recommendation/copy.ts, every
+`components/*.tsx`, every `content/emails/*.txt`) matched zero times.
+
 ## 5. BTC pricing scan
 
 `Grep` for dollar amounts and every known BTC retainer/onboarding figure
@@ -280,6 +361,20 @@ BTC pricing figure. The only dollar amounts anywhere in the repo are
 (the industry lawsuit anchor, explicitly framed as an industry figure, not
 a BTC guarantee, in both `data/gap-library.ts` and every email that
 references it).
+
+**Re-run 2026-07-14.** Same zero result for BTC pricing figures. Also grepped
+for the literal string `BTC` in every `.tsx` and `.txt` file (the
+user-facing surfaces) across the repo: zero matches. The remaining `BTC`
+mentions in the repo are all non-rendered: `data/gap-library.ts`'s
+`complianceAngle` field (an internal metadata field never rendered by any
+component, confirmed by grepping for `complianceAngle` across
+`components/`), this file's own historical pipeline-evidence text (test
+contact names, workflow names), `CLAUDE.md`'s own rule text, and
+`ops/n8n-workflow.md`'s internal credential name, all internal/comment
+usage explicitly allowed by `CLAUDE.md` rule 1. `$200,000` was also
+re-sourced this pass away from `data/gap-library.ts`'s prior citation to
+BTC's own pitch deck (Genevieve's flag), to Novian Law 2026 and Hiscox, see
+`LEGAL-RESEARCH-2026-07-14.md` item 10 and `REVIEW.md`.
 
 ## 6. Both payloads exercised end to end
 
@@ -405,7 +500,9 @@ labeled test identity:
   "name": "QA Test Contact",
   "company": "DO NOT CONTACT - BTC Pipeline Test",
   "fbclid": "test-fbclid-verification-2026-07-08",
-  "grade": "F", "score": 39, "maxPossibleScore": 49
+  "grade": "F",
+  "score": 39,
+  "maxPossibleScore": 49
 }
 ```
 
@@ -577,6 +674,36 @@ explicitly rather than silently asserting it. `npm run build` was not
 re-run either, per this phase's instructions, section 10 below still
 applies unchanged.
 
+**Re-run 2026-07-14, end of session, after the naming/legal-accuracy pass,
+the two new scored questions, the back button, and the copy softening:**
+
+```
+npm test           -> 5 test files, 32 tests, all passed
+npm run typecheck   -> clean, no output
+npm run lint        -> "No ESLint warnings or errors"
+npm run format:check -> clean for every file touched this session
+```
+
+`npm test` initially failed one test (`lib/validateAnswers.test.ts`'s
+`VALID_ANSWERS` fixture was missing the two new required fields, correctly
+rejected by `validateComplianceAnswers`); fixed, then the full 32/32 passed.
+`npm run format:check` initially flagged pre-existing style issues in four
+touched files (`app/layout.tsx`, `components/EmailGateStep.tsx`,
+`components/Hero.tsx`, `components/RiskAssessmentCTA.tsx`), confirmed via
+`git stash` to already exist before this session's edits, not introduced by
+this pass; fixed with `prettier --write` on the touched files (content
+unchanged, whitespace only, confirmed via `git diff`). That same `git stash`
+round-trip also normalized line endings on every other file already edited
+this session (git's `core.autocrlf=true` rewrote LF to CRLF on the stash/pop
+checkout), which then also needed `prettier --write` before `format:check`
+passed clean; content was unaffected, confirmed by re-running the full test
+suite, typecheck, and lint clean afterward. `npm run build` was not re-run,
+same as the 2026-07-09 note above, section 10 below still applies unchanged.
+`format:check` still flags 8 pre-existing files this session did not touch
+(`app/globals.css`, `tailwind.config.ts`, `ops/n8n-workflow.md`,
+`ops/NEXT-SESSION-HANDOFF.md`, `.planning/debug/business-creation-error.md`,
+and `LEGAL-RESEARCH-2026-07-14.md`), out of scope for this pass.
+
 ## 10. Environment limitation: `next build` fails locally, unrelated to app code
 
 `npm run build` (`next build`) fails locally with:
@@ -634,7 +761,7 @@ evidence trail:
   enrolled, was correctly flipped to `hs_marketable_status: true`, and
   received a real send: `hs_email_last_send_date: 2026-07-11T05:43:40Z`,
   `hs_email_last_email_name: "CA Risk Audit - Initial"`, `hs_email_delivered:
-  1`, zero bounces.
+1`, zero bounces.
 - **Deliverability issue found**: despite `hs_email_delivered: 1`, the email
   did not reach the test Gmail inbox at all (confirmed via exhaustive Gmail
   search: inbox, spam, trash, promotions, sender-domain search, and an
@@ -675,16 +802,33 @@ evidence trail:
 See `REVIEW.md` for the full checklist. Highest-priority items:
 
 - Re-run the section 6 curl walkthrough and the section 7 n8n/HubSpot
-  test-fire against the post-2026-07-09 Part A engine (54-point max, 9th
-  question). The values currently in sections 6 and 7 (39/49,
-  `compliance_check_max_score: "49"`, etc.) predate this rework and are
-  historical record only, not current expected output.
+  test-fire against the current 11-question, 69-point engine (2026-07-14).
+  The values currently in sections 6 and 7 (39/49,
+  `compliance_check_max_score: "49"`, etc.) predate both the 2026-07-09 and
+  2026-07-14 reworks and are historical record only, not current expected
+  output. The HubSpot `cc_*` custom-property schema also needs two new
+  properties (`cc_wage_hour`, `cc_workers_comp`) added before a real
+  submission is sent, see `ops/n8n-workflow.md` and `REVIEW.md`.
 - HR-Pro sign-off on every scoring weight, band cutoff, and gap-item
-  wording (liability gate), including the two new gap-newhire-* items and
-  the newly-zeroed HR-support weight.
+  wording (liability gate), including the four new 2026-07-14
+  `gap-wage-hour-*`/`gap-workerscomp-*` items, the eight reworded items
+  (`gap-1099-mostly`, `gap-1099-some`, `gap-exempt-all`, `gap-exempt-mix`,
+  `gap-handbook-none`, `gap-handbook-stale`, `gap-training-none`,
+  `gap-training-unsure`), the two `gap-newhire-*` items from 2026-07-09, and
+  the newly-zeroed HR-support weight. This is the single largest open item,
+  see `REVIEW.md` sign-off section.
+- LeiLani's naming correction ("be the change HR", dropping "HR Pro" from
+  the booking/consultant phrase) was applied per her literal instruction;
+  confirm she is comfortable with that literal reading rather than "an HR
+  Pro from be the change HR," see the TODO comment in
+  `lib/recommendation/copy.ts` and `REVIEW.md` FLAG 1.
+- Confirm the $200,000 industry lawsuit anchor's new framing (re-sourced
+  2026-07-14 to Novian Law and Hiscox, away from BTC's pitch deck) is the
+  final wording BTC wants, see `REVIEW.md` FLAG 2 and the code comment in
+  `data/gap-library.ts`.
 - Provision a Twilio account and credential, then enable the "Send SMS
   (Twilio)" node (section 7.7). Out of scope per Noah for now.
-- Confirm the question 2 answer-option interpretation and the 8-vs-10
+- Confirm the question 2 answer-option interpretation and the 8-vs-10-vs-11
   question discrepancy with LeiLani.
 - Insert a real, approved testimonial in `content/emails/nurture-3-proof.txt`
   before that email is used (note: the live 3-email sequence, "Initial /

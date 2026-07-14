@@ -18,6 +18,8 @@ import {
   NEW_HIRE_PAPERWORK_POINTS,
   SALARIED_CLASSIFICATION_POINTS,
   STATES_POINTS,
+  WAGE_HOUR_POINTS,
+  WORKERS_COMP_POINTS,
   scoreToGrade,
 } from "@/data/scoring";
 import { getGapItem } from "@/data/gap-library";
@@ -44,6 +46,8 @@ function computeScore(answers: ComplianceAnswers): number {
     HARASSMENT_TRAINING_POINTS[answers.harassmentTraining] +
     LEAVE_PROCESS_POINTS[answers.leaveProcess] +
     NEW_HIRE_PAPERWORK_POINTS[answers.newHirePaperwork] +
+    WAGE_HOUR_POINTS[answers.wageHour] +
+    WORKERS_COMP_POINTS[answers.workersComp] +
     HR_SUPPORT_POINTS[answers.hrSupport]
   );
 }

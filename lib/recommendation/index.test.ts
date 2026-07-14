@@ -17,6 +17,8 @@ const RISKY_ANSWERS: ComplianceAnswers = {
   harassmentTraining: "no",
   leaveProcess: "no",
   newHirePaperwork: "none",
+  wageHour: "none",
+  workersComp: "no",
   hrSupport: "none",
 };
 

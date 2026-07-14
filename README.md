@@ -1,6 +1,6 @@
 # BTC California HR Risk Audit
 
-A paid-ads lead magnet for Be the Change HR. A visitor answers 8 questions in
+A paid-ads lead magnet for be the change HR. A visitor answers 11 questions in
 60 to 90 seconds and receives an instant A-F HR compliance risk grade with
 named (not detailed) gap categories, plus a free 30-minute HR discovery call
 booked immediately on the result screen. After they give an email, a
@@ -61,6 +61,15 @@ vercel --prod
 Set every variable from `.env.example` in the Vercel project's environment
 settings before the first production deploy. `REPORT_TOKEN_SECRET` must be a
 real, long random secret in production, never the placeholder dev value.
+
+## Annual maintenance
+
+The CA exempt salary floor ($70,304) and the CA state minimum wage ($16.90/hr,
+its basis) change every year. CA DIR announces the next year's minimum wage by
+August 1, effective the following January 1. Update `data/gap-library.ts`
+(`gap-exempt-all`, `gap-exempt-mix`) once the 2027 figure publishes, expected
+around 2026-08-01. See the ANNUAL MAINTENANCE comment above `GAP_LIBRARY` in
+that file.
 
 ## Project files that gate whether this can go live
 

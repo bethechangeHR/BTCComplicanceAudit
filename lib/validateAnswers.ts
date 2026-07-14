@@ -17,6 +17,8 @@ import {
   NEW_HIRE_PAPERWORK_POINTS,
   SALARIED_CLASSIFICATION_POINTS,
   STATES_POINTS,
+  WAGE_HOUR_POINTS,
+  WORKERS_COMP_POINTS,
 } from "@/data/scoring";
 import type { ComplianceAnswers } from "@/lib/engine/types";
 
@@ -42,6 +44,8 @@ export function validateComplianceAnswers(
     isValid(a.harassmentTraining, HARASSMENT_TRAINING_POINTS) &&
     isValid(a.leaveProcess, LEAVE_PROCESS_POINTS) &&
     isValid(a.newHirePaperwork, NEW_HIRE_PAPERWORK_POINTS) &&
+    isValid(a.wageHour, WAGE_HOUR_POINTS) &&
+    isValid(a.workersComp, WORKERS_COMP_POINTS) &&
     isValid(a.hrSupport, HR_SUPPORT_POINTS)
   ) {
     return {
@@ -53,6 +57,8 @@ export function validateComplianceAnswers(
       harassmentTraining: a.harassmentTraining,
       leaveProcess: a.leaveProcess,
       newHirePaperwork: a.newHirePaperwork,
+      wageHour: a.wageHour,
+      workersComp: a.workersComp,
       hrSupport: a.hrSupport,
     };
   }

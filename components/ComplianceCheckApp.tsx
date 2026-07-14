@@ -46,6 +46,14 @@ export function ComplianceCheckApp({
     setStage({ name: "question", index: 0 });
   }
 
+  function handleBack() {
+    if (stage.name === "question" && stage.index > 0) {
+      setStage({ name: "question", index: stage.index - 1 });
+    } else if (stage.name === "gate") {
+      setStage({ name: "question", index: QUESTIONS.length - 1 });
+    }
+  }
+
   function handleAnswer(value: string) {
     if (stage.name !== "question") return;
     const question = QUESTIONS[stage.index];
@@ -117,6 +125,7 @@ export function ComplianceCheckApp({
           <QuestionStep
             question={QUESTIONS[stage.index]!}
             onAnswer={handleAnswer}
+            onBack={stage.index > 0 ? handleBack : undefined}
           />
         </div>
       )}
@@ -125,6 +134,7 @@ export function ComplianceCheckApp({
         <EmailGateStep
           onSubmit={handleGateSubmit}
           submitting={stage.name === "submitting"}
+          onBack={stage.name === "gate" ? handleBack : undefined}
         />
       )}
 
