@@ -73,6 +73,19 @@ export async function POST(request: NextRequest) {
     typeof body.name === "string" ? body.name : undefined;
   const fbclid: string | undefined =
     typeof body.fbclid === "string" ? body.fbclid : undefined;
+  // CAPI match keys, added 2026-07-14 for the server-side Lead send
+  // (btc-meta-launch-tracking-plan Section 3c/3d). eventId must be the same
+  // id trackPixelEvent("Lead", ..., eventId) fired client-side, fbp/fbc come
+  // from channels/pixel.ts's getFbCookies() on the client. Never trust a
+  // client-reported IP, this route captures it server-side same as always.
+  const eventId: string | undefined =
+    typeof body.eventId === "string" ? body.eventId : undefined;
+  const fbp: string | undefined =
+    typeof body.fbp === "string" ? body.fbp : undefined;
+  const fbc: string | undefined =
+    typeof body.fbc === "string" ? body.fbc : undefined;
+  const userAgent: string | undefined =
+    request.headers.get("user-agent") ?? undefined;
   const ipAddress: string | undefined =
     request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
     request.headers.get("x-real-ip") ??
@@ -125,6 +138,11 @@ export async function POST(request: NextRequest) {
           company,
           name,
           fbclid,
+          eventId,
+          fbp,
+          fbc,
+          ipAddress,
+          userAgent,
           answers,
           grade: result.grade,
           score: result.score,

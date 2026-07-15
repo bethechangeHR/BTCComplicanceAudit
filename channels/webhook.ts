@@ -11,7 +11,11 @@
  * /preview QA route never require a live endpoint.
  */
 
-import type { SubmitPayload, ToolViewedPayload } from "./types";
+import type {
+  SubmitPayload,
+  ToolStartPayload,
+  ToolViewedPayload,
+} from "./types";
 
 type WebhookResult = { sent: boolean; reason?: string };
 
@@ -54,4 +58,17 @@ export async function fireToolCompleteWebhook(
   payload: SubmitPayload,
 ): Promise<WebhookResult> {
   return postEvent("tool_complete", { ...payload });
+}
+
+/**
+ * tool_start, added 2026-07-14. This is the launch plan's ToolStart
+ * optimization event (Section 4), the one the prospecting ad set actually
+ * optimizes on at $30/day. Fires once, the first time a visitor answers Q1,
+ * from app/api/tool-start/route.ts. Carries the CAPI match keys so n8n can
+ * send the server-side twin of the client Pixel fire.
+ */
+export async function fireToolStartWebhook(
+  payload: ToolStartPayload,
+): Promise<WebhookResult> {
+  return postEvent("tool_start", { ...payload });
 }

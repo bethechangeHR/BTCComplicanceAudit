@@ -8,12 +8,23 @@
  *
  * generateEventId() produces the shared id used to dedupe the browser
  * Pixel fire against the server-side CAPI fire, per the BTC funnel spec's
- * shared event_id convention.
+ * shared event_id convention. Per the 2026-07-14 launch plan (Section 3c),
+ * ToolStart and Lead both need a server-side CAPI twin sharing this same
+ * id, so callers that post to a server route (app/api/tool-start,
+ * app/api/submit) must generate the id once and pass it to BOTH
+ * trackPixelEvent() and the server POST body, not let trackPixelEvent
+ * generate its own. ToolComplete and PageView stay client-only (PageView
+ * fires from the base snippet in components/MetaPixel.tsx, ToolComplete is
+ * not part of the plan's 3-event set), so trackPixelEvent still generates
+ * its own id when the caller does not supply one.
  *
- * Event wiring (client-side Pixel only, no server-side CAPI yet, that is a
- * future phase): PageView fires automatically from the base snippet in
- * components/MetaPixel.tsx. ToolStart, Lead, and ToolComplete are fired via
- * trackPixelEvent() below from components/ComplianceCheckApp.tsx.
+ * getFbCookies() / buildFbcFromClickId() read/derive the fbp and fbc
+ * match-key values Meta's CAPI matching wants alongside hashed email/phone
+ * (Section 3d, EMQ 6+ target). fbp is set by the base pixel snippet itself;
+ * fbc is set by the base snippet too when it sees an fbclid in the URL, so
+ * the cookie is preferred. buildFbcFromClickId() is the fallback for the
+ * rare race where a server POST fires before the base snippet has had a
+ * chance to set the _fbc cookie yet.
  */
 
 declare global {
@@ -35,17 +46,54 @@ export function generateEventId(): string {
 }
 
 /**
+ * Reads the _fbp and _fbc cookies the Meta base pixel snippet sets on this
+ * domain. Returns undefined for either that is not present (pixel disabled,
+ * ad blocker, or the fbc race described above). Browser-only, no-ops to {}
+ * on the server.
+ */
+export function getFbCookies(): { fbp?: string; fbc?: string } {
+  if (typeof document === "undefined") return {};
+  const cookies = document.cookie.split(";").reduce<Record<string, string>>(
+    (acc, part) => {
+      const [key, ...rest] = part.trim().split("=");
+      if (key) acc[key] = rest.join("=");
+      return acc;
+    },
+    {},
+  );
+  return { fbp: cookies["_fbp"], fbc: cookies["_fbc"] };
+}
+
+/**
+ * Builds an fbc value from a raw fbclid per Meta's documented format
+ * (fb.1.<click_timestamp_ms>.<fbclid>), for the fallback case where no
+ * _fbc cookie exists yet. subdomainIndex is fixed at 1 per Meta's own
+ * example, this is not a real subdomain depth count.
+ */
+export function buildFbcFromClickId(fbclid: string): string {
+  return `fb.1.${Date.now()}.${fbclid}`;
+}
+
+/**
  * Safely fires a Meta Pixel custom event. No-ops silently (never throws)
  * unless the pixel is enabled, running in the browser, and the base snippet
  * has already defined window.fbq. Never pass PII (email, phone, name) in
  * params, these are marketing conversion events, not the data pipeline.
+ *
+ * Pass eventId explicitly for any event that also gets sent server-side via
+ * CAPI (ToolStart, Lead) so Meta dedupes the pair instead of double
+ * counting. Omit it for client-only events (ToolComplete) and one will be
+ * generated internally.
  */
 export function trackPixelEvent(
   eventName: string,
   params?: Record<string, unknown>,
+  eventId?: string,
 ): void {
   if (!isPixelEnabled()) return;
   if (typeof window === "undefined") return;
   if (typeof window.fbq !== "function") return;
-  window.fbq("track", eventName, params, { eventID: generateEventId() });
+  window.fbq("track", eventName, params, {
+    eventID: eventId ?? generateEventId(),
+  });
 }

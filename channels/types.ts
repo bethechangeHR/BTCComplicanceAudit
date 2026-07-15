@@ -43,6 +43,27 @@ export interface ToolViewedPayload {
 }
 
 /**
+ * tool_start (aka calculator_started). Fires once, the first time a
+ * visitor answers Q1, mirroring the client-side ToolStart Pixel event
+ * fired from components/ComplianceCheckApp.tsx. This is the server-side
+ * CAPI twin per the 2026-07-14 launch plan (Section 3c): eventId must be
+ * the exact same id passed to trackPixelEvent's eventID so Meta dedupes
+ * the browser and server fires into a single event. fbp/fbc/ipAddress/
+ * userAgent are the CAPI match keys used to hit Event Match Quality 6+
+ * (Section 3d), not analytics fields, no PII beyond what CAPI itself needs.
+ */
+export interface ToolStartPayload {
+  mode: ChannelMode;
+  timestamp: string;
+  fbclid?: string;
+  eventId?: string;
+  fbp?: string;
+  fbc?: string;
+  ipAddress?: string;
+  userAgent?: string;
+}
+
+/**
  * TCPA-defensible record of what a visitor agreed to when they checked (or
  * left unchecked) the SMS opt-in box, captured regardless of optIn state so
  * a later opt-out claim can be evidenced either way. disclosureText and
@@ -63,6 +84,11 @@ export interface SmsConsentRecord {
  * the email gate validates and the report token is signed. This is the
  * payload posted to the n8n webhook that upserts the HubSpot contact and
  * triggers the report email, SMS, and nurture sequence.
+ *
+ * eventId/fbp/fbc/ipAddress/userAgent added 2026-07-14 for the server-side
+ * Lead CAPI send (Section 3c/3d of the launch plan). eventId must match the
+ * id passed to trackPixelEvent("Lead", ..., eventId) client-side so Meta
+ * dedupes browser and server fires into one event.
  */
 export interface SubmitPayload {
   mode: ChannelMode;
@@ -74,6 +100,11 @@ export interface SubmitPayload {
   company?: string;
   name?: string;
   fbclid?: string;
+  eventId?: string;
+  fbp?: string;
+  fbc?: string;
+  ipAddress?: string;
+  userAgent?: string;
   answers: ComplianceAnswers;
   grade: RiskGrade;
   score: number;

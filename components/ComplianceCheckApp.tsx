@@ -10,7 +10,12 @@ import { QUESTIONS } from "@/data/questions";
 import type { ComplianceAnswers } from "@/lib/engine/types";
 import type { OnPageResult } from "@/lib/recommendation/types";
 import type { ChannelMode } from "@/channels/types";
-import { trackPixelEvent } from "@/channels/pixel";
+import {
+  trackPixelEvent,
+  generateEventId,
+  getFbCookies,
+  buildFbcFromClickId,
+} from "@/channels/pixel";
 
 type Stage =
   | { name: "intro" }
@@ -59,7 +64,23 @@ export function ComplianceCheckApp({
     const question = QUESTIONS[stage.index];
     if (!question) return;
     if (stage.index === 0 && Object.keys(answers).length === 0) {
-      trackPixelEvent("ToolStart");
+      // Shared eventId, passed to BOTH the browser Pixel fire and the
+      // server-side CAPI twin (app/api/tool-start), so Meta dedupes the
+      // pair per btc-meta-launch-tracking-plan Section 3c. This is the
+      // launch's actual optimization event (Section 4), do not drop the
+      // server post even though the browser fire alone looks sufficient.
+      const eventId = generateEventId();
+      trackPixelEvent("ToolStart", undefined, eventId);
+      const { fbp, fbc: cookieFbc } = getFbCookies();
+      const fbc = cookieFbc ?? (fbclid ? buildFbcFromClickId(fbclid) : undefined);
+      fetch("/api/tool-start", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mode, fbclid, eventId, fbp, fbc }),
+      }).catch(() => {
+        // Best-effort, same as the tool_viewed POST above, never block the
+        // tool on a tracking call.
+      });
     }
     const nextAnswers = { ...answers, [question.key]: value };
     setAnswers(nextAnswers);
@@ -72,7 +93,13 @@ export function ComplianceCheckApp({
   }
 
   async function handleGateSubmit(submission: GateSubmission) {
-    trackPixelEvent("Lead");
+    // Shared eventId, same dedup pattern as ToolStart above: the browser
+    // Lead fire and the server-side CAPI Lead send (app/api/submit → n8n)
+    // must carry the same id so Meta counts one lead, not two.
+    const eventId = generateEventId();
+    trackPixelEvent("Lead", undefined, eventId);
+    const { fbp, fbc: cookieFbc } = getFbCookies();
+    const fbc = cookieFbc ?? (fbclid ? buildFbcFromClickId(fbclid) : undefined);
     setStage({ name: "submitting" });
     try {
       const response = await fetch("/api/submit", {
@@ -81,6 +108,9 @@ export function ComplianceCheckApp({
         body: JSON.stringify({
           mode,
           fbclid,
+          eventId,
+          fbp,
+          fbc,
           answers,
           name: submission.name,
           email: submission.email,
