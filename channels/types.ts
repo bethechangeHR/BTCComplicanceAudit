@@ -43,6 +43,22 @@ export interface ToolViewedPayload {
 }
 
 /**
+ * TCPA-defensible record of what a visitor agreed to when they checked (or
+ * left unchecked) the SMS opt-in box, captured regardless of optIn state so
+ * a later opt-out claim can be evidenced either way. disclosureText and
+ * disclosureVersion must stay in lockstep with the checkbox copy in
+ * components/EmailGateStep.tsx, see app/api/submit/route.ts.
+ */
+export interface SmsConsentRecord {
+  optIn: boolean;
+  timestamp: string;
+  ipAddress?: string;
+  sourceUrl: string;
+  disclosureVersion: string;
+  disclosureText: string;
+}
+
+/**
  * tool_complete (aka calculator_completed). Fires server-side, only after
  * the email gate validates and the report token is signed. This is the
  * payload posted to the n8n webhook that upserts the HubSpot contact and
@@ -54,6 +70,7 @@ export interface SubmitPayload {
   email: string;
   phone?: string;
   smsOptIn: boolean;
+  smsConsent?: SmsConsentRecord;
   company?: string;
   name?: string;
   fbclid?: string;

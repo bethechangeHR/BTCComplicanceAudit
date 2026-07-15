@@ -124,7 +124,31 @@ export function EmailGateStep({
               onChange={(e) => setSmsOptIn(e.target.checked)}
               className="mt-1 h-4 w-4 rounded border-ink/25 text-btc-teal focus:ring-btc-teal/40"
             />
-            <span>Text me my results and a reminder before my call.</span>
+            <span>
+              I agree to receive text messages from Be the Change HR about my
+              HR audit results and scheduling my free assessment. Consent is
+              not a condition of purchase. Message and data rates may apply.
+              Message frequency varies. Reply HELP for help and STOP to opt
+              out. See our{" "}
+              <a
+                href="/privacy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-btc-teal underline underline-offset-2 hover:text-btc-teal-dark"
+              >
+                Privacy Policy
+              </a>{" "}
+              and{" "}
+              <a
+                href="/terms"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-btc-teal underline underline-offset-2 hover:text-btc-teal-dark"
+              >
+                Terms of Service
+              </a>
+              .
+            </span>
           </label>
         )}
         {error && <p className="text-sm text-[#b3452f]">{error}</p>}

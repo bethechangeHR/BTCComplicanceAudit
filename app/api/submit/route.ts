@@ -24,9 +24,18 @@ import { buildOnPageResult } from "@/lib/recommendation";
 import { validateComplianceAnswers, isValidEmail } from "@/lib/validateAnswers";
 import { signReportToken } from "@/lib/token";
 import { fireToolCompleteWebhook } from "@/channels/webhook";
-import type { ChannelMode } from "@/channels/types";
+import type { ChannelMode, SmsConsentRecord } from "@/channels/types";
 
 export const runtime = "nodejs";
+
+// Must stay in lockstep with the checkbox copy in
+// components/EmailGateStep.tsx and the Message Flow text filed with the
+// A2P 10DLC campaign. Bump the version whenever the disclosure wording
+// changes so old consent records stay tied to the language a user actually
+// saw.
+const SMS_CONSENT_DISCLOSURE_VERSION = "2026-07-14";
+const SMS_CONSENT_DISCLOSURE_TEXT =
+  "I agree to receive text messages from Be the Change HR about my HR audit results and scheduling my free assessment. Consent is not a condition of purchase. Message and data rates may apply. Message frequency varies. Reply HELP for help and STOP to opt out. See our Privacy Policy and Terms of Service.";
 
 export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => null);
@@ -64,6 +73,10 @@ export async function POST(request: NextRequest) {
     typeof body.name === "string" ? body.name : undefined;
   const fbclid: string | undefined =
     typeof body.fbclid === "string" ? body.fbclid : undefined;
+  const ipAddress: string | undefined =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+    request.headers.get("x-real-ip") ??
+    undefined;
 
   const result = scoreComplianceAnswers(answers);
   const createdAt = new Date().toISOString();
@@ -82,6 +95,20 @@ export async function POST(request: NextRequest) {
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
     const reportUrl = `${siteUrl.replace(/\/$/, "")}/report/${token}`;
 
+    // TCPA-defensible consent record, built whenever a phone number was
+    // submitted so an opt-out (box left unchecked) is evidenced too, not
+    // just an opt-in. See channels/types.ts SmsConsentRecord.
+    const smsConsent: SmsConsentRecord | undefined = phone
+      ? {
+          optIn: smsOptIn,
+          timestamp: createdAt,
+          ipAddress,
+          sourceUrl: siteUrl,
+          disclosureVersion: SMS_CONSENT_DISCLOSURE_VERSION,
+          disclosureText: SMS_CONSENT_DISCLOSURE_TEXT,
+        }
+      : undefined;
+
     // Fire the webhook after the response has been sent, so grade reveal
     // does not wait on n8n latency. Wrapped in its own try/catch: a webhook
     // failure here must never throw unhandled after the client already has
@@ -94,6 +121,7 @@ export async function POST(request: NextRequest) {
           email,
           phone,
           smsOptIn,
+          smsConsent,
           company,
           name,
           fbclid,

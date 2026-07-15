@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Newsreader, Hanken_Grotesk } from "next/font/google";
 import { MetaPixel } from "@/components/MetaPixel";
+import { SiteFooter } from "@/components/SiteFooter";
 import "./globals.css";
 
 const newsreader = Newsreader({
@@ -36,6 +37,7 @@ export default function RootLayout({
       <body className="min-h-screen bg-surface font-sans text-btc-gray antialiased">
         <MetaPixel />
         {children}
+        <SiteFooter />
       </body>
     </html>
   );
