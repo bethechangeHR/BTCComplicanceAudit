@@ -16,10 +16,16 @@ export type HeadcountAnswer = "1-9" | "10-49" | "50-149" | "150+";
  * The buildspec's shorthand for question 2 is "(one / CA / multi-state)".
  * That is ambiguous on its own (a single state could be California or not),
  * so this is an explicit interpretation, flagged for HR-Pro review: the
- * three real-world buckets a CA-focused paid-ads visitor can be in.
+ * real-world buckets a CA-focused paid-ads visitor can be in. Split
+ * 2026-07-15 per LeiLani's feedback: multi-state needs to distinguish
+ * whether California is one of the states or not, since the ABC test and
+ * other CA-specific facts only apply if CA is actually in the mix.
  */
 export type StatesAnswer =
-  "california_only" | "one_other_state" | "multi_state";
+  | "california_only"
+  | "one_other_state"
+  | "multi_state_ca"
+  | "multi_state_no_ca";
 
 export type ContractorUseAnswer = "none" | "some" | "mostly";
 

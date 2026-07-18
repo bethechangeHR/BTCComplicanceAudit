@@ -1,9 +1,12 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { GradeBadge } from "./GradeBadge";
+import { RISK_TIER_LABELS } from "@/lib/recommendation/copy";
+import type { RiskGrade } from "@/lib/engine/types";
 
 export interface GateSubmission {
-  name: string;
+  name?: string;
   email: string;
   company?: string;
   phone?: string;
@@ -15,11 +18,20 @@ export function EmailGateStep({
   submitting,
   error,
   onBack,
+  grade,
 }: {
   onSubmit: (submission: GateSubmission) => void;
   submitting: boolean;
   error?: string;
   onBack?: () => void;
+  /**
+   * Client-safe grade, computed by data/scoring.ts gradeAnswers() in
+   * components/ComplianceCheckApp.tsx once all 11 questions are answered.
+   * Shown here as an honest teaser before the visitor submits their email.
+   * Only the letter grade and its tier label render, never a category name
+   * or report text, those stay gated behind submit.
+   */
+  grade: RiskGrade;
 }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -30,7 +42,7 @@ export function EmailGateStep({
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
     onSubmit({
-      name: name.trim(),
+      name: name.trim() || undefined,
       email: email.trim(),
       company: company.trim() || undefined,
       phone: phone.trim() || undefined,
@@ -40,27 +52,26 @@ export function EmailGateStep({
 
   return (
     <div className="animate-rise-in mx-auto max-w-md space-y-6 text-center">
-      <div className="space-y-2">
-        <h2 className="font-display text-2xl font-medium text-ink sm:text-3xl">
-          Your grade is ready.
-        </h2>
-        <p className="text-sm text-btc-gray/80">
-          Enter your email to see your grade now and get the full audit report
-          sent to your inbox.
-        </p>
-      </div>
+      <GradeBadge
+        grade={grade}
+        riskTierLabel={RISK_TIER_LABELS[grade]}
+        compact
+      />
+      <p className="text-sm text-btc-gray/80">
+        Enter your email to see the specific risk areas behind this grade and
+        get the full audit report sent to your inbox.
+      </p>
       <form onSubmit={handleSubmit} className="space-y-4 text-left">
         <div>
           <label
             htmlFor="name"
             className="mb-1 block text-xs font-semibold uppercase tracking-wide text-btc-gray/70"
           >
-            Your name
+            Your name (optional)
           </label>
           <input
             id="name"
             type="text"
-            required
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Jordan Smith"
@@ -125,11 +136,10 @@ export function EmailGateStep({
               className="mt-1 h-4 w-4 rounded border-ink/25 text-btc-teal focus:ring-btc-teal/40"
             />
             <span>
-              I agree to receive text messages from Be the Change HR about my
-              HR audit results and scheduling my free assessment. Consent is
-              not a condition of purchase. Message and data rates may apply.
-              Message frequency varies. Reply HELP for help and STOP to opt
-              out. See our{" "}
+              I agree to receive text messages from Be the Change HR about my HR
+              audit results and scheduling my free assessment. Consent is not a
+              condition of purchase. Message and data rates may apply. Message
+              frequency varies. Reply HELP for help and STOP to opt out. See our{" "}
               <a
                 href="/privacy"
                 target="_blank"
@@ -157,7 +167,7 @@ export function EmailGateStep({
           disabled={submitting}
           className="w-full rounded-lg bg-btc-teal px-6 py-3.5 text-base font-semibold text-white shadow-seal transition-transform hover:-translate-y-0.5 disabled:pointer-events-none disabled:opacity-60"
         >
-          {submitting ? "Grading your business..." : "Reveal my grade"}
+          {submitting ? "Unlocking your report..." : "Unlock my full report"}
         </button>
         <p className="text-center text-xs text-btc-gray/60">
           No spam. Just your result and, if you want it, a follow-up from be the

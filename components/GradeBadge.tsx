@@ -30,26 +30,40 @@ function flaggedCountLine(flaggedCount: number): string {
  * funnel per client feedback (2026-07-09), replacing the prior circular
  * "seal" badge. Lives on the deep-teal instrument surface built for exactly
  * this moment. See plan Part B3.
+ *
+ * `compact` added 2026-07-18 for the gate teaser (components/EmailGateStep.tsx,
+ * P1d): the full-size badge is tuned for the result page where it is the
+ * only thing on screen, but at the gate it sits above a 3-field form, and on
+ * a small phone in the actual Facebook/Instagram in-app browser (reduced
+ * viewport height from the in-app toolbar, the exact environment P0 was
+ * about) the full-size badge pushes the email field, the whole point of the
+ * gate, below the fold. Compact keeps the same colors and grade emphasis at
+ * roughly half the vertical footprint. ResultView does not pass this prop,
+ * so the main reveal moment is unaffected.
  */
 export function GradeBadge({
   grade,
   riskTierLabel,
   flaggedCount,
   animated = true,
+  compact = false,
 }: {
   grade: RiskGrade;
   riskTierLabel?: string;
   flaggedCount?: number;
   animated?: boolean;
+  compact?: boolean;
 }) {
   return (
     <div
-      className={`rounded-3xl border bg-instrument px-8 py-8 shadow-document sm:px-10 sm:py-10 ${animated ? "animate-reveal-in" : ""}`}
+      className={`rounded-3xl border bg-instrument shadow-document ${compact ? "px-6 py-5 sm:px-8 sm:py-6" : "px-8 py-8 sm:px-10 sm:py-10"} ${animated ? "animate-reveal-in" : ""}`}
       style={{ borderColor: "var(--btc-instrument-line)" }}
     >
-      <div className="flex flex-col items-center gap-4 text-center">
+      <div
+        className={`flex flex-col items-center text-center ${compact ? "gap-2" : "gap-4"}`}
+      >
         <span
-          className={`font-display text-8xl font-medium leading-none sm:text-9xl ${GRADE_ACCENT[grade]}`}
+          className={`font-display font-medium leading-none ${compact ? "text-6xl sm:text-7xl" : "text-8xl sm:text-9xl"} ${GRADE_ACCENT[grade]}`}
         >
           {grade}
         </span>

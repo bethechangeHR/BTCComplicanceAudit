@@ -21,6 +21,7 @@
 
 import { describe, expect, it } from "vitest";
 import { scoreComplianceAnswers } from "./index";
+import { gradeAnswers } from "@/data/scoring";
 import type { ComplianceAnswers } from "./types";
 
 describe("golden master: buildspec scenario 1", () => {
@@ -147,7 +148,7 @@ describe("golden master: buildspec scenario 3", () => {
   // timekeeping/break process and carry required coverage.
   const scenario3: ComplianceAnswers = {
     headcount: "50-149",
-    states: "multi_state",
+    states: "multi_state_ca",
     contractorUse: "some",
     salariedClassification: "mix",
     handbookStatus: "current",
@@ -223,4 +224,78 @@ describe("golden master: genuinely clean business (verification gate requirement
     expect(result.triggeredGapIds).toEqual([]);
     expect(result.categoryRisks).toEqual([]);
   });
+
+  it("matches the client-safe gradeAnswers() path", () => {
+    expect(gradeAnswers(cleanBusiness)).toBe(
+      scoreComplianceAnswers(cleanBusiness).grade,
+    );
+  });
+});
+
+describe("gradeAnswers: client-safe grade path used for the gate teaser", () => {
+  // components/EmailGateStep.tsx shows the real letter grade before the
+  // visitor submits their email (P1d, 2026-07-18). gradeAnswers() must
+  // always agree with the server-computed engine grade, or the teaser would
+  // be dishonest. Checked across every golden-master scenario above so the
+  // two paths can never silently drift apart as data/scoring.ts changes.
+  const scenarios: Record<string, ComplianceAnswers> = {
+    "buildspec scenario 1 (D)": {
+      headcount: "1-9",
+      states: "california_only",
+      contractorUse: "mostly",
+      salariedClassification: "hourly",
+      handbookStatus: "none",
+      harassmentTraining: "no",
+      leaveProcess: "no",
+      newHirePaperwork: "none",
+      wageHour: "none",
+      workersComp: "unsure",
+      hrSupport: "none",
+    },
+    "buildspec scenario 2 (C)": {
+      headcount: "10-49",
+      states: "california_only",
+      contractorUse: "none",
+      salariedClassification: "all_salaried",
+      handbookStatus: "stale",
+      harassmentTraining: "no",
+      leaveProcess: "yes",
+      newHirePaperwork: "partial",
+      wageHour: "partial",
+      workersComp: "yes",
+      hrSupport: "outside",
+    },
+    "buildspec scenario 3 (B)": {
+      headcount: "50-149",
+      states: "multi_state_ca",
+      contractorUse: "some",
+      salariedClassification: "mix",
+      handbookStatus: "current",
+      harassmentTraining: "yes",
+      leaveProcess: "yes",
+      newHirePaperwork: "complete",
+      wageHour: "complete",
+      workersComp: "yes",
+      hrSupport: "in_house",
+    },
+    "genuinely clean business (A)": {
+      headcount: "1-9",
+      states: "california_only",
+      contractorUse: "none",
+      salariedClassification: "hourly",
+      handbookStatus: "current",
+      harassmentTraining: "yes",
+      leaveProcess: "yes",
+      newHirePaperwork: "complete",
+      wageHour: "complete",
+      workersComp: "yes",
+      hrSupport: "in_house",
+    },
+  };
+
+  for (const [label, answers] of Object.entries(scenarios)) {
+    it(`agrees with the engine grade for ${label}`, () => {
+      expect(gradeAnswers(answers)).toBe(scoreComplianceAnswers(answers).grade);
+    });
+  }
 });

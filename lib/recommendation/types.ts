@@ -36,6 +36,23 @@ export interface OnPageResult {
   categoryRisks: CategoryRisk[];
   disclaimer: string;
   bookingUrl: string;
+  /**
+   * Industry-framed cost-of-inaction context, added 2026-07-18 (P2.2). The
+   * same INDUSTRY_LAWSUIT_ANCHOR data/gap-library.ts already exposes to the
+   * hosted report, reused verbatim, never a new legal claim. Always an
+   * industry figure, never a BTC guarantee, see the framing string itself.
+   */
+  industryContext: {
+    amountUsd: number;
+    framing: string;
+    source: string;
+  };
+  /**
+   * Lead-fit tag, added 2026-07-18 (P2.3), from buildQualificationTag(). Not
+   * PII, just the same signal already collected via the hrSupport question.
+   * Used to gate the dark VSL slot to high-priority visitors only.
+   */
+  leadPriority: LeadPriority;
 }
 
 /** One category's full detail for the hosted report, grouped from possibly

@@ -64,11 +64,14 @@ real, long random secret in production, never the placeholder dev value.
 
 ## Annual maintenance
 
-The CA exempt salary floor ($70,304) and the CA state minimum wage ($16.90/hr,
-its basis) change every year. CA DIR announces the next year's minimum wage by
-August 1, effective the following January 1. Update `data/gap-library.ts`
-(`gap-exempt-all`, `gap-exempt-mix`) once the 2027 figure publishes, expected
-around 2026-08-01. See the ANNUAL MAINTENANCE comment above `GAP_LIBRARY` in
+The CA exempt salary floor ($70,304 for 2026, $74,672 for 2027) and the CA
+state minimum wage, its basis, change every year. CA DIR announces the next
+year's minimum wage by August 1, effective the following January 1. The 2027
+figure was supplied directly by LeiLani on 2026-07-15, ahead of CA DIR's usual
+announcement, and is flagged in `UNVERIFIED_RESEARCH_FLAGS` pending
+confirmation against a published CA DIR release. Update `data/gap-library.ts`
+(`gap-exempt-all`, `gap-exempt-mix`) once the 2028 figure publishes, expected
+around 2027-08-01. See the ANNUAL MAINTENANCE comment above `GAP_LIBRARY` in
 that file.
 
 ## Project files that gate whether this can go live

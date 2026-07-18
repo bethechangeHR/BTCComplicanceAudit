@@ -43,7 +43,14 @@ export const QUESTIONS: Question[] = [
     options: [
       { value: "california_only", label: "California only" },
       { value: "one_other_state", label: "One state, not California" },
-      { value: "multi_state", label: "More than one state" },
+      {
+        value: "multi_state_ca",
+        label: "More than one state, including California",
+      },
+      {
+        value: "multi_state_no_ca",
+        label: "More than one state, not California",
+      },
     ],
   },
   {

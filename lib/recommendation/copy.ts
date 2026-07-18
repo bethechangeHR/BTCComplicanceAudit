@@ -14,7 +14,7 @@ import type { QualificationTag } from "./types";
 export const GRADE_VERDICT_COPY: Record<RiskGrade, string> = {
   A: "Your HR practices are in strong shape overall. A few areas are still worth a second look.",
   B: "You are mostly covered, but real gaps remain that could still cost you.",
-  C: "You have compliance exposure worth addressing soon, before it becomes a claim.",
+  C: "You have compliance exposure worth addressing soon before it becomes a claim.",
   D: "Your business carries serious HR compliance risk right now.",
   F: "Your business is significantly exposed across multiple compliance areas. This needs attention now.",
 };
@@ -33,14 +33,15 @@ export const RISK_TIER_LABELS: Record<RiskGrade, string> = {
 };
 
 /**
- * "be the change HR" per LeiLani's naming correction (2026-07-14), dropping
- * "HR Pro" from the consultant/booking phrase per her literal instruction.
+ * "Be the Change HR" per LeiLani's 2026-07-15 correction, reversing her prior
+ * 2026-07-14 lowercase instruction (dropping "HR Pro" from the
+ * consultant/booking phrase). Title case is the current, final instruction.
  * TODO confirm with LeiLani: she may still want the consultant referred to
- * as "an HR Pro from be the change HR" rather than just the brand name, see
+ * as "an HR Pro from Be the Change HR" rather than just the brand name, see
  * REVIEW.md FLAG 1.
  */
 export const RESULT_DISCLAIMER =
-  "This is an educational estimate and a directional risk indicator, not legal advice. It does not tell you which laws apply to your specific business as settled fact. For a full review of your actual exposure, book a free 30-minute HR risk assessment with be the change HR.";
+  "This is an educational estimate and a directional risk indicator, not legal advice. It does not tell you which laws apply to your specific business as settled fact. For a full review of your actual exposure, book a free 30-minute HR risk assessment with Be the Change HR.";
 
 export const QUALIFICATION_TAGS: Record<HrSupportAnswer, QualificationTag> = {
   none: {
@@ -66,7 +67,7 @@ export const QUALIFICATION_TAGS: Record<HrSupportAnswer, QualificationTag> = {
 };
 
 export const REPORT_INTRO_COPY =
-  "This report walks through the risk areas your answers point to, the reasoning behind each one, and the scope of work it would take to close them. It is not an exhaustive list of every issue your business could face. It does not include the specific fixes themselves, the compliant policy language, the reclassification steps, or the training rollout. That is what be the change HR builds with you on a call.";
+  "This report walks through the risk areas your answers point to, the reasoning behind each one, and the scope of work it would take to close them. It is not an exhaustive list of every issue your business could face. It does not include the specific fixes themselves, the compliant policy language, the reclassification steps, or the training rollout. That is what Be the Change HR builds with you on a call.";
 
 /**
  * Report-only, per LEGAL-RESEARCH-2026-07-14.md item 11: many California

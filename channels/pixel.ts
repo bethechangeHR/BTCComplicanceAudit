@@ -41,8 +41,57 @@ export function getMetaPixelId(): string | undefined {
   return process.env.NEXT_PUBLIC_META_PIXEL_ID || undefined;
 }
 
+/**
+ * Builds a v4-shaped UUID from crypto.getRandomValues, for runtimes that
+ * have the Web Crypto API but not the newer randomUUID() convenience method
+ * (older WebView builds in particular). Sets the version (4) and variant
+ * bits per RFC 4122 section 4.4, formatted as the standard 8-4-4-4-12 hex
+ * string.
+ */
+function uuidFromRandomValues(): string {
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  bytes[6] = (bytes[6]! & 0x0f) | 0x40;
+  bytes[8] = (bytes[8]! & 0x3f) | 0x80;
+  const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join(
+    "",
+  );
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
+
+/**
+ * Must never throw. This id is generated synchronously on the first answer
+ * tap (see components/ComplianceCheckApp.tsx handleAnswer), and older
+ * in-app WebViews (Facebook/Instagram browser, iOS below 15.4) can lack
+ * crypto.randomUUID entirely. A throw here used to freeze the tool on
+ * question 1 before the UI could advance, which is what took a real Meta
+ * campaign from 223 landing views to 0 ToolStart events, all on mobile
+ * in-app browsers. The fallback chain only needs to produce a string that
+ * is shared between the browser Pixel fire and the server-side CAPI twin
+ * for dedup, it does not need to be a spec-perfect UUID.
+ */
 export function generateEventId(): string {
-  return crypto.randomUUID();
+  try {
+    if (
+      typeof crypto !== "undefined" &&
+      typeof crypto.randomUUID === "function"
+    ) {
+      return crypto.randomUUID();
+    }
+  } catch {
+    // Fall through to the next strategy.
+  }
+  try {
+    if (
+      typeof crypto !== "undefined" &&
+      typeof crypto.getRandomValues === "function"
+    ) {
+      return uuidFromRandomValues();
+    }
+  } catch {
+    // Fall through to the final strategy.
+  }
+  return `evt-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
 /**
@@ -53,14 +102,13 @@ export function generateEventId(): string {
  */
 export function getFbCookies(): { fbp?: string; fbc?: string } {
   if (typeof document === "undefined") return {};
-  const cookies = document.cookie.split(";").reduce<Record<string, string>>(
-    (acc, part) => {
+  const cookies = document.cookie
+    .split(";")
+    .reduce<Record<string, string>>((acc, part) => {
       const [key, ...rest] = part.trim().split("=");
       if (key) acc[key] = rest.join("=");
       return acc;
-    },
-    {},
-  );
+    }, {});
   return { fbp: cookies["_fbp"], fbc: cookies["_fbc"] };
 }
 

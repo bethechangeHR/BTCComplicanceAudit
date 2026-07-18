@@ -1,5 +1,7 @@
 import { GradeBadge } from "./GradeBadge";
 import { CategoryRiskList } from "./CategoryRiskList";
+import { RiskContrast } from "./RiskContrast";
+import { CostAnchorLine } from "./CostAnchorLine";
 import { RiskAssessmentCTA } from "./RiskAssessmentCTA";
 import { BookingEmbed } from "./BookingEmbed";
 import { Disclaimer } from "./Disclaimer";
@@ -31,6 +33,22 @@ export function ResultView({ result }: { result: OnPageResult }) {
           <CategoryRiskList categoryRisks={result.categoryRisks} />
         </div>
       )}
+
+      {result.categoryRisks.length > 0 && (
+        <div className="animate-rise-in" style={{ animationDelay: "160ms" }}>
+          <RiskContrast
+            riskTierLabel={result.riskTierLabel}
+            flaggedCount={result.categoryRisks.length}
+          />
+        </div>
+      )}
+
+      <div className="animate-rise-in" style={{ animationDelay: "190ms" }}>
+        <CostAnchorLine
+          amountUsd={result.industryContext.amountUsd}
+          framing={result.industryContext.framing}
+        />
+      </div>
 
       <div
         className="animate-rise-in space-y-1.5 text-center"

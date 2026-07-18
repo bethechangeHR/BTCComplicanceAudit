@@ -6,6 +6,43 @@ named in `CLAUDE.md`: the scoring weights and every gap-item wording need a
 human HR review, not just a correct build. See `VERIFICATION.md` first for
 the full evidence-backed definition-of-done checklist.
 
+## 2026-07-18 tool-changes pass, gate status
+
+See `PLAN-tool-changes-2026-07-18.md` and `VERIFICATION.md`'s matching
+2026-07-18 note for the full detail. Summary for this checklist:
+
+- [x] Confirmed no item in this pass edits `data/gap-library.ts` gap-item
+      wording (`onPageStatement`, `reportDiagnosis`, `scopeOfWork`) or any
+      `data/scoring.ts` weight or `GRADE_BANDS` cutoff. The formal HR-Pro
+      gap-item sign-off gate below is unaffected by this pass; every item
+      already listed there still needs the same sign-off it needed before.
+- [ ] **New liability-adjacent copy, not gap-item wording, but worth an
+      HR-Pro eyeball before it ships to real traffic:** the results-page
+      now-vs-could-be contrast (`components/RiskContrast.tsx`) and the
+      cost-of-doing-nothing line (`components/CostAnchorLine.tsx`, reuses
+      `INDUSTRY_LAWSUIT_ANCHOR`'s existing framing string verbatim, no new
+      legal claim authored). Confirm the contrast's "clean profile"
+      benchmark framing and the placement of the $200,000 anchor on the
+      on-page result (previously report-only) both read as industry-general,
+      never a company-specific claim, per `CLAUDE.md` rule 5.
+- [ ] **Gate teaser sequencing, not gap wording, worth Noah's eyeball, not
+      HR-Pro's:** the real letter grade now shows at the gate
+      (`components/EmailGateStep.tsx`) before the visitor submits their
+      email, rather than only after. Confirm this reveal order is the
+      intended trade (curiosity plus honesty, versus the grade previously
+      being the reward for submitting).
+- [x] Confirmed the gate's phone field and SMS consent checkbox
+      (`components/EmailGateStep.tsx`) were left completely unchanged: they
+      are the registered Twilio A2P 10DLC opt-in surface for a campaign
+      mid-resubmission (SID `CMc7a7d23fc58fa791da103bda48928036`, see
+      `build/btc-a2p-resubmission-fix-v2-2026-07-17.md`). Only the `name`
+      field lost its required flag. No A2P re-file needed.
+- [ ] **P0 fix still needs the mandatory real-device confirmation** before
+      real ad spend resumes: open the deployed preview inside the actual
+      Facebook and Instagram in-app browsers and confirm question 1
+      advances. This environment could not perform that test, see
+      `VERIFICATION.md`.
+
 ## Before anything else
 
 - [x] `npm install`, `npm test`, `npm run typecheck`, `next lint`,

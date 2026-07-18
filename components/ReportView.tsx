@@ -53,7 +53,7 @@ export function ReportView({ report }: { report: ReportViewData }) {
           <div className="flex flex-wrap items-center justify-between gap-6 border-b border-white/10 pb-8">
             <Image
               src="/btc-logo-white.png"
-              alt="be the change HR"
+              alt="Be the Change HR"
               width={168}
               height={56}
               className="h-auto w-36 sm:w-40"
@@ -84,8 +84,8 @@ export function ReportView({ report }: { report: ReportViewData }) {
                 {report.gapSections.length === 0
                   ? "No flagged risk areas from your answers."
                   : report.gapSections.length === 1
-                    ? "One risk area flagged below, in full."
-                    : `${report.gapSections.length} risk areas flagged below, in full.`}
+                    ? "One risk area flagged below in full."
+                    : `${report.gapSections.length} risk areas flagged below in full.`}
               </p>
             </div>
             <GradeBadge
@@ -175,8 +175,8 @@ export function ReportView({ report }: { report: ReportViewData }) {
 
         <section className="mb-16 space-y-8 rounded-2xl border border-ink/10 bg-white px-8 py-10 text-center shadow-document sm:px-12 sm:py-12">
           <div className="space-y-2">
-            <h2 className="font-display text-2xl text-ink">
-              Talk it through with be the change HR
+            <h2 className="font-display text-3xl text-ink sm:text-4xl">
+              Talk it through with Be the Change HR
             </h2>
             <p className="mx-auto max-w-md text-sm text-btc-gray">
               A free 30-minute call to walk through what closes these gaps

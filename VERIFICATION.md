@@ -5,6 +5,150 @@ Evidence-backed definition-of-done for the California HR Risk Audit. See
 in this document is asserted without the actual command output or curl
 output that produced it.
 
+**2026-07-18 tool-changes pass (P0 through P3), see `PLAN-tool-changes-2026-07-18.md`
+for the full plan this executed:**
+
+P0, the Q1 freeze that took a real Meta campaign from 223 landing views to 0
+ToolStart events. `generateEventId()` (`channels/pixel.ts`) was a bare
+`crypto.randomUUID()` with no fallback, called synchronously on the first
+answer before the UI advanced, with no try/catch. Fixed with a three-step
+fallback chain (`crypto.randomUUID()`, then a v4 UUID built from
+`crypto.getRandomValues()`, then a `Date.now()`/`Math.random()` string, each
+step wrapped so it can never throw) plus decoupling every tracking call in
+`components/ComplianceCheckApp.tsx`'s `handleAnswer` and `handleGateSubmit`
+from the state transition: the UI now always advances first, and all
+tracking runs inside a try/catch guard afterward. The shared-eventId dedup
+contract between the browser Pixel fire and the server-side CAPI twin
+(`/api/tool-start`, `/api/submit`) is unchanged, each event still generates
+one id and passes it to both legs.
+
+P1, start and opt-in rate. The intro Hero screen (a separate "Start my free
+risk audit" click) was removed; the tool now opens directly on question 1
+(`components/ComplianceCheckApp.tsx` initial `Stage`), with `Hero.tsx`
+repurposed into a slim header (logo, headline, value-prop line) shown only
+above question 1. Headline copy is now an A/B seam (`lib/copy/headline.ts`,
+`HEADLINE_VARIANTS`), selected via `?v=` on the landing URL
+(`app/page.tsx`, `resolveHeadlineVariant`), default `control`. At the email
+gate, the `name` field is no longer required, email is the only required
+field; the phone field and its SMS consent checkbox were left completely
+untouched, since they are the registered Twilio A2P 10DLC opt-in surface for
+a campaign that is mid-resubmission (SID
+`CMc7a7d23fc58fa791da103bda48928036`), confirmed by reading
+`build/btc-a2p-resubmission-fix-v2-2026-07-17.md` and
+`build/btc-a2p-book-redirect-vscode-handoff-2026-07-17.md`, and the exact
+consent string was grepped unchanged against
+`SMS_CONSENT_DISCLOSURE_TEXT` in `app/api/submit/route.ts`. A real letter-grade
+teaser now shows at the gate before submit: `data/scoring.ts` gained
+`computeAnswersScore()` (single source of truth, also now used by
+`lib/engine/index.ts`, replacing a duplicate local sum) and `gradeAnswers()`,
+a client-safe grade compute that imports only point records and
+`scoreToGrade`, never `data/gap-library.ts`, so no gated report text is
+reachable in the client bundle before the gate. `lib/engine/goldenMaster.test.ts`
+asserts `gradeAnswers()` agrees with the full engine's grade on every
+golden-master scenario.
+
+P2, results-page deficit. `OnPageResult` (`lib/recommendation/types.ts`)
+gained `industryContext` (the existing `INDUSTRY_LAWSUIT_ANCHOR`, reused
+verbatim, never a new legal claim) and `leadPriority` (from
+`buildQualificationTag`), both populated in `buildOnPageResult`
+(`lib/recommendation/index.ts`). `components/ResultView.tsx` gained a
+now-vs-could-be contrast (`components/RiskContrast.tsx`, only rendered when
+at least one category is flagged) and a cost-of-doing-nothing line
+(`components/CostAnchorLine.tsx`, the anchor's own framing string rendered
+unchanged). The planned P2.3 VSL slot was dropped from scope: there is no
+VSL recorded and no plan to record one, so no dark scaffolding was built for
+it, per direct instruction mid-session.
+
+P3, booking-link prefill. `bookingUrlWithAttribution()`
+(`lib/recommendation/index.ts`) now accepts an optional prefill object
+(firstname, lastname, email, company, phone via `URLSearchParams.set`, which
+URL-encodes automatically) alongside the existing UTM params, wired through
+`buildOnPageResult` (called from `app/api/submit/route.ts` with the
+submitted name/email/company/phone), `buildReport` (called from
+`app/report/[token]/page.tsx` with the signed token's payload), and
+`buildEmailPayload`. A `splitName()` helper divides the gate's single name
+field into firstname/lastname. Degrades gracefully: a contact with only an
+email still gets that one param, no empty params are ever appended (see the
+unit tests in `lib/recommendation/index.test.ts`, "booking URL prefill,
+added 2026-07-18 P3").
+
+Mobile QA pass on this same session's changes (code-level review only, no
+device lab or browser automation tool available in this environment, same
+limitation as section 8 below): reviewed every touched and new component for
+Tailwind mobile-first classes, tap target sizing, and text overflow risk.
+Two real issues were found and fixed as part of this pass, not left as
+findings: (1) `components/EmailGateStep.tsx` originally reused the full-size
+result-page `GradeBadge` (`text-8xl`/`text-9xl`) above a 3-field form, which
+on a short viewport (the exact Facebook/Instagram in-app-browser environment
+P0 is about) would push the email field, the actual point of the gate, below
+the fold; fixed by adding a `compact` prop to `components/GradeBadge.tsx`
+(smaller type scale and padding, same colors) used only at the gate,
+`ResultView.tsx`'s usage is unaffected. (2) The outer page wrapper in
+`components/ComplianceCheckApp.tsx` carried a fixed `py-16` (64px top and
+bottom) regardless of screen size, and question 1 now stacks the header,
+progress trail, and all 4 answer options on one screen (P1a); tightened to
+`py-8 sm:py-16` and the Hero-to-question gap to `space-y-6 sm:space-y-8`
+(desktop spacing unchanged) so the fixed chrome competes less with the
+actual answer buttons for vertical space on a compressed mobile viewport.
+
+Automated verification, all run for real this session:
+
+```
+npx vitest run   -> 6 test files, 48 tests, all passed (up from 32; 16 new
+                     tests: 4 for generateEventId's fallback chain, 5 for
+                     gradeAnswers agreeing with the engine across every
+                     golden-master scenario, 2 for the new OnPageResult
+                     fields, 4 for booking URL prefill, plus small updates
+                     to existing suites)
+npx tsc --noEmit -> clean, no output
+npm run lint     -> "No ESLint warnings or errors"
+```
+
+`npm run format:check` initially flagged 30 files; cross-referenced against
+`git status -s` and confirmed all but the 19 files this session actually
+touched were pre-existing dirty state from before this session (the same
+CRLF-normalization pattern documented in the 2026-07-14 note below).
+`npx prettier --write` was run only on the files this session touched or
+created, confirmed via `git diff` that the changes were whitespace-only,
+then the full suite (tests, typecheck, lint) was re-run clean.
+
+Em/en dash grep (`[\x{2012}-\x{2015}]|&mdash;|&ndash;`) across every file
+this session touched or created: zero matches.
+
+Manual end-to-end verification via `next dev` and curl:
+- `GET /` returns the value-prop header and question 1 directly, no
+  intermediate "Start" screen; confirmed absence of "Start my free risk
+  audit" in the response body.
+- `GET /?v=dream` swaps the headline to the dream-outcome variant; `GET /`
+  and any unrecognized `?v=` value fall back to the control headline.
+- `POST /api/submit` with only `email` (no `name`, no `phone`) returns 200
+  with a valid `onPageResult` and `reportUrl`; the returned `bookingUrl`
+  carries `email=` and the UTM params but no `firstname`/`lastname`/
+  `company`/`phone` params, confirming graceful degradation.
+- `POST /api/submit` with `name`, `email`, `company`, and `phone` all
+  provided, followed by `GET /report/<token>`: the hosted report's booking
+  link carries `firstname=Jordan&lastname=Smith&email=...&company=...&
+phone=...` alongside the existing UTM params.
+- Confirmed no gated content (`scope of work`, `ABC test`, `Labor Code`)
+  appears in the `/` response body before the gate.
+- Confirmed `GET /book` still returns a 307 to the HubSpot scheduler,
+  unaffected by this session (next.config.mjs was not touched, per the P3
+  plan's explicit instruction not to route prefill through that redirect).
+
+**Not done this session, still an open gate:** the mandatory real-device
+test in the actual Facebook and Instagram in-app browsers. This environment
+has no device lab or mobile browser access. Every P0 verification above
+(unit tests, a simulated `crypto.randomUUID` failure would need to be run in
+an actual browser devtools console, not this Node-based toolchain, and was
+not performed this session either) is necessary but not sufficient
+evidence: desktop and curl passing was already true before this fix and did
+not predict the original failure, so it cannot be treated as proof this fix
+works in the field. Before resuming real ad spend, a human must open the
+deployed preview from inside the Facebook in-app browser and the Instagram
+in-app browser, ideally on an older iOS device, tap through question 1, and
+confirm the tool advances and a ToolStart appears in Meta Events Manager
+Test Events with the pixel flag on in a test environment.
+
 **2026-07-14 rework note:** a brand/naming pass, a legal-accuracy pass
 against `LEGAL-RESEARCH-2026-07-14.md` (correcting the sick-leave citation,
 reframing SB 294 as a current obligation, adding the conjunctive exempt

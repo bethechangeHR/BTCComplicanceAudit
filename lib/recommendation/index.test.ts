@@ -10,7 +10,7 @@ import {
 
 const RISKY_ANSWERS: ComplianceAnswers = {
   headcount: "50-149",
-  states: "multi_state",
+  states: "multi_state_ca",
   contractorUse: "mostly",
   salariedClassification: "all_salaried",
   handbookStatus: "none",
@@ -41,6 +41,27 @@ describe("buildOnPageResult", () => {
       "meetings.hubspot.com/bethechangehr/discoverycall",
     );
     expect(onPage.disclaimer.toLowerCase()).toContain("not legal advice");
+  });
+
+  it("carries the industry cost-of-inaction anchor, framed as an industry figure not a guarantee, added 2026-07-18 P2.2", () => {
+    const onPage = buildOnPageResult(scoreComplianceAnswers(RISKY_ANSWERS));
+    expect(onPage.industryContext.amountUsd).toBe(200000);
+    expect(onPage.industryContext.framing.toLowerCase()).toContain("not a");
+    const serialized = JSON.stringify(onPage);
+    expect(serialized).not.toContain("ABC test");
+    expect(serialized).not.toContain("scopeOfWork");
+    expect(serialized).not.toContain("Labor Code");
+  });
+
+  it("carries a lead priority derived from the qualification tag, added 2026-07-18 P2.3", () => {
+    const onPage = buildOnPageResult(
+      scoreComplianceAnswers({ ...RISKY_ANSWERS, hrSupport: "none" }),
+    );
+    expect(onPage.leadPriority).toBe("high");
+    const inHouse = buildOnPageResult(
+      scoreComplianceAnswers({ ...RISKY_ANSWERS, hrSupport: "in_house" }),
+    );
+    expect(inHouse.leadPriority).toBe("standard");
   });
 });
 
@@ -114,5 +135,57 @@ describe("buildQualificationTag", () => {
     expect(buildQualificationTag("none").leadPriority).toBe("high");
     expect(buildQualificationTag("outside").leadPriority).toBe("medium");
     expect(buildQualificationTag("in_house").leadPriority).toBe("standard");
+  });
+});
+
+describe("booking URL prefill, added 2026-07-18 P3", () => {
+  it("always carries UTM attribution even with no contact info", () => {
+    const onPage = buildOnPageResult(scoreComplianceAnswers(RISKY_ANSWERS));
+    const url = new URL(onPage.bookingUrl);
+    expect(url.searchParams.get("utm_campaign")).toBe("ca-hr-risk-audit");
+    expect(url.searchParams.get("utm_source")).toBe("landing-page-cta");
+    expect(url.searchParams.get("utm_medium")).toBe("web");
+    expect(url.searchParams.has("firstname")).toBe(false);
+    expect(url.searchParams.has("email")).toBe(false);
+  });
+
+  it("prefills firstname, lastname, email, company, and phone when a contact is given", () => {
+    const onPage = buildOnPageResult(scoreComplianceAnswers(RISKY_ANSWERS), {
+      name: "Jordan Smith",
+      email: "jordan@example.com",
+      company: "Acme Co",
+      phone: "+15555550100",
+    });
+    const url = new URL(onPage.bookingUrl);
+    expect(url.searchParams.get("firstname")).toBe("Jordan");
+    expect(url.searchParams.get("lastname")).toBe("Smith");
+    expect(url.searchParams.get("email")).toBe("jordan@example.com");
+    expect(url.searchParams.get("company")).toBe("Acme Co");
+    expect(url.searchParams.get("phone")).toBe("+15555550100");
+    // UTMs are unaffected by prefill.
+    expect(url.searchParams.get("utm_campaign")).toBe("ca-hr-risk-audit");
+  });
+
+  it("degrades gracefully with only a partial contact, and never appends an empty param", () => {
+    const onPage = buildOnPageResult(scoreComplianceAnswers(RISKY_ANSWERS), {
+      email: "solo@example.com",
+    });
+    const url = new URL(onPage.bookingUrl);
+    expect(url.searchParams.get("email")).toBe("solo@example.com");
+    expect(url.searchParams.has("firstname")).toBe(false);
+    expect(url.searchParams.has("lastname")).toBe(false);
+    expect(url.searchParams.has("company")).toBe(false);
+    expect(url.searchParams.has("phone")).toBe(false);
+  });
+
+  it("splits a single name field into firstname and lastname on the hosted report booking link too", () => {
+    const report = buildReport(scoreComplianceAnswers(RISKY_ANSWERS), {
+      generatedAt: "2026-07-18T00:00:00.000Z",
+      contactName: "Taylor Reyes Vega",
+      email: "taylor@example.com",
+    });
+    const url = new URL(report.bookingUrl);
+    expect(url.searchParams.get("firstname")).toBe("Taylor");
+    expect(url.searchParams.get("lastname")).toBe("Reyes Vega");
   });
 });

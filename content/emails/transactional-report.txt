@@ -29,8 +29,8 @@ could face:
 The area flagged as your biggest exposure right now: {{topCategory}}.
 
 If you'd rather talk it through directly, book a free 30-minute HR risk
-assessment with be the change HR. No cost, no obligation.
+assessment with Be the Change HR. No cost, no obligation.
 
 {{bookingUrl}}
 
-be the change HR
+Be the Change HR

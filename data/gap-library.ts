@@ -50,13 +50,15 @@ export interface GapItem {
 }
 
 /**
- * ANNUAL MAINTENANCE: the CA exempt salary floor ($70,304, used in
- * gap-exempt-all and gap-exempt-mix below) and the CA state minimum wage
- * ($16.90/hr, its basis) change every year. CA DIR announces the next year's
- * minimum wage by August 1, effective the following January 1. The 2027
- * figures were NOT published as of this 2026-07-14 pass, do not state them.
- * Update both gap items and this comment once CA DIR publishes the 2027
- * figure, expected around 2026-08-01.
+ * ANNUAL MAINTENANCE: the CA exempt salary floor and the CA state minimum
+ * wage, its basis, change every year. CA DIR announces the next year's
+ * minimum wage by August 1, effective the following January 1. The 2026
+ * floor is $70,304/year. LeiLani supplied the 2027 figure on 2026-07-15,
+ * ahead of CA DIR's usual August announcement: $74,672/year
+ * ($6,222.67/month), effective January 1, 2027. Flagged for legal
+ * confirmation against a CA DIR source once published, see
+ * UNVERIFIED_RESEARCH_FLAGS. Update both gap items and this comment again
+ * once the 2028 figure is announced, expected around 2027-08-01.
  */
 export const GAP_LIBRARY: GapItem[] = [
   {
@@ -103,9 +105,9 @@ export const GAP_LIBRARY: GapItem[] = [
     severity: "high",
     onPageStatement: "Exempt / salaried classification",
     reportDiagnosis:
-      "California's bar for exempt, no-overtime status is stricter than federal law and requires passing both of two tests. First, the salary basis test: a fixed salary of at least twice the state minimum wage, $70,304 per year as of January 1, 2026 (Labor Code Section 515(a); this floor changes annually, see the maintenance note below). Second, the duties test: more than half of actual work time spent on exempt duties, a strict quantitative standard, stricter than the federal test. Businesses that classify staff as exempt using only federal assumptions or salary alone often miss one of these two requirements, and back-overtime exposure compounds for every misclassified employee.",
+      "California's bar for exempt, no-overtime status is stricter than federal law and requires passing both of two tests. First, the salary basis test: a fixed salary of at least twice the state minimum wage, $70,304 per year as of January 1, 2026, rising to $74,672 per year ($6,222.67 per month) effective January 1, 2027 (Labor Code Section 515(a); this floor changes annually, see the maintenance note below). Second, the duties test: more than half of actual work time spent on exempt duties, a strict quantitative standard, stricter than the federal test. Businesses that classify staff as exempt using only federal assumptions or salary alone often miss one of these two requirements, and back-overtime exposure compounds for every misclassified employee.",
     scopeOfWork: [
-      "Confirm every exempt salary meets the current $70,304 California floor (the salary basis test)",
+      "Confirm every exempt salary meets the current $70,304 California floor for 2026, and the $74,672 floor taking effect January 1, 2027 (the salary basis test)",
       "Run the California duties test against every exempt role: confirm more than half of actual work time is spent on exempt duties",
       "Write down an exempt or nonexempt designation for every role, not just salaried ones",
       "Identify misclassified roles and estimate the back-overtime exposure window",
@@ -114,7 +116,7 @@ export const GAP_LIBRARY: GapItem[] = [
     complianceAngle:
       "California classification / exempt vs non-exempt errors that trigger back pay, BTC's own June 2026 blog post: Are Your Salaried Employees Really Exempt? The FLSA Error That Triggers Back Pay (btc-kb-lead-magnets.md section 6)",
     sourceRef:
-      "Cal. Labor Code Section 515(a); CA DIR News Release 2025-118 confirming the 2026 minimum wage increase to $16.90/hr, dir.ca.gov. lastVerified 2026-07-14.",
+      "Cal. Labor Code Section 515(a); CA DIR News Release 2025-118 confirming the 2026 minimum wage increase to $16.90/hr, dir.ca.gov; 2027 figure ($74,672/yr) per LeiLani, 2026-07-15, not yet independently confirmed against a published CA DIR release, see UNVERIFIED_RESEARCH_FLAGS. lastVerified 2026-07-15.",
   },
   {
     id: "gap-exempt-mix",
@@ -123,9 +125,9 @@ export const GAP_LIBRARY: GapItem[] = [
     severity: "medium",
     onPageStatement: "Exempt / salaried classification",
     reportDiagnosis:
-      "For your salaried staff, the same two-part standard applies. First, the salary basis test: a fixed salary of at least twice the state minimum wage, currently $70,304 per year (Labor Code Section 515(a)). Second, the duties test: more than half of actual work time spent on exempt duties, a strict quantitative standard. Mixed teams need every salaried role checked individually against both tests, partial rollouts are where undocumented exceptions tend to hide. Nonexempt roles in a mixed team also carry meal, rest break, and overtime obligations.",
+      "For your salaried staff, the same two-part standard applies. First, the salary basis test: a fixed salary of at least twice the state minimum wage, currently $70,304 per year, rising to $74,672 per year ($6,222.67 per month) effective January 1, 2027 (Labor Code Section 515(a)). Second, the duties test: more than half of actual work time spent on exempt duties, a strict quantitative standard. Mixed teams need every salaried role checked individually against both tests, partial rollouts are where undocumented exceptions tend to hide. Nonexempt roles in a mixed team also carry meal, rest break, and overtime obligations.",
     scopeOfWork: [
-      "Confirm each salaried role's salary meets the current $70,304 California floor (the salary basis test)",
+      "Confirm each salaried role's salary meets the current $70,304 California floor for 2026, and the $74,672 floor taking effect January 1, 2027 (the salary basis test)",
       "Run the California duties test against each salaried role individually",
       "Write down an exempt or nonexempt designation for every role",
       "Document why each role qualifies as exempt",
@@ -133,7 +135,7 @@ export const GAP_LIBRARY: GapItem[] = [
     complianceAngle:
       "California classification / exempt vs non-exempt errors that trigger back pay (btc-kb-lead-magnets.md section 6)",
     sourceRef:
-      "Cal. Labor Code Section 515(a); CA DIR News Release 2025-118. lastVerified 2026-07-14.",
+      "Cal. Labor Code Section 515(a); CA DIR News Release 2025-118; 2027 figure ($74,672/yr) per LeiLani, 2026-07-15, not yet independently confirmed against a published CA DIR release, see UNVERIFIED_RESEARCH_FLAGS. lastVerified 2026-07-15.",
   },
   {
     id: "gap-handbook-none",
@@ -181,17 +183,18 @@ export const GAP_LIBRARY: GapItem[] = [
     severity: "high",
     onPageStatement: "Harassment-prevention training",
     reportDiagnosis:
-      "California employers with five or more employees, including temporary and seasonal staff, must provide sexual harassment prevention training through the California Civil Rights Department, CRD (formerly DFEH), two hours for supervisors and one hour for staff, every two years (Government Code Section 12950.1). Supervisors carry the higher two-hour requirement, and under FEHA (Government Code Section 12940(j)(3)) an individual supervisor can be held personally liable for harassment, unlike discrimination or retaliation claims and unlike federal law. With no training on record, you have no documented proof of this legally required step, and that absence can count against you if a claim is filed.",
+      "California employers with five or more employees, including temporary and seasonal staff, must provide sexual harassment prevention training through the California Civil Rights Department (CRD, formerly DFEH), two hours for supervisors and one hour for staff, every two years (Government Code Section 12950.1). New employees must be trained within six months of hire, and temporary or seasonal employees within 30 calendar days or 100 hours worked, whichever comes first. Supervisors carry the higher two-hour requirement, and under FEHA (Government Code Section 12940(j)(3)) an individual supervisor can be held personally liable for harassment, unlike discrimination or retaliation claims and unlike federal law. With no training on record, you have no documented proof of this legally required step, and that absence can count against you if a claim is filed.",
     scopeOfWork: [
       "Confirm headcount against the five-employee threshold, all locations and temp staff",
-      "Deliver CRD-compliant training: two hours for supervisors, one hour for staff",
+      "Deliver California Civil Rights Department (CRD)-compliant training: two hours for supervisors, one hour for staff",
+      "Train new hires within six months of hire, and temporary or seasonal staff within 30 calendar days or 100 hours worked, whichever comes first",
       "Document completion records for every employee",
       "Build a recurring two-year retraining cadence",
     ],
     complianceAngle:
       "Harassment-prevention training requirements, CA, 5+ employees (btc-kb-lead-magnets.md section 6)",
     sourceRef:
-      "Cal. Gov Code Section 12950.1 (SB 1343, 2018, compliance deadline 2020-01-01); Gov Code Section 12940(j)(3) and CACI 2521 on individual harassment liability; CRD Sexual Harassment Prevention Training FAQ, calcivilrights.ca.gov. lastVerified 2026-07-14.",
+      "Cal. Gov Code Section 12950.1 (SB 1343, 2018, compliance deadline 2020-01-01); 2 CCR Section 11024 (new-hire and temp/seasonal training deadlines); Gov Code Section 12940(j)(3) and CACI 2521 on individual harassment liability; CRD Sexual Harassment Prevention Training FAQ, calcivilrights.ca.gov. lastVerified 2026-07-14. New-hire timing line added 2026-07-15 per LeiLani's feedback, not yet through a fresh legal pass, see UNVERIFIED_RESEARCH_FLAGS.",
   },
   {
     id: "gap-training-unsure",
@@ -200,17 +203,18 @@ export const GAP_LIBRARY: GapItem[] = [
     severity: "medium",
     onPageStatement: "Harassment-prevention training",
     reportDiagnosis:
-      "Harassment-prevention training is a legal requirement for California employers with five or more employees, through the California Civil Rights Department, CRD (formerly DFEH). The burden of proving compliant, documented training sits with the employer (Government Code Section 12950.1), so answering 'not sure' means you cannot currently prove it, even if the training itself turns out to be fine. Supervisors carry a higher two-hour requirement and, under FEHA (Government Code Section 12940(j)(3)), can be held personally liable for harassment, unlike federal law.",
+      "Harassment-prevention training is a legal requirement for California employers with five or more employees, through the California Civil Rights Department (CRD, formerly DFEH). New employees must be trained within six months of hire, and temporary or seasonal employees within 30 calendar days or 100 hours worked, whichever comes first. The burden of proving compliant, documented training sits with the employer (Government Code Section 12950.1), so answering 'not sure' means you cannot currently prove it, even if the training itself turns out to be fine. Supervisors carry a higher two-hour requirement and, under FEHA (Government Code Section 12940(j)(3)), can be held personally liable for harassment, unlike federal law.",
     scopeOfWork: [
       "Pull existing training records and confirm hours and content for every employee",
-      "Identify anyone missing documented, CRD-compliant training within two years",
+      "Identify anyone missing documented, California Civil Rights Department (CRD)-compliant training within two years",
+      "Confirm every new hire is trained within six months of hire, and every temp or seasonal hire within 30 calendar days or 100 hours worked",
       "Close any gaps and document completion going forward",
       "Build a recurring two-year retraining cadence",
     ],
     complianceAngle:
       "Harassment-prevention training requirements, CA, 5+ employees (btc-kb-lead-magnets.md section 6)",
     sourceRef:
-      "Cal. Gov Code Section 12950.1 (SB 1343, 2018); Gov Code Section 12940(j)(3) and CACI 2521 on individual harassment liability; CRD Sexual Harassment Prevention Training FAQ. lastVerified 2026-07-14.",
+      "Cal. Gov Code Section 12950.1 (SB 1343, 2018); 2 CCR Section 11024 (new-hire and temp/seasonal training deadlines); Gov Code Section 12940(j)(3) and CACI 2521 on individual harassment liability; CRD Sexual Harassment Prevention Training FAQ. lastVerified 2026-07-14. New-hire timing line added 2026-07-15 per LeiLani's feedback, not yet through a fresh legal pass, see UNVERIFIED_RESEARCH_FLAGS.",
   },
   {
     id: "gap-leave-none",
@@ -225,7 +229,7 @@ export const GAP_LIBRARY: GapItem[] = [
       "Build a documented intake and eligibility-tracking process",
       "Train managers on job-protection obligations during leave",
       "Set a review trigger tied to headcount growth",
-      "be the change HR provides the legally mandated forms for any type of leave of absence",
+      "Be the Change HR provides the legally mandated forms for any type of leave of absence",
     ],
     complianceAngle:
       "Leave-law exposure. Expanded 2026-07-14 (second pass) per LeiLani's direct feedback that the original four-leave framing understated the actual stack (btc-kb-lead-magnets.md section 6, LEGAL-RESEARCH-2026-07-14.md follow-up)",
@@ -244,10 +248,12 @@ export const GAP_LIBRARY: GapItem[] = [
       "Inventory every state where you actually have an employee",
       "Build a state-by-state compliance matrix: wage and hour, leave, notices",
       "Identify which policies need state-specific versions",
+      "Confirm the employee handbook covers every state where you have employees, with policies identified by state",
+      "Confirm each employee's new-hire and ongoing paperwork meets their own state's and city's requirements, California included",
       "Set a process for checking requirements before hiring in a new state",
     ],
     complianceAngle:
-      "Multi-state exposure as headcount grows (btc-kb-lead-magnets.md section 6)",
+      "Multi-state exposure as headcount grows (btc-kb-lead-magnets.md section 6). State/city paperwork and by-state handbook bullets added 2026-07-15 per LeiLani's feedback.",
     sourceRef:
       "General principle of state-level employment law primacy, SHRM State and Local Updates (shrm.org). This is a structural, cross-jurisdictional fact rather than a single statute citation. lastVerified 2026-07-08.",
   },
@@ -334,17 +340,18 @@ export const GAP_LIBRARY: GapItem[] = [
     severity: "high",
     onPageStatement: "Workers' compensation coverage",
     reportDiagnosis:
-      "Every California employer with one or more employees, including part-time, temporary, and family-member employees, must carry workers' compensation insurance (Labor Code Section 3700). There is no small-employer exemption. Being uninsured is a misdemeanor (Labor Code Section 3700.5), carrying a minimum $10,000 fine or up to a year in county jail, or both, plus civil and administrative penalties up to $100,000. If an injury occurs while uninsured, penalties run $10,000 per employee on payroll for a compensable claim, up to $100,000. The Division of Labor Standards Enforcement can issue a Stop Order halting all use of employee labor until coverage is secured. SB 291 (effective January 1, 2026) raised the minimum penalties for uninsured contractors further.",
+      "Every California employer with one or more employees, including part-time, temporary, and family-member employees, must carry workers' compensation insurance (Labor Code Section 3700). There is no small-employer exemption. Being uninsured is a misdemeanor (Labor Code Section 3700.5), carrying a minimum $10,000 fine or up to a year in county jail, or both, plus civil and administrative penalties up to $100,000. If an injury occurs while uninsured, penalties run $10,000 per employee on payroll for a compensable claim, up to $100,000. The Division of Labor Standards Enforcement can issue a Stop Order halting all use of employee labor until coverage is secured. SB 291 (effective January 1, 2026) raised the minimum penalties for uninsured contractors further. Coverage alone is not the full picture: once a workplace injury actually happens, you must hand the injured employee a claim form (DWC-1) within one working day of learning about the injury, keep a workers' comp poster and the Time of Hire pamphlet current and visible, and run a return-to-work or interactive process once the employee is cleared to come back. Without insurance, none of that process exists yet either.",
     scopeOfWork: [
       "Confirm current headcount, including part-time, temporary, and family-member employees, against the coverage requirement",
       "Secure workers' compensation coverage for every employee",
       "Document proof of coverage and keep it current",
       "Build a process to confirm coverage stays active as headcount changes",
+      "Build a documented workplace-injury process: DWC-1 claim form issued within one working day, current workers' comp poster and Time of Hire pamphlet, and a return-to-work or interactive process",
     ],
     complianceAngle:
-      "Workers' compensation coverage, a bright-line legal mandate with hard penalties (LEGAL-RESEARCH-2026-07-14.md item 9, question B, added 2026-07-14)",
+      "Workers' compensation coverage, a bright-line legal mandate with hard penalties (LEGAL-RESEARCH-2026-07-14.md item 9, question B, added 2026-07-14). Injury-process content added 2026-07-15 per LeiLani's feedback that Yaz's original request was about the injury-handling process, not just insurance.",
     sourceRef:
-      "Cal. Labor Code Sections 3700 and 3700.5, leginfo.legislature.ca.gov; CA DIR Division of Workers' Compensation employer FAQ, dir.ca.gov; SB 291 (2026). lastVerified 2026-07-14. Added 2026-07-14, not part of the original 2026-07-08 research pass, flagged for a fresh HR-Pro/legal review before launch, see UNVERIFIED_RESEARCH_FLAGS below.",
+      "Cal. Labor Code Sections 3700 and 3700.5, leginfo.legislature.ca.gov; CA DIR Division of Workers' Compensation employer FAQ, dir.ca.gov; SB 291 (2026); Labor Code Section 5401 and 8 CCR Section 10118 (DWC-1 claim form, one-working-day deadline); Labor Code Section 3550 (workers' comp notice and Time of Hire pamphlet). lastVerified 2026-07-14 for the coverage facts; injury-process facts added 2026-07-15, not yet through a fresh legal pass, see UNVERIFIED_RESEARCH_FLAGS below.",
   },
   {
     id: "gap-workerscomp-unsure",
@@ -353,17 +360,18 @@ export const GAP_LIBRARY: GapItem[] = [
     severity: "medium",
     onPageStatement: "Workers' compensation coverage",
     reportDiagnosis:
-      "Every California employer with one or more employees must carry workers' compensation insurance (Labor Code Section 3700), no small-employer exemption, and being uninsured is a misdemeanor with penalties up to $100,000 (Labor Code Section 3700.5). Not knowing whether every employee, including part-time, temporary, and family-member employees, is actually covered means you cannot currently confirm you meet this bright-line requirement.",
+      "Every California employer with one or more employees must carry workers' compensation insurance (Labor Code Section 3700), no small-employer exemption, and being uninsured is a misdemeanor with penalties up to $100,000 (Labor Code Section 3700.5). Not knowing whether every employee, including part-time, temporary, and family-member employees, is actually covered means you cannot currently confirm you meet this bright-line requirement. Coverage is also only half of it: once a workplace injury happens, the employer must hand the injured employee a claim form (DWC-1) within one working day of learning about the injury, keep a workers' comp poster and Time of Hire pamphlet current, and run a return-to-work process. Answering 'not sure' on coverage usually means that process is not documented either.",
     scopeOfWork: [
       "Confirm current coverage actually extends to every employee, including part-time, temporary, and family-member employees",
       "Pull proof of coverage and confirm it is active",
       "Close any coverage gaps immediately",
       "Build a process to confirm coverage stays current as headcount changes",
+      "Build a documented workplace-injury process: DWC-1 claim form issued within one working day, current workers' comp poster and Time of Hire pamphlet, and a return-to-work or interactive process",
     ],
     complianceAngle:
-      "Workers' compensation coverage, a bright-line legal mandate with hard penalties (LEGAL-RESEARCH-2026-07-14.md item 9, question B, added 2026-07-14)",
+      "Workers' compensation coverage, a bright-line legal mandate with hard penalties (LEGAL-RESEARCH-2026-07-14.md item 9, question B, added 2026-07-14). Injury-process content added 2026-07-15 per LeiLani's feedback that Yaz's original request was about the injury-handling process, not just insurance.",
     sourceRef:
-      "Cal. Labor Code Sections 3700 and 3700.5, leginfo.legislature.ca.gov; CA DIR Division of Workers' Compensation employer FAQ, dir.ca.gov; SB 291 (2026). lastVerified 2026-07-14. Added 2026-07-14, not part of the original 2026-07-08 research pass, flagged for a fresh HR-Pro/legal review before launch, see UNVERIFIED_RESEARCH_FLAGS below.",
+      "Cal. Labor Code Sections 3700 and 3700.5, leginfo.legislature.ca.gov; CA DIR Division of Workers' Compensation employer FAQ, dir.ca.gov; SB 291 (2026); Labor Code Section 5401 and 8 CCR Section 10118 (DWC-1 claim form, one-working-day deadline); Labor Code Section 3550 (workers' comp notice and Time of Hire pamphlet). lastVerified 2026-07-14 for the coverage facts; injury-process facts added 2026-07-15, not yet through a fresh legal pass, see UNVERIFIED_RESEARCH_FLAGS below.",
   },
   {
     id: "gap-other-state",
@@ -377,9 +385,11 @@ export const GAP_LIBRARY: GapItem[] = [
       "Confirm which state's laws actually govern your employees",
       "Replace California-specific assumptions with that state's requirements",
       "Identify which risk areas here still apply, and how, under that state's law",
+      "Confirm the employee handbook covers every state where you have employees, with policies identified by state",
+      "Confirm each employee's new-hire and ongoing paperwork meets their own state's and city's requirements",
     ],
     complianceAngle:
-      "State-aware framing, per the 2026-07-08 buildspec geo decision: the tool is built California-first and must generalize honestly for a non-California, single-state answer",
+      "State-aware framing, per the 2026-07-08 buildspec geo decision: the tool is built California-first and must generalize honestly for a non-California, single-state answer. State/city paperwork and by-state handbook bullets added 2026-07-15 per LeiLani's feedback.",
     sourceRef:
       "btc-paid-ads-campaign-buildspec-v1-2026-07-08.md (geo decision); general principle of state-level employment law primacy. lastVerified 2026-07-08.",
   },
@@ -429,4 +439,7 @@ export const UNVERIFIED_RESEARCH_FLAGS = [
   "gap-newhire-none and gap-newhire-partial (added 2026-07-09, not part of the 2026-07-08 research pass): the federal Form I-9 requirement (8 U.S.C. Section 1324a, INA Section 274A) and the CA Wage Theft Prevention Act notice at hire (Labor Code Section 2810.5) are both well-established, but this build did not independently confirm the exact current statutory or regulatory citation for California's specific workplace-poster mandate (referenced here only generally as 'CA DIR poster requirements'). Recommend a final legal pass confirming the precise poster-requirement citation before these two gap items reach a real prospect.",
   "gap-wage-hour-none and gap-wage-hour-partial, and gap-workerscomp-none and gap-workerscomp-unsure (added 2026-07-14, questions A and B of the LEGAL-RESEARCH-2026-07-14.md pass): the underlying statutes (Labor Code Sections 512, 226.7, 3700, 3700.5; SB 291) are well-established and dated 2026-07-14, but these four items have not yet been through the same HR-Pro sign-off rigor as the original 11. Recommend a fresh legal pass before launch, see REVIEW.md.",
   "gap-leave-none (expanded 2026-07-14, second pass, per LeiLani's direct feedback that the original four-leave framing understated the real stack): nine additional CA leave laws were researched and added (paid sick leave already covered; new additions are jury duty and witness leave, kin care, bereavement leave, reproductive loss leave, organ and bone marrow donor leave, school-activity leave, military spouse leave, and victims of qualifying acts of violence leave). Each citation was cross-checked against leginfo.legislature.ca.gov and CRD/DIR primary guidance. Three items were deliberately left out of the report copy rather than risk overclaiming: (1) SB 590 (expands Paid Family Leave to 'designated persons') is enacted but not effective until 2028-07-01, including it would misstate it as a current obligation; (2) Elections Code Section 14000 (voting leave) has no independently confirmed enforcing agency for wage complaints and was left out of this leave-process gap to avoid a citation we could not verify; (3) Labor Code Sections 1025-1028 (alcohol/drug rehab) and 1040-1044 (adult literacy) are reasonable-accommodation duties, not scheduled leave entitlements, and were excluded from a 'leave' framing on that basis. Not yet through the same HR-Pro sign-off rigor as the original 11, see REVIEW.md.",
+  "gap-training-none and gap-training-unsure (updated 2026-07-15 per LeiLani's feedback): added that new hires must be trained within six months of hire, and temp/seasonal staff within 30 calendar days or 100 hours worked, whichever comes first, citing 2 CCR Section 11024. This citation has not been independently cross-checked against leginfo.legislature.ca.gov or calcivilrights.ca.gov in this pass. Recommend confirming the exact regulation section and deadline language before a real prospect sees it, see REVIEW.md.",
+  "gap-exempt-all and gap-exempt-mix (updated 2026-07-15 per LeiLani's feedback): the 2027 CA exempt-salary floor ($74,672/yr, $6,222.67/mo) was supplied directly by LeiLani, ahead of CA DIR's usual August announcement for the following year. Unlike every other dollar figure in this file, it has not been independently verified against a CA DIR news release or leginfo text. Recommend confirming against CA DIR once published (expected around 2026-08-01) before a real prospect sees it, see REVIEW.md.",
+  "gap-workerscomp-none and gap-workerscomp-unsure (updated 2026-07-15 per LeiLani's feedback that Yaz's original request was about the workplace-injury process, not just insurance): added the DWC-1 claim form one-working-day deadline (Labor Code Section 5401, 8 CCR Section 10118) and the workers' comp notice / Time of Hire pamphlet requirement (Labor Code Section 3550). These citations have not been independently cross-checked against leginfo.legislature.ca.gov or dir.ca.gov in this pass. Recommend a fresh legal pass before launch, see REVIEW.md.",
 ];

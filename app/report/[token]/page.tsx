@@ -36,6 +36,8 @@ export default async function ReportPage({
     generatedAt: payload.createdAt,
     contactName: payload.name,
     company: payload.company,
+    email: payload.email,
+    phone: payload.phone,
   });
 
   return <ReportView report={report} />;

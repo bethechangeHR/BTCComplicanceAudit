@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | be the change HR",
+  title: "Privacy Policy | Be the Change HR",
   description:
     "How Be the Change HR, Inc. collects, uses, and protects information submitted through the California HR Risk Audit tool.",
 };

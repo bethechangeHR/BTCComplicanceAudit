@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Terms of Service | be the change HR",
+  title: "Terms of Service | Be the Change HR",
   description:
     "Terms governing use of the California HR Risk Audit tool provided by Be the Change HR, Inc.",
 };

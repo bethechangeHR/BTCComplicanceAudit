@@ -7,9 +7,11 @@ import { QuestionStep } from "./QuestionStep";
 import { EmailGateStep, type GateSubmission } from "./EmailGateStep";
 import { ResultView } from "./ResultView";
 import { QUESTIONS } from "@/data/questions";
+import { gradeAnswers } from "@/data/scoring";
 import type { ComplianceAnswers } from "@/lib/engine/types";
 import type { OnPageResult } from "@/lib/recommendation/types";
 import type { ChannelMode } from "@/channels/types";
+import type { HeadlineVariant } from "@/lib/copy/headline";
 import {
   trackPixelEvent,
   generateEventId,
@@ -17,8 +19,10 @@ import {
   buildFbcFromClickId,
 } from "@/channels/pixel";
 
+// "intro" stage removed 2026-07-18: the tool now opens directly on question
+// 1 to close the intro-to-Q1 drop-off (see components/Hero.tsx, repurposed
+// into a slim header shown above question 1 only).
 type Stage =
-  | { name: "intro" }
   | { name: "question"; index: number }
   | { name: "gate" }
   | { name: "submitting" }
@@ -28,11 +32,13 @@ type Stage =
 export function ComplianceCheckApp({
   mode,
   fbclid,
+  headlineVariant,
 }: {
   mode: ChannelMode;
   fbclid?: string;
+  headlineVariant: HeadlineVariant;
 }) {
-  const [stage, setStage] = useState<Stage>({ name: "intro" });
+  const [stage, setStage] = useState<Stage>({ name: "question", index: 0 });
   const [answers, setAnswers] = useState<Partial<ComplianceAnswers>>({});
 
   useEffect(() => {
@@ -47,10 +53,6 @@ export function ComplianceCheckApp({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  function handleStart() {
-    setStage({ name: "question", index: 0 });
-  }
-
   function handleBack() {
     if (stage.name === "question" && stage.index > 0) {
       setStage({ name: "question", index: stage.index - 1 });
@@ -63,25 +65,13 @@ export function ComplianceCheckApp({
     if (stage.name !== "question") return;
     const question = QUESTIONS[stage.index];
     if (!question) return;
-    if (stage.index === 0 && Object.keys(answers).length === 0) {
-      // Shared eventId, passed to BOTH the browser Pixel fire and the
-      // server-side CAPI twin (app/api/tool-start), so Meta dedupes the
-      // pair per btc-meta-launch-tracking-plan Section 3c. This is the
-      // launch's actual optimization event (Section 4), do not drop the
-      // server post even though the browser fire alone looks sufficient.
-      const eventId = generateEventId();
-      trackPixelEvent("ToolStart", undefined, eventId);
-      const { fbp, fbc: cookieFbc } = getFbCookies();
-      const fbc = cookieFbc ?? (fbclid ? buildFbcFromClickId(fbclid) : undefined);
-      fetch("/api/tool-start", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mode, fbclid, eventId, fbp, fbc }),
-      }).catch(() => {
-        // Best-effort, same as the tool_viewed POST above, never block the
-        // tool on a tracking call.
-      });
-    }
+    const isFirstAnswer =
+      stage.index === 0 && Object.keys(answers).length === 0;
+
+    // Advance the UI FIRST, before any tracking runs. Tracking used to run
+    // synchronously ahead of this and could throw (see fireToolStartTracking
+    // below), which froze the tool on question 1 before it ever advanced.
+    // The state update itself must never depend on tracking succeeding.
     const nextAnswers = { ...answers, [question.key]: value };
     setAnswers(nextAnswers);
 
@@ -90,16 +80,60 @@ export function ComplianceCheckApp({
     } else {
       setStage({ name: "gate" });
     }
+
+    if (isFirstAnswer) {
+      fireToolStartTracking();
+    }
+  }
+
+  /**
+   * Guarded, best-effort ToolStart tracking. Wrapped so nothing inside can
+   * throw back into the caller: generateEventId() is itself hardened
+   * (channels/pixel.ts), but this guard is the second line of defense so a
+   * future change to the tracking call chain can never again freeze the
+   * question flow. Shared eventId, passed to BOTH the browser Pixel fire
+   * and the server-side CAPI twin (app/api/tool-start), so Meta dedupes the
+   * pair per btc-meta-launch-tracking-plan Section 3c. This is the launch's
+   * actual optimization event (Section 4), do not drop the server post even
+   * though the browser fire alone looks sufficient.
+   */
+  function fireToolStartTracking() {
+    try {
+      const eventId = generateEventId();
+      trackPixelEvent("ToolStart", undefined, eventId);
+      const { fbp, fbc: cookieFbc } = getFbCookies();
+      const fbc =
+        cookieFbc ?? (fbclid ? buildFbcFromClickId(fbclid) : undefined);
+      fetch("/api/tool-start", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mode, fbclid, eventId, fbp, fbc }),
+      }).catch(() => {
+        // Best-effort, same as the tool_viewed POST above, never block the
+        // tool on a tracking call.
+      });
+    } catch {
+      // Never let a tracking failure affect the question flow.
+    }
   }
 
   async function handleGateSubmit(submission: GateSubmission) {
     // Shared eventId, same dedup pattern as ToolStart above: the browser
     // Lead fire and the server-side CAPI Lead send (app/api/submit → n8n)
-    // must carry the same id so Meta counts one lead, not two.
-    const eventId = generateEventId();
-    trackPixelEvent("Lead", undefined, eventId);
-    const { fbp, fbc: cookieFbc } = getFbCookies();
-    const fbc = cookieFbc ?? (fbclid ? buildFbcFromClickId(fbclid) : undefined);
+    // must carry the same id so Meta counts one lead, not two. Guarded so a
+    // tracking failure can never block the actual submit.
+    let eventId: string | undefined;
+    let fbp: string | undefined;
+    let fbc: string | undefined;
+    try {
+      eventId = generateEventId();
+      trackPixelEvent("Lead", undefined, eventId);
+      const cookies = getFbCookies();
+      fbp = cookies.fbp;
+      fbc = cookies.fbc ?? (fbclid ? buildFbcFromClickId(fbclid) : undefined);
+    } catch {
+      // Never let a tracking failure block the actual grade submission.
+    }
     setStage({ name: "submitting" });
     try {
       const response = await fetch("/api/submit", {
@@ -146,17 +180,18 @@ export function ComplianceCheckApp({
   }
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-2xl flex-col justify-center px-6 py-16">
-      {stage.name === "intro" && <Hero onStart={handleStart} />}
-
+    <div className="mx-auto flex min-h-screen max-w-2xl flex-col justify-center px-6 py-8 sm:py-16">
       {stage.name === "question" && QUESTIONS[stage.index] && (
-        <div className="space-y-10">
-          <ProgressTrail step={stage.index + 1} total={QUESTIONS.length} />
-          <QuestionStep
-            question={QUESTIONS[stage.index]!}
-            onAnswer={handleAnswer}
-            onBack={stage.index > 0 ? handleBack : undefined}
-          />
+        <div className="space-y-6 sm:space-y-8">
+          {stage.index === 0 && <Hero headlineVariant={headlineVariant} />}
+          <div className="space-y-6 sm:space-y-10">
+            <ProgressTrail step={stage.index + 1} total={QUESTIONS.length} />
+            <QuestionStep
+              question={QUESTIONS[stage.index]!}
+              onAnswer={handleAnswer}
+              onBack={stage.index > 0 ? handleBack : undefined}
+            />
+          </div>
         </div>
       )}
 
@@ -165,6 +200,11 @@ export function ComplianceCheckApp({
           onSubmit={handleGateSubmit}
           submitting={stage.name === "submitting"}
           onBack={stage.name === "gate" ? handleBack : undefined}
+          // All 11 questions are answered by the time the gate renders, so
+          // this cast is safe. gradeAnswers() is the client-safe path (see
+          // data/scoring.ts), it never imports gap-library, so nothing
+          // gated leaks into the client bundle for this teaser.
+          grade={gradeAnswers(answers as ComplianceAnswers)}
         />
       )}
 

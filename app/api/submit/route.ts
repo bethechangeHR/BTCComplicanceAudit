@@ -160,7 +160,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       reportUrl,
-      onPageResult: buildOnPageResult(result),
+      onPageResult: buildOnPageResult(result, { name, email, company, phone }),
     });
   } catch (error) {
     // Most likely cause: REPORT_TOKEN_SECRET is not set in this

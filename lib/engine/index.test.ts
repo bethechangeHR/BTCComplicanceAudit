@@ -19,7 +19,7 @@ const CLEANEST: ComplianceAnswers = {
 
 const RISKIEST: ComplianceAnswers = {
   headcount: "150+",
-  states: "multi_state",
+  states: "multi_state_ca",
   contractorUse: "mostly",
   salariedClassification: "all_salaried",
   handbookStatus: "none",
@@ -90,7 +90,7 @@ describe("scoreComplianceAnswers", () => {
     });
     const multiState = scoreComplianceAnswers({
       ...CLEANEST,
-      states: "multi_state",
+      states: "multi_state_ca",
     });
 
     expect(caOnly.triggeredGapIds).toEqual([]);
@@ -98,6 +98,16 @@ describe("scoreComplianceAnswers", () => {
     expect(multiState.triggeredGapIds).toContain("gap-multistate");
     expect(multiState.score).toBeGreaterThan(otherState.score);
     expect(otherState.score).toBeGreaterThan(caOnly.score);
+  });
+
+  it("flags both the multi-state and primary-state-alignment gaps when multiple states exclude California", () => {
+    const multiStateNoCa = scoreComplianceAnswers({
+      ...CLEANEST,
+      states: "multi_state_no_ca",
+    });
+
+    expect(multiStateNoCa.triggeredGapIds).toContain("gap-multistate");
+    expect(multiStateNoCa.triggeredGapIds).toContain("gap-other-state");
   });
 
   it("never lets question 9 (HR support) move the answer set more than one grade band on its own", () => {

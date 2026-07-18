@@ -48,7 +48,8 @@ export const HEADCOUNT_POINTS: Record<HeadcountAnswer, number> = {
 export const STATES_POINTS: Record<StatesAnswer, number> = {
   california_only: 0,
   one_other_state: 2,
-  multi_state: 6,
+  multi_state_ca: 6,
+  multi_state_no_ca: 6,
 };
 
 export const CONTRACTOR_USE_POINTS: Record<ContractorUseAnswer, number> = {
@@ -206,6 +207,45 @@ export function scoreToGrade(score: number): RiskGrade {
 }
 
 /**
+ * Single source of truth for summing every question's points. Shared by
+ * lib/engine/index.ts (the full engine, which also attaches gap detail from
+ * data/gap-library.ts) and gradeAnswers() below (the client-safe,
+ * letter-grade-only path). Keeping the sum in exactly one place means the
+ * two can never silently drift apart as new questions are added.
+ */
+export function computeAnswersScore(answers: ComplianceAnswers): number {
+  return (
+    HEADCOUNT_POINTS[answers.headcount] +
+    STATES_POINTS[answers.states] +
+    CONTRACTOR_USE_POINTS[answers.contractorUse] +
+    SALARIED_CLASSIFICATION_POINTS[answers.salariedClassification] +
+    HANDBOOK_STATUS_POINTS[answers.handbookStatus] +
+    HARASSMENT_TRAINING_POINTS[answers.harassmentTraining] +
+    LEAVE_PROCESS_POINTS[answers.leaveProcess] +
+    NEW_HIRE_PAPERWORK_POINTS[answers.newHirePaperwork] +
+    WAGE_HOUR_POINTS[answers.wageHour] +
+    WORKERS_COMP_POINTS[answers.workersComp] +
+    HR_SUPPORT_POINTS[answers.hrSupport]
+  );
+}
+
+/**
+ * Client-safe grade compute for the gate teaser (components/EmailGateStep.tsx,
+ * wired from components/ComplianceCheckApp.tsx): shows the real letter grade
+ * before the visitor submits their email, without importing
+ * lib/engine/index.ts, which pulls in data/gap-library.ts's gated
+ * reportDiagnosis/scopeOfWork prose via getGapItem and would leak the full
+ * report content into the client bundle before the gate is cleared. This
+ * file imports only types and point records, never gap prose, so it is safe
+ * to import directly from a client component. Named categories, the verdict
+ * line, and the full report stay server-computed and gated behind submit,
+ * see lib/recommendation/index.ts buildOnPageResult.
+ */
+export function gradeAnswers(answers: ComplianceAnswers): RiskGrade {
+  return scoreToGrade(computeAnswersScore(answers));
+}
+
+/**
  * Maps each answer to zero or more gap-library item ids it triggers, and
  * the category that gap belongs to (for the on-page, named-category-only
  * view). Content for each id lives in data/gap-library.ts, this file only
@@ -273,8 +313,14 @@ export const ANSWER_GAP_TRIGGERS: {
   },
   {
     question: "states",
-    answer: "multi_state",
+    answer: "multi_state_ca",
     gapIds: ["gap-multistate"],
+    category: "Multi-State Compliance",
+  },
+  {
+    question: "states",
+    answer: "multi_state_no_ca",
+    gapIds: ["gap-other-state", "gap-multistate"],
     category: "Multi-State Compliance",
   },
   {

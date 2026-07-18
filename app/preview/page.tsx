@@ -69,7 +69,7 @@ const SCENARIOS: {
       "Golden master, expected score 17, grade B, driven by structure not practice gaps.",
     answers: {
       headcount: "50-149",
-      states: "multi_state",
+      states: "multi_state_ca",
       contractorUse: "some",
       salariedClassification: "mix",
       handbookStatus: "current",
@@ -86,7 +86,7 @@ const SCENARIOS: {
     description: "Every worst answer. Proves the ceiling grade is F.",
     answers: {
       headcount: "150+",
-      states: "multi_state",
+      states: "multi_state_ca",
       contractorUse: "mostly",
       salariedClassification: "all_salaried",
       handbookStatus: "none",

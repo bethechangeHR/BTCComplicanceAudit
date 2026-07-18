@@ -8,12 +8,12 @@
  */
 export function RiskAssessmentCTA() {
   return (
-    <div className="animate-rise-in space-y-2 border-t border-btc-teal/20 pt-8">
+    <div className="animate-rise-in space-y-2 border-t border-btc-teal/20 pt-8 text-center">
       <p className="font-display text-2xl text-ink sm:text-3xl">
         Want to know why these gaps exist?
       </p>
       <p className="text-sm text-btc-gray sm:text-base">
-        A free 30-minute HR risk assessment with be the change HR walks through
+        A free 30-minute HR risk assessment with Be the Change HR walks through
         exactly what is driving your score, and what closing each gap actually
         takes.
       </p>

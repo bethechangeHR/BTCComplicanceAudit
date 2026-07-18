@@ -8,18 +8,8 @@
 
 import {
   ANSWER_GAP_TRIGGERS,
-  CONTRACTOR_USE_POINTS,
-  HANDBOOK_STATUS_POINTS,
-  HARASSMENT_TRAINING_POINTS,
-  HEADCOUNT_POINTS,
-  HR_SUPPORT_POINTS,
-  LEAVE_PROCESS_POINTS,
   MAX_POSSIBLE_SCORE,
-  NEW_HIRE_PAPERWORK_POINTS,
-  SALARIED_CLASSIFICATION_POINTS,
-  STATES_POINTS,
-  WAGE_HOUR_POINTS,
-  WORKERS_COMP_POINTS,
+  computeAnswersScore,
   scoreToGrade,
 } from "@/data/scoring";
 import { getGapItem } from "@/data/gap-library";
@@ -35,22 +25,6 @@ const SEVERITY_RANK: Record<GapSeverity, number> = {
   medium: 2,
   low: 1,
 };
-
-function computeScore(answers: ComplianceAnswers): number {
-  return (
-    HEADCOUNT_POINTS[answers.headcount] +
-    STATES_POINTS[answers.states] +
-    CONTRACTOR_USE_POINTS[answers.contractorUse] +
-    SALARIED_CLASSIFICATION_POINTS[answers.salariedClassification] +
-    HANDBOOK_STATUS_POINTS[answers.handbookStatus] +
-    HARASSMENT_TRAINING_POINTS[answers.harassmentTraining] +
-    LEAVE_PROCESS_POINTS[answers.leaveProcess] +
-    NEW_HIRE_PAPERWORK_POINTS[answers.newHirePaperwork] +
-    WAGE_HOUR_POINTS[answers.wageHour] +
-    WORKERS_COMP_POINTS[answers.workersComp] +
-    HR_SUPPORT_POINTS[answers.hrSupport]
-  );
-}
 
 function computeTriggeredGapIds(answers: ComplianceAnswers): string[] {
   const ids: string[] = [];
@@ -99,7 +73,7 @@ function sortGapIdsBySeverityDescending(ids: string[]): string[] {
 export function scoreComplianceAnswers(
   answers: ComplianceAnswers,
 ): EngineResult {
-  const score = computeScore(answers);
+  const score = computeAnswersScore(answers);
   const triggeredGapIds = sortGapIdsBySeverityDescending(
     computeTriggeredGapIds(answers),
   );
