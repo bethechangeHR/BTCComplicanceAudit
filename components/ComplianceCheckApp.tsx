@@ -7,7 +7,7 @@ import { QuestionStep } from "./QuestionStep";
 import { EmailGateStep, type GateSubmission } from "./EmailGateStep";
 import { ResultView } from "./ResultView";
 import { QUESTIONS } from "@/data/questions";
-import { gradeAnswers } from "@/data/scoring";
+import { gradeAnswers, previewFlaggedCategoryCount } from "@/data/scoring";
 import type { ComplianceAnswers } from "@/lib/engine/types";
 import type { OnPageResult } from "@/lib/recommendation/types";
 import type { ChannelMode } from "@/channels/types";
@@ -201,10 +201,15 @@ export function ComplianceCheckApp({
           submitting={stage.name === "submitting"}
           onBack={stage.name === "gate" ? handleBack : undefined}
           // All 11 questions are answered by the time the gate renders, so
-          // this cast is safe. gradeAnswers() is the client-safe path (see
-          // data/scoring.ts), it never imports gap-library, so nothing
-          // gated leaks into the client bundle for this teaser.
+          // this cast is safe. gradeAnswers() and previewFlaggedCategoryCount()
+          // are both client-safe paths (see data/scoring.ts), neither imports
+          // gap-library, so nothing gated leaks into the client bundle for
+          // this teaser. The count makes the value of unlocking concrete;
+          // the category names themselves stay gated behind submit.
           grade={gradeAnswers(answers as ComplianceAnswers)}
+          flaggedCount={previewFlaggedCategoryCount(
+            answers as ComplianceAnswers,
+          )}
         />
       )}
 

@@ -366,3 +366,27 @@ export const ANSWER_GAP_TRIGGERS: {
     category: "Workers' Compensation",
   },
 ];
+
+/**
+ * Client-safe flagged-category count for the gate teaser
+ * (components/EmailGateStep.tsx), added 2026-07-18: counts distinct
+ * categories from ANSWER_GAP_TRIGGERS, the same dedup ANSWER_GAP_TRIGGERS
+ * drives in lib/engine/index.ts's computeCategoryRisks, but without
+ * importing data/gap-library.ts for severity or content. A count is safe to
+ * show pre-submit under CLAUDE.md's report philosophy (named categories are
+ * already the on-page tier, one step more specific than a bare count), but
+ * the category NAMES themselves stay gated behind submit, that is still the
+ * actual reward for giving an email. See lib/engine/goldenMaster.test.ts for
+ * proof this always agrees with the post-submit categoryRisks.length.
+ */
+export function previewFlaggedCategoryCount(
+  answers: ComplianceAnswers,
+): number {
+  const categories = new Set<GapCategory>();
+  for (const trigger of ANSWER_GAP_TRIGGERS) {
+    if (answers[trigger.question] === trigger.answer) {
+      categories.add(trigger.category);
+    }
+  }
+  return categories.size;
+}

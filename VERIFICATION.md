@@ -135,6 +135,34 @@ phone=...` alongside the existing UTM params.
   unaffected by this session (next.config.mjs was not touched, per the P3
   plan's explicit instruction not to route prefill through that redirect).
 
+**Same-session follow-up: gate value-proposition copy.** Noah asked for the
+gate to make clear WHY someone should fill out the form, with larger, more
+persuasive text. `data/scoring.ts` gained `previewFlaggedCategoryCount()`,
+built from `ANSWER_GAP_TRIGGERS` (already category-labeled) the same way as
+`gradeAnswers()`, never importing `data/gap-library.ts`. It reveals a COUNT
+of flagged categories pre-submit, not the category names themselves, which
+stay gated behind submit exactly as before, that is still the actual reward.
+`components/EmailGateStep.tsx` now shows this count on the compact
+`GradeBadge` and in a larger `font-display text-xl sm:text-2xl` headline
+("N risk areas are putting your business at risk right now" / "Your answers
+show a clean profile so far" when zero), with a shorter supporting line
+below it. `lib/engine/goldenMaster.test.ts` gained a
+`previewFlaggedCategoryCount` describe block asserting agreement with the
+engine's `categoryRisks.length` on every golden-master scenario (`npx vitest
+run` now 6 test files, 52 tests, all passed). Verified
+against the live client bundle (`next dev`, fetched `_next/static/chunks/app/page.js`
+directly): the new copy strings are present, and neither of the leak-guard
+sentinels ("ABC test", "Labor Code") appear anywhere in that bundle. Two
+unrelated string fragments did match a broader search ("scopeOfWork",
+"scope of work"): one was this session's own code comment describing the
+leak the client-safe path avoids (dev builds do not strip comments the way a
+minified production build does), the other was the pre-existing
+`REPORT_INTRO_COPY` marketing string ("the scope of work it would take to
+close them"), generic UX copy describing the report, not actual per-item
+gated content, and not reachable from the rendered `/` page before submit
+either way. `npx tsc --noEmit`, `npm run lint`, and `npx prettier --write` on
+the touched files were all re-run clean after this change.
+
 **Not done this session, still an open gate:** the mandatory real-device
 test in the actual Facebook and Instagram in-app browsers. This environment
 has no device lab or mobile browser access. Every P0 verification above

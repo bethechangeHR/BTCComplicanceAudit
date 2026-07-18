@@ -13,12 +13,37 @@ export interface GateSubmission {
   smsOptIn: boolean;
 }
 
+/**
+ * The "why fill this out" hook, added 2026-07-18. Leads with the specific
+ * consequence (how many risk areas were actually found) rather than a
+ * generic "see your results" line, per CLAUDE.md voice rules. flaggedCount
+ * comes from data/scoring.ts previewFlaggedCategoryCount(), a real computed
+ * number, never a manufactured one, see the file-level comment there for why
+ * this is safe to reveal pre-submit while the category names stay gated.
+ */
+function flaggedAreasHeadline(flaggedCount: number): string {
+  if (flaggedCount === 0) {
+    return "Your answers show a clean profile so far.";
+  }
+  return flaggedCount === 1
+    ? "1 risk area is putting your business at risk right now."
+    : `${flaggedCount} risk areas are putting your business at risk right now.`;
+}
+
+function flaggedAreasSubline(flaggedCount: number): string {
+  if (flaggedCount === 0) {
+    return "Enter your email to get your full report and confirm what's working.";
+  }
+  return "Enter your email to see exactly which ones, and what each one means for your business.";
+}
+
 export function EmailGateStep({
   onSubmit,
   submitting,
   error,
   onBack,
   grade,
+  flaggedCount,
 }: {
   onSubmit: (submission: GateSubmission) => void;
   submitting: boolean;
@@ -32,6 +57,13 @@ export function EmailGateStep({
    * or report text, those stay gated behind submit.
    */
   grade: RiskGrade;
+  /**
+   * Client-safe flagged-category count, computed by data/scoring.ts
+   * previewFlaggedCategoryCount(). Drives both the GradeBadge's flagged-count
+   * line and the headline below it. Never leaks which categories, only how
+   * many.
+   */
+  flaggedCount: number;
 }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -55,12 +87,17 @@ export function EmailGateStep({
       <GradeBadge
         grade={grade}
         riskTierLabel={RISK_TIER_LABELS[grade]}
+        flaggedCount={flaggedCount}
         compact
       />
-      <p className="text-sm text-btc-gray/80">
-        Enter your email to see the specific risk areas behind this grade and
-        get the full audit report sent to your inbox.
-      </p>
+      <div className="space-y-2">
+        <p className="font-display text-xl font-medium text-ink sm:text-2xl">
+          {flaggedAreasHeadline(flaggedCount)}
+        </p>
+        <p className="text-sm text-btc-gray/80 sm:text-base">
+          {flaggedAreasSubline(flaggedCount)}
+        </p>
+      </div>
       <form onSubmit={handleSubmit} className="space-y-4 text-left">
         <div>
           <label

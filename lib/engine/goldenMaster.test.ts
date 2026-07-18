@@ -21,7 +21,7 @@
 
 import { describe, expect, it } from "vitest";
 import { scoreComplianceAnswers } from "./index";
-import { gradeAnswers } from "@/data/scoring";
+import { gradeAnswers, previewFlaggedCategoryCount } from "@/data/scoring";
 import type { ComplianceAnswers } from "./types";
 
 describe("golden master: buildspec scenario 1", () => {
@@ -296,6 +296,76 @@ describe("gradeAnswers: client-safe grade path used for the gate teaser", () => 
   for (const [label, answers] of Object.entries(scenarios)) {
     it(`agrees with the engine grade for ${label}`, () => {
       expect(gradeAnswers(answers)).toBe(scoreComplianceAnswers(answers).grade);
+    });
+  }
+});
+
+describe("previewFlaggedCategoryCount: client-safe flagged-category count used for the gate teaser", () => {
+  // Same scenarios as above. components/EmailGateStep.tsx shows this count
+  // (added 2026-07-18) to make the value of unlocking the report concrete
+  // before the visitor submits their email, without naming which categories
+  // are flagged, that stays gated behind submit. Must always agree with the
+  // post-submit categoryRisks.length.
+  const scenarios: Record<string, ComplianceAnswers> = {
+    "buildspec scenario 1": {
+      headcount: "1-9",
+      states: "california_only",
+      contractorUse: "mostly",
+      salariedClassification: "hourly",
+      handbookStatus: "none",
+      harassmentTraining: "no",
+      leaveProcess: "no",
+      newHirePaperwork: "none",
+      wageHour: "none",
+      workersComp: "unsure",
+      hrSupport: "none",
+    },
+    "buildspec scenario 2": {
+      headcount: "10-49",
+      states: "california_only",
+      contractorUse: "none",
+      salariedClassification: "all_salaried",
+      handbookStatus: "stale",
+      harassmentTraining: "no",
+      leaveProcess: "yes",
+      newHirePaperwork: "partial",
+      wageHour: "partial",
+      workersComp: "yes",
+      hrSupport: "outside",
+    },
+    "buildspec scenario 3": {
+      headcount: "50-149",
+      states: "multi_state_ca",
+      contractorUse: "some",
+      salariedClassification: "mix",
+      handbookStatus: "current",
+      harassmentTraining: "yes",
+      leaveProcess: "yes",
+      newHirePaperwork: "complete",
+      wageHour: "complete",
+      workersComp: "yes",
+      hrSupport: "in_house",
+    },
+    "genuinely clean business": {
+      headcount: "1-9",
+      states: "california_only",
+      contractorUse: "none",
+      salariedClassification: "hourly",
+      handbookStatus: "current",
+      harassmentTraining: "yes",
+      leaveProcess: "yes",
+      newHirePaperwork: "complete",
+      wageHour: "complete",
+      workersComp: "yes",
+      hrSupport: "in_house",
+    },
+  };
+
+  for (const [label, answers] of Object.entries(scenarios)) {
+    it(`agrees with the engine's categoryRisks.length for ${label}`, () => {
+      expect(previewFlaggedCategoryCount(answers)).toBe(
+        scoreComplianceAnswers(answers).categoryRisks.length,
+      );
     });
   }
 });
