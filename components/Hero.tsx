@@ -11,6 +11,13 @@ import { HEADLINE_VARIANTS, type HeadlineVariant } from "@/lib/copy/headline";
  * costing a click, and without eating vertical space on every later
  * question (rendered only when stage.index === 0). Headline copy is now an
  * A/B seam, see lib/copy/headline.ts and app/page.tsx's ?v= param.
+ *
+ * Trimmed 2026-07-20 per Noah's direct feedback: the subline and fine-print
+ * trust line were cut so the title is the single apparent focal point. A
+ * small eyebrow label replaces them to name the tool ("what this is") so
+ * that context is not lost, keeping the above-the-fold read as tight as
+ * possible per the value-equation approach (maximize clarity, minimize
+ * friction before question 1).
  */
 export function Hero({
   headlineVariant,
@@ -20,7 +27,7 @@ export function Hero({
   const copy = HEADLINE_VARIANTS[headlineVariant];
 
   return (
-    <div className="animate-reveal-in mx-auto max-w-2xl space-y-5 text-center">
+    <div className="animate-reveal-in mx-auto max-w-2xl space-y-4 text-center">
       <Image
         src="/btc-logo-color.png"
         alt="Be the Change HR"
@@ -29,16 +36,12 @@ export function Hero({
         className="mx-auto h-auto w-28 sm:w-32"
         priority
       />
-      <div className="space-y-3">
-        <h1 className="text-balance font-display text-3xl font-medium text-ink sm:text-4xl">
-          {copy.headline}
-        </h1>
-        <p className="text-sm text-btc-gray sm:text-base">{copy.subline}</p>
-      </div>
-      <p className="text-xs text-btc-gray/60">
-        Built by California HR professionals. About 90 seconds, no cost, no
-        obligation.
+      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-btc-teal">
+        Free California HR Risk Audit
       </p>
+      <h1 className="text-balance font-display text-4xl font-medium text-ink sm:text-5xl">
+        {copy.headline}
+      </h1>
     </div>
   );
 }

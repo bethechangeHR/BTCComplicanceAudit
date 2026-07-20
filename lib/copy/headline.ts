@@ -16,7 +16,6 @@ export type HeadlineVariant = "control" | "dream";
 
 export interface HeadlineCopy {
   headline: string;
-  subline: string;
 }
 
 export const DEFAULT_HEADLINE_VARIANT: HeadlineVariant = "control";
@@ -25,14 +24,10 @@ export const HEADLINE_VARIANTS: Record<HeadlineVariant, HeadlineCopy> = {
   control: {
     headline:
       "The HR gaps exposing your California business, before they become a claim.",
-    subline:
-      "11 quick questions. A real A-F grade and the specific gaps putting you at risk right now.",
   },
   dream: {
     headline:
       "Know exactly where your California HR stands, in about 90 seconds.",
-    subline:
-      "11 quick questions. A real A-F grade, so you know what is solid and what needs a closer look.",
   },
 };
 

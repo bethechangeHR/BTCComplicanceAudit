@@ -179,8 +179,18 @@ export function ComplianceCheckApp({
     }
   }
 
+  // Top-align on the opening question so the eyebrow, title, progress bar,
+  // and all four answer options are visible together without scrolling
+  // (see CLAUDE.md revision, 2026-07-20). Every other stage keeps the
+  // original vertical centering.
+  const isOpeningQuestion = stage.name === "question" && stage.index === 0;
+
   return (
-    <div className="mx-auto flex min-h-screen max-w-2xl flex-col justify-center px-6 py-8 sm:py-16">
+    <div
+      className={`mx-auto flex min-h-screen max-w-2xl flex-col px-6 py-8 sm:py-16 ${
+        isOpeningQuestion ? "justify-start pt-12 sm:pt-20" : "justify-center"
+      }`}
+    >
       {stage.name === "question" && QUESTIONS[stage.index] && (
         <div className="space-y-6 sm:space-y-8">
           {stage.index === 0 && <Hero headlineVariant={headlineVariant} />}
