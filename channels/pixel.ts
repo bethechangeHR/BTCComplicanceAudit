@@ -42,6 +42,26 @@ export function getMetaPixelId(): string | undefined {
 }
 
 /**
+ * Hostnames the Pixel base snippet is allowed to fire on. Every other host
+ * (Vercel preview/dev URLs like *.vercel.app, localhost) is blocked so dev
+ * traffic and preview-URL bot hits never pollute the production dataset.
+ * Added 2026-07-21 after the dev domain btc-complicance-audit.vercel.app was
+ * found firing PageView into the live pixel (a ~232-event bot burst inflated
+ * the landing denominator). Comma-separated override via
+ * NEXT_PUBLIC_PIXEL_ALLOWED_HOSTS, defaults to the production audit host.
+ * An empty allowlist means "no host restriction" (fires everywhere), so the
+ * default is never empty.
+ */
+export function getPixelAllowedHosts(): string[] {
+  const raw = process.env.NEXT_PUBLIC_PIXEL_ALLOWED_HOSTS;
+  if (!raw) return ["audit.bethechangehr.com"];
+  return raw
+    .split(",")
+    .map((host) => host.trim())
+    .filter(Boolean);
+}
+
+/**
  * Builds a v4-shaped UUID from crypto.getRandomValues, for runtimes that
  * have the Web Crypto API but not the newer randomUUID() convenience method
  * (older WebView builds in particular). Sets the version (4) and variant

@@ -40,6 +40,30 @@ export interface ToolViewedPayload {
   mode: ChannelMode;
   timestamp: string;
   fbclid?: string;
+  // userAgent added 2026-07-21 so the load signal can be segmented by device
+  // server-side. tool_viewed fires on mount (Q1 render), so comparing
+  // tool_viewed vs tool_start counts by device is the crash-vs-motivation
+  // discriminator: a device class that loads but never starts is the frozen
+  // in-app-browser fingerprint (see channels/pixel.ts). Captured server-side
+  // in app/api/track, never trusted from the client.
+  userAgent?: string;
+}
+
+/**
+ * client_error. Fires from components/ClientErrorBeacon.tsx when a global
+ * window error or unhandled promise rejection is caught on the tool page.
+ * Added 2026-07-21 as the server-visible half of crash detection: a frozen
+ * in-app WebView can swallow a browser-only signal, so app/api/client-error
+ * logs this server-side (Vercel logs) regardless of webhook config. This is
+ * the exact failure class that once took a campaign from 223 landing views
+ * to 0 ToolStart (see channels/pixel.ts). No PII.
+ */
+export interface ClientErrorPayload {
+  message: string;
+  source?: string;
+  url?: string;
+  userAgent?: string;
+  timestamp: string;
 }
 
 /**

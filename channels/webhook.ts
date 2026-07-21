@@ -12,6 +12,7 @@
  */
 
 import type {
+  ClientErrorPayload,
   SubmitPayload,
   ToolStartPayload,
   ToolViewedPayload,
@@ -71,4 +72,16 @@ export async function fireToolStartWebhook(
   payload: ToolStartPayload,
 ): Promise<WebhookResult> {
   return postEvent("tool_start", { ...payload });
+}
+
+/**
+ * client_error, added 2026-07-21. Best-effort record of a caught client-side
+ * error on the tool page. The route (app/api/client-error) already logs it
+ * to the server console so it is visible in Vercel logs even when no webhook
+ * URL is configured, so a failed send here is non-fatal by design.
+ */
+export async function fireClientErrorWebhook(
+  payload: ClientErrorPayload,
+): Promise<WebhookResult> {
+  return postEvent("client_error", { ...payload });
 }

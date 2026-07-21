@@ -6,6 +6,7 @@ import { ProgressTrail } from "./ProgressTrail";
 import { QuestionStep } from "./QuestionStep";
 import { EmailGateStep, type GateSubmission } from "./EmailGateStep";
 import { ResultView } from "./ResultView";
+import { ClientErrorBeacon } from "./ClientErrorBeacon";
 import { QUESTIONS } from "@/data/questions";
 import { gradeAnswers, previewFlaggedCategoryCount } from "@/data/scoring";
 import type { ComplianceAnswers } from "@/lib/engine/types";
@@ -52,6 +53,27 @@ export function ComplianceCheckApp({
     // Fire once per page load only.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Per-question funnel instrumentation, added 2026-07-21. Fires a ToolStep
+  // Pixel event as each question renders so Meta Events Manager shows which
+  // question people abandon on (there was previously no per-step signal
+  // between ToolStart and Lead). Client-only, like ToolComplete: it is a
+  // diagnostic funnel event, not an optimization event, so it needs no CAPI
+  // twin. Guarded so a tracking failure can never affect the question flow.
+  const currentStepIndex = stage.name === "question" ? stage.index : -1;
+  useEffect(() => {
+    if (currentStepIndex < 0) return;
+    const question = QUESTIONS[currentStepIndex];
+    if (!question) return;
+    try {
+      trackPixelEvent("ToolStep", {
+        step_number: currentStepIndex + 1,
+        step_key: question.key,
+      });
+    } catch {
+      // Never let a tracking failure affect the question flow.
+    }
+  }, [currentStepIndex]);
 
   function handleBack() {
     if (stage.name === "question" && stage.index > 0) {
@@ -186,57 +208,60 @@ export function ComplianceCheckApp({
   const isOpeningQuestion = stage.name === "question" && stage.index === 0;
 
   return (
-    <div
-      className={`mx-auto flex min-h-screen max-w-2xl flex-col px-6 py-8 sm:py-16 ${
-        isOpeningQuestion ? "justify-start pt-12 sm:pt-20" : "justify-center"
-      }`}
-    >
-      {stage.name === "question" && QUESTIONS[stage.index] && (
-        <div className="space-y-6 sm:space-y-8">
-          {stage.index === 0 && <Hero headlineVariant={headlineVariant} />}
-          <div className="space-y-6 sm:space-y-10">
-            <ProgressTrail step={stage.index + 1} total={QUESTIONS.length} />
-            <QuestionStep
-              question={QUESTIONS[stage.index]!}
-              onAnswer={handleAnswer}
-              onBack={stage.index > 0 ? handleBack : undefined}
-            />
+    <>
+      <ClientErrorBeacon />
+      <div
+        className={`mx-auto flex min-h-screen max-w-2xl flex-col px-6 py-8 sm:py-16 ${
+          isOpeningQuestion ? "justify-start pt-12 sm:pt-20" : "justify-center"
+        }`}
+      >
+        {stage.name === "question" && QUESTIONS[stage.index] && (
+          <div className="space-y-6 sm:space-y-8">
+            {stage.index === 0 && <Hero headlineVariant={headlineVariant} />}
+            <div className="space-y-6 sm:space-y-10">
+              <ProgressTrail step={stage.index + 1} total={QUESTIONS.length} />
+              <QuestionStep
+                question={QUESTIONS[stage.index]!}
+                onAnswer={handleAnswer}
+                onBack={stage.index > 0 ? handleBack : undefined}
+              />
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {(stage.name === "gate" || stage.name === "submitting") && (
-        <EmailGateStep
-          onSubmit={handleGateSubmit}
-          submitting={stage.name === "submitting"}
-          onBack={stage.name === "gate" ? handleBack : undefined}
-          // All 11 questions are answered by the time the gate renders, so
-          // this cast is safe. gradeAnswers() and previewFlaggedCategoryCount()
-          // are both client-safe paths (see data/scoring.ts), neither imports
-          // gap-library, so nothing gated leaks into the client bundle for
-          // this teaser. The count makes the value of unlocking concrete;
-          // the category names themselves stay gated behind submit.
-          grade={gradeAnswers(answers as ComplianceAnswers)}
-          flaggedCount={previewFlaggedCategoryCount(
-            answers as ComplianceAnswers,
-          )}
-        />
-      )}
+        {(stage.name === "gate" || stage.name === "submitting") && (
+          <EmailGateStep
+            onSubmit={handleGateSubmit}
+            submitting={stage.name === "submitting"}
+            onBack={stage.name === "gate" ? handleBack : undefined}
+            // All 11 questions are answered by the time the gate renders, so
+            // this cast is safe. gradeAnswers() and previewFlaggedCategoryCount()
+            // are both client-safe paths (see data/scoring.ts), neither imports
+            // gap-library, so nothing gated leaks into the client bundle for
+            // this teaser. The count makes the value of unlocking concrete;
+            // the category names themselves stay gated behind submit.
+            grade={gradeAnswers(answers as ComplianceAnswers)}
+            flaggedCount={previewFlaggedCategoryCount(
+              answers as ComplianceAnswers,
+            )}
+          />
+        )}
 
-      {stage.name === "result" && <ResultView result={stage.onPageResult} />}
+        {stage.name === "result" && <ResultView result={stage.onPageResult} />}
 
-      {stage.name === "error" && (
-        <div className="mx-auto max-w-md space-y-4 text-center">
-          <p className="text-sm text-[#b3452f]">{stage.message}</p>
-          <button
-            type="button"
-            onClick={() => setStage({ name: "gate" })}
-            className="rounded-lg bg-btc-teal px-6 py-3 text-sm font-semibold text-white"
-          >
-            Try again
-          </button>
-        </div>
-      )}
-    </div>
+        {stage.name === "error" && (
+          <div className="mx-auto max-w-md space-y-4 text-center">
+            <p className="text-sm text-[#b3452f]">{stage.message}</p>
+            <button
+              type="button"
+              onClick={() => setStage({ name: "gate" })}
+              className="rounded-lg bg-btc-teal px-6 py-3 text-sm font-semibold text-white"
+            >
+              Try again
+            </button>
+          </div>
+        )}
+      </div>
+    </>
   );
 }

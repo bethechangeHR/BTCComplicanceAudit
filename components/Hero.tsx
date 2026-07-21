@@ -42,6 +42,11 @@ export function Hero({
       <h1 className="text-balance font-display text-4xl font-medium text-ink sm:text-5xl">
         {copy.headline}
       </h1>
+      {copy.subline && (
+        <p className="text-balance text-base text-btc-gray sm:text-lg">
+          {copy.subline}
+        </p>
+      )}
     </div>
   );
 }

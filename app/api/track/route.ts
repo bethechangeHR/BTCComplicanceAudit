@@ -18,11 +18,16 @@ export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => ({}));
   const mode: ChannelMode = body.mode === "email" ? "email" : "paid";
   const fbclid = typeof body.fbclid === "string" ? body.fbclid : undefined;
+  // Captured server-side (never trust a client-reported UA) so the load
+  // signal can be segmented by device, the crash-vs-motivation discriminator,
+  // added 2026-07-21. See channels/types.ts ToolViewedPayload.
+  const userAgent = request.headers.get("user-agent") ?? undefined;
 
   const result = await fireToolViewedWebhook({
     mode,
     timestamp: new Date().toISOString(),
     fbclid,
+    userAgent,
   });
 
   return NextResponse.json({ ok: true, sent: result.sent });
