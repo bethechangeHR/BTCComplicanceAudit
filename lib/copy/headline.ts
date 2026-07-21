@@ -12,16 +12,16 @@
  * no pricing, no company-specific legal claim.
  */
 
-export type HeadlineVariant = "control" | "dream" | "payoff";
+export type HeadlineVariant = "control" | "dream";
 
 export interface HeadlineCopy {
   headline: string;
-  // Optional supporting line under the headline. Only the "payoff" variant
-  // sets it (added 2026-07-21). The 2026-07-20 design pass cut the standing
-  // subline so the headline is the single focal point; this reintroduces a
-  // single short payoff-plus-time line ONLY for the A/B variant that tests
-  // whether stating the deal on Q1 lifts the load-to-ToolStart rate. Control
-  // stays exactly as Noah left it, so control vs payoff isolates the subline.
+  // Optional supporting line under the headline. Reinstated on control
+  // 2026-07-21 per Noah: the 2026-07-20 pass cut the standing subline for
+  // focus, but the Q1 load-to-ToolStart drop needs the payoff stated on the
+  // question itself. There is no ad budget for an A/B test, so it ships to all
+  // traffic (no ?v=payoff variant). Kept optional so a future variant can omit
+  // it.
   subline?: string;
 }
 
@@ -31,16 +31,12 @@ export const HEADLINE_VARIANTS: Record<HeadlineVariant, HeadlineCopy> = {
   control: {
     headline:
       "The HR gaps exposing your California business, before they become a claim.",
+    subline:
+      "See all your HR gaps that can turn into real problems, in a few questions.",
   },
   dream: {
     headline:
       "Know exactly where your California HR stands, in about 90 seconds.",
-  },
-  payoff: {
-    headline:
-      "The HR gaps exposing your California business, before they become a claim.",
-    subline:
-      "See all your HR gaps that can turn into real problems, in a few questions.",
   },
 };
 
@@ -48,6 +44,5 @@ export function resolveHeadlineVariant(
   value: string | undefined,
 ): HeadlineVariant {
   if (value === "dream") return "dream";
-  if (value === "payoff") return "payoff";
   return DEFAULT_HEADLINE_VARIANT;
 }
